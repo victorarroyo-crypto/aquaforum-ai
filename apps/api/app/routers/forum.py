@@ -152,3 +152,28 @@ async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
         )
     finally:
         _running_sessions.discard(session_id)
+
+
+@router.get("/{session_id}/audio/{message_id}")
+async def get_message_audio(session_id: str, message_id: str):
+    """Generate audio for a specific message on demand."""
+    from app.services import supabase_client as db
+    from app.services.tts import generate_speech
+
+    # Check if already generated
+    result = db.get_supabase().table("forum_messages").select("metadata,content,agent_name").eq("id", message_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    msg = result.data[0]
+    existing_url = msg.get("metadata", {}).get("audio_url")
+    if existing_url:
+        return {"audio_url": existing_url}
+
+    # Generate audio
+    audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
+    if audio_url:
+        await db.update_message_metadata(message_id, {"audio_url": audio_url})
+        return {"audio_url": audio_url}
+
+    raise HTTPException(status_code=500, detail="Audio generation failed")

@@ -77,6 +77,7 @@ export const api = {
     request<{ report_id: string; content: string }>(`/forum/${sessionId}/export`, {
       method: "POST",
     }),
+
+  getMessageAudio: (sessionId: string, messageId: string) =>
+    request<{ audio_url: string }>(`/forum/${sessionId}/audio/${messageId}`),
 };
-// build trigger 1774214774
-// 1774216809

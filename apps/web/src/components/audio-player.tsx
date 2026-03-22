@@ -1,87 +1,86 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX, SkipForward } from "lucide-react";
 import type { ForumMessage } from "@/lib/api";
+import { api } from "@/lib/api";
 
 function initials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-interface AudioPlayerProps {
+export function AudioPlayer({
+  messages,
+  onRevealUpTo,
+}: {
   messages: ForumMessage[];
-  onRevealUpTo: (count: number) => void; // tells parent how many messages to show
-}
-
-export function AudioPlayer({ messages, onRevealUpTo }: AudioPlayerProps) {
+  onRevealUpTo: (n: number) => void;
+}) {
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [agent, setAgent] = useState<string | null>(null);
   const [color, setColor] = useState("#14B8A6");
 
   const audio = useRef<HTMLAudioElement | null>(null);
-  const currentIdx = useRef(0); // index of message currently playing / next to play
+  const idx = useRef(0);
   const isMuted = useRef(true);
 
-  useEffect(() => { isMuted.current = muted; }, [muted]);
-
-  // When muted, reveal all messages immediately
   useEffect(() => {
-    if (muted) {
-      onRevealUpTo(messages.length);
-    }
+    isMuted.current = muted;
+  }, [muted]);
+
+  // When muted, show all messages
+  useEffect(() => {
+    if (muted) onRevealUpTo(messages.length);
   }, [muted, messages.length, onRevealUpTo]);
 
-  // When new messages arrive and we're unmuted, start playing if idle
+  // When new messages arrive and unmuted, start if idle
   useEffect(() => {
-    if (!isMuted.current && currentIdx.current < messages.length && !playing) {
-      playMessage(currentIdx.current);
+    if (!isMuted.current && idx.current < messages.length && !playing) {
+      play(idx.current);
     }
   }, [messages.length]);
 
-  const playMessage = useCallback((idx: number) => {
-    if (idx >= messages.length || isMuted.current) {
+  async function play(i: number) {
+    if (i >= messages.length || isMuted.current) {
       setPlaying(false);
       setAgent(null);
       return;
     }
 
-    const msg = messages[idx];
-    const url = msg.metadata?.audio_url as string | undefined;
-
-    // Reveal this message on screen
-    onRevealUpTo(idx + 1);
-    currentIdx.current = idx;
-
+    const msg = messages[i];
+    onRevealUpTo(i + 1);
+    idx.current = i;
     setAgent(msg.agent_name);
     setColor((msg.metadata?.color as string) || "#14B8A6");
     setPlaying(true);
 
-    if (url) {
-      // Play audio from URL
+    try {
+      // Request audio from backend (generates on demand if needed)
+      const { audio_url } = await api.getMessageAudio(msg.session_id, msg.id);
+
       stopAudio();
-      const a = new Audio(url);
+      const a = new Audio(audio_url);
       audio.current = a;
       a.onended = () => {
-        currentIdx.current = idx + 1;
-        setTimeout(() => playMessage(idx + 1), 600);
+        idx.current = i + 1;
+        setTimeout(() => play(i + 1), 600);
       };
       a.onerror = () => {
-        currentIdx.current = idx + 1;
-        setTimeout(() => playMessage(idx + 1), 200);
+        idx.current = i + 1;
+        setTimeout(() => play(i + 1), 200);
       };
       a.play().catch(() => {
-        // Autoplay blocked — reveal message anyway, move to next
-        currentIdx.current = idx + 1;
-        setTimeout(() => playMessage(idx + 1), 1000);
+        idx.current = i + 1;
+        setTimeout(() => play(i + 1), 1000);
       });
-    } else {
-      // No audio — show message and move to next after a pause
-      currentIdx.current = idx + 1;
-      setTimeout(() => playMessage(idx + 1), 2000);
+    } catch {
+      // API failed — skip to next message after pause
+      idx.current = i + 1;
+      setTimeout(() => play(i + 1), 2000);
     }
-  }, [messages, onRevealUpTo]);
+  }
 
   function stopAudio() {
     if (audio.current) {
@@ -95,41 +94,39 @@ export function AudioPlayer({ messages, onRevealUpTo }: AudioPlayerProps) {
     const nowMuted = !muted;
     setMuted(nowMuted);
     isMuted.current = nowMuted;
-
     if (nowMuted) {
       stopAudio();
       setPlaying(false);
       setAgent(null);
-      // Show all messages
       onRevealUpTo(messages.length);
-    } else {
-      // Start from first unplayed message
-      if (currentIdx.current < messages.length) {
-        playMessage(currentIdx.current);
-      }
+    } else if (idx.current < messages.length) {
+      play(idx.current);
     }
   }
 
   function skip() {
     stopAudio();
-    const next = currentIdx.current + 1;
-    currentIdx.current = next;
+    const next = idx.current + 1;
+    idx.current = next;
     onRevealUpTo(next);
-    playMessage(next);
+    play(next);
   }
-
-  const pending = messages.length - currentIdx.current;
-  const hasAudio = messages.some((m) => m.metadata?.audio_url);
 
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 border-t border-[rgba(255,255,255,0.06)] bg-[#111113]">
       <button
         onClick={toggle}
         className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
-          muted ? "bg-[#27272A] text-[#52525B]" : "bg-[rgba(20,184,166,0.15)] text-[#14B8A6]"
+          muted
+            ? "bg-[#27272A] text-[#52525B]"
+            : "bg-[rgba(20,184,166,0.15)] text-[#14B8A6]"
         }`}
       >
-        {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        {muted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
       </button>
 
       {playing && agent ? (
@@ -142,35 +139,43 @@ export function AudioPlayer({ messages, onRevealUpTo }: AudioPlayerProps) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-[13px] font-semibold text-[#FAFAFA]">{agent}</span>
+              <span className="text-[13px] font-semibold text-[#FAFAFA]">
+                {agent}
+              </span>
               <span className="text-[11px] text-[#52525B]">hablando</span>
             </div>
             <div className="flex items-end gap-[2px] h-3 mt-1">
               {Array.from({ length: 14 }).map((_, i) => (
                 <motion.div
                   key={i}
-                  animate={{ height: [2, 5 + Math.random() * 7, 2] }}
-                  transition={{ duration: 0.25 + Math.random() * 0.25, repeat: Infinity, repeatType: "reverse", delay: i * 0.03 }}
+                  animate={{
+                    height: [2, 5 + Math.random() * 7, 2],
+                  }}
+                  transition={{
+                    duration: 0.25 + Math.random() * 0.25,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    delay: i * 0.03,
+                  }}
                   className="w-[2.5px] rounded-full bg-[#14B8A6]"
                   style={{ minHeight: 2 }}
                 />
               ))}
             </div>
           </div>
-          <button onClick={skip} className="p-1.5 text-[#52525B] hover:text-[#FAFAFA] transition-colors">
+          <button
+            onClick={skip}
+            className="p-1.5 text-[#52525B] hover:text-[#FAFAFA] transition-colors"
+          >
             <SkipForward className="h-4 w-4" />
           </button>
         </div>
       ) : (
         <span className="flex-1 text-[12px] text-[#3F3F46]">
           {muted
-            ? hasAudio ? "Pulsa 🔊 para escuchar el debate" : "Audio disponible cuando inicie el debate"
-            : pending > 0 ? "Preparando..." : "Esperando intervenciones..."}
+            ? "Pulsa 🔊 para escuchar el debate"
+            : "Esperando intervenciones..."}
         </span>
-      )}
-
-      {pending > 0 && !muted && (
-        <span className="text-[10px] text-[#52525B] bg-[#18181B] px-2 py-1 rounded-full">{pending}</span>
       )}
     </div>
   );
