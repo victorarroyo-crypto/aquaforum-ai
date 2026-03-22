@@ -62,6 +62,13 @@ async def _update_pipeline(session_id: str, node: str):
 
 
 async def _persist_message(session_id: str, msg: ForumMessage) -> str:
+    # Generate audio for this message
+    from app.services.tts import generate_speech
+    audio_b64 = await generate_speech(msg["content"], msg["agent_name"])
+    metadata = msg.get("metadata", {})
+    if audio_b64:
+        metadata["audio_b64"] = audio_b64
+
     return await db.add_message(
         session_id=session_id,
         agent_name=msg["agent_name"],
@@ -70,7 +77,7 @@ async def _persist_message(session_id: str, msg: ForumMessage) -> str:
         message_type=msg["message_type"],
         round_number=msg["round_number"],
         turn_number=msg["turn_number"],
-        metadata=msg.get("metadata", {}),
+        metadata=metadata,
     )
 
 

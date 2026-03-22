@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 import type { ForumMessage } from "@/lib/api";
 
 const borderColorMap: Record<string, string> = {
@@ -38,6 +40,29 @@ export function MessageBubble({ message, color }: MessageBubbleProps) {
   const borderColor = borderColorMap[message.message_type] || "#52525B";
   const bgTint = bgTintMap[message.message_type] || "transparent";
   const isModeration = message.message_type === "moderation" || message.message_type === "summary";
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [hasAudio] = useState(() => !!(message.metadata?.audio_b64));
+
+  // Auto-play audio when message first appears
+  useEffect(() => {
+    const audio_b64 = message.metadata?.audio_b64 as string | undefined;
+    if (!audio_b64) return;
+    const audio = new Audio(`data:audio/mpeg;base64,${audio_b64}`);
+    audioRef.current = audio;
+    audio.onplay = () => setPlaying(true);
+    audio.onended = () => setPlaying(false);
+    audio.onpause = () => setPlaying(false);
+    // Auto-play (may be blocked by browser)
+    audio.play().catch(() => {});
+    return () => { audio.pause(); audio.src = ""; };
+  }, [message.id]);
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+    if (playing) { audioRef.current.pause(); }
+    else { audioRef.current.currentTime = 0; audioRef.current.play().catch(() => {}); }
+  };
 
   if (isModeration) {
     return (
@@ -100,6 +125,19 @@ export function MessageBubble({ message, color }: MessageBubbleProps) {
                 second: "2-digit",
               })}
             </span>
+            {hasAudio && (
+              <button
+                onClick={toggleAudio}
+                className={`ml-auto flex items-center gap-1 px-2 py-0.5 rounded text-[10px] transition-colors ${
+                  playing
+                    ? "text-[#14B8A6] bg-[rgba(20,184,166,0.1)]"
+                    : "text-[#52525B] hover:text-[#A1A1AA]"
+                }`}
+              >
+                {playing ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+                {playing ? "Reproduciendo" : "Escuchar"}
+              </button>
+            )}
           </div>
         </div>
       </div>
