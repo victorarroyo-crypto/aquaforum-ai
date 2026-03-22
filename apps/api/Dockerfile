@@ -1,5 +1,6 @@
 FROM python:3.12-slim
 
+# cache-bust: v3
 WORKDIR /app
 
 # Copy dependency file and install
