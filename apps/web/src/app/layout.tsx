@@ -7,7 +7,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "AquaForum AI",
-  description: "La IA ya nos supera. ¿Y el agua? Un experimento donde agentes de IA debaten sobre su propio impacto en el recurso más esencial de la humanidad.",
+  description: "La IA ya nos supera. ¿Y el agua?",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
