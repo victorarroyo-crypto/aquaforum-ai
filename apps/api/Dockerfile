@@ -1,6 +1,5 @@
 FROM python:3.12-slim
 
-# cache-bust: v3
 WORKDIR /app
 
 # Copy dependency file and install
@@ -10,5 +9,5 @@ RUN pip install --no-cache-dir .
 # Copy application code
 COPY apps/api/app/ ./app/
 
-# Use shell form so $PORT expands at runtime
-CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Let Python read PORT from env at runtime
+CMD ["python", "-c", "import os, uvicorn; uvicorn.run('app.main:app', host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))"]
