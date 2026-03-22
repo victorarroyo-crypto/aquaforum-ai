@@ -21,9 +21,16 @@ VOICE_MAP = {
 DEFAULT_VOICE = "CwhRBWXzGAHq8TQ4Fs17"  # Roger
 
 
+def _get_api_key() -> str:
+    """Get ElevenLabs API key from settings or env."""
+    import os
+    return settings.elevenlabs_api_key or os.environ.get("ELEVENLABS_API_KEY", "")
+
+
 async def generate_speech(text: str, agent_name: str) -> str | None:
     """Generate speech audio for a message. Returns base64-encoded mp3 or None."""
-    if not settings.elevenlabs_api_key:
+    api_key = _get_api_key()
+    if not api_key:
         return None
 
     voice_id = VOICE_MAP.get(agent_name, DEFAULT_VOICE)
@@ -36,7 +43,7 @@ async def generate_speech(text: str, agent_name: str) -> str | None:
             response = await client.post(
                 f"{ELEVENLABS_API}/text-to-speech/{voice_id}",
                 headers={
-                    "xi-api-key": settings.elevenlabs_api_key,
+                    "xi-api-key": api_key,
                     "Content-Type": "application/json",
                 },
                 json={

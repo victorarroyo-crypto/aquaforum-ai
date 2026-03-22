@@ -23,9 +23,12 @@ app.include_router(forum.router, prefix="/forum", tags=["forum"])
 
 @app.get("/health")
 async def health():
+    import os
+    env_key = os.environ.get("ELEVENLABS_API_KEY", "")
     return {
         "status": "ok",
         "service": "aquaforum-api",
-        "tts": "configured" if settings.elevenlabs_api_key else "not_configured",
-        "tts_key_prefix": settings.elevenlabs_api_key[:8] + "..." if settings.elevenlabs_api_key else "empty",
+        "tts_settings": "yes" if settings.elevenlabs_api_key else "no",
+        "tts_env": "yes" if env_key else "no",
+        "tts_env_prefix": env_key[:8] + "..." if env_key else "empty",
     }
