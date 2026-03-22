@@ -1,33 +1,31 @@
-"""Chatterbox TTS via HuggingFace Spaces — free, high quality.
+"""ElevenLabs TTS — paid plan, production quality.
 
-Flow: text → Chatterbox Space (Gradio API) → WAV → Supabase Storage → public URL
-Each panelist gets distinct voice via different seed + exaggeration values."""
+Each panelist has a unique voice. Audio uploaded to Supabase Storage."""
 
 import httpx
-import json
 import os
+import re
 import uuid
 from app.config import settings
 
-CHATTERBOX_URL = "https://resembleai-chatterbox.hf.space/gradio_api"
+ELEVENLABS_API = "https://api.elevenlabs.io/v1"
 
-# Each panelist gets a unique seed + exaggeration for distinct voice
-VOICE_PARAMS: dict[str, dict] = {
-    "Elena Vásquez":       {"seed": 42,  "exaggeration": 0.4, "temperature": 0.9, "cfg_pace": 0.5},
-    "Marcus Chen":         {"seed": 137, "exaggeration": 0.3, "temperature": 0.85, "cfg_pace": 0.6},
-    "Sofia Andersen":      {"seed": 256, "exaggeration": 0.5, "temperature": 0.95, "cfg_pace": 0.45},
-    "Ahmed Al-Rashid":     {"seed": 789, "exaggeration": 0.35, "temperature": 0.88, "cfg_pace": 0.55},
-    "Dr. Ingrid Hoffmann": {"seed": 512, "exaggeration": 0.45, "temperature": 0.92, "cfg_pace": 0.5},
-    "James Okafor":        {"seed": 333, "exaggeration": 0.3, "temperature": 0.87, "cfg_pace": 0.6},
-    "Moderador":           {"seed": 100, "exaggeration": 0.25, "temperature": 0.8, "cfg_pace": 0.5},
-    "Integrador":          {"seed": 200, "exaggeration": 0.3, "temperature": 0.85, "cfg_pace": 0.5},
+VOICE_MAP = {
+    "Elena Vásquez":       "EXAVITQu4vr4xnSDxMaL",   # Sarah
+    "Marcus Chen":         "onwK4e9ZLuTAKqWW03F9",    # Daniel
+    "Sofia Andersen":      "Xb7hH8MSUJpSbSDYk0k2",    # Alice
+    "Ahmed Al-Rashid":     "JBFqnCBsd6RMkjVDRZzb",    # George
+    "Dr. Ingrid Hoffmann": "XrExE9yKIg1WjnnlVkGX",    # Matilda
+    "James Okafor":        "nPczCjzI2devNBz1zQrb",    # Brian
+    "Moderador":           "CwhRBWXzGAHq8TQ4Fs17",    # Roger
+    "Integrador":          "cjVigY5qzO86Huf0OWal",    # Eric
 }
 
-DEFAULT_PARAMS = {"seed": 42, "exaggeration": 0.4, "temperature": 0.9, "cfg_pace": 0.5}
+DEFAULT_VOICE = "CwhRBWXzGAHq8TQ4Fs17"
 
 
-def _get_hf_token() -> str:
-    return os.environ.get("HF_TOKEN", "") or os.environ.get("HUGGINGFACE_TOKEN", "")
+def _get_el_key() -> str:
+    return settings.elevenlabs_api_key or os.environ.get("ELEVENLABS_API_KEY", "")
 
 
 def _get_supabase_jwt() -> str:
@@ -39,132 +37,84 @@ def _get_supabase_jwt() -> str:
 
 
 async def generate_speech(text: str, agent_name: str, session_id: str) -> str | None:
-    """Generate speech via Chatterbox, upload to Supabase Storage, return URL."""
-    hf_token = _get_hf_token()
+    """Generate speech via ElevenLabs, upload to Supabase Storage, return public URL."""
+    api_key = _get_el_key()
+    if not api_key:
+        return None
 
-    # Clean text for TTS
-    import re
+    voice_id = VOICE_MAP.get(agent_name, DEFAULT_VOICE)
+
+    # Clean text
     clean = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)
     clean = re.sub(r'\[CHALLENGE:[^\]]+\]', '', clean)
     clean = re.sub(r'#{1,3}\s', '', clean)
-    # Remove labels that Claude sometimes adds
     clean = re.sub(r'^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*', '', clean, flags=re.IGNORECASE)
-    clean = clean.strip()[:300]  # Chatterbox max 300 chars
+    clean = clean.strip()
 
     if len(clean) < 5:
         return None
 
-    params = VOICE_PARAMS.get(agent_name, DEFAULT_PARAMS)
-    headers = {"Content-Type": "application/json"}
-    if hf_token:
-        headers["Authorization"] = f"Bearer {hf_token}"
-
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            # Step 1: Submit job
-            resp = await client.post(
-                f"{CHATTERBOX_URL}/call/generate_tts_audio",
-                headers=headers,
+        # Generate audio — stream for lower latency
+        audio_chunks: list[bytes] = []
+        async with httpx.AsyncClient(timeout=45.0) as client:
+            async with client.stream(
+                "POST",
+                f"{ELEVENLABS_API}/text-to-speech/{voice_id}/stream",
+                headers={"xi-api-key": api_key, "Content-Type": "application/json"},
+                params={"output_format": "mp3_44100_128", "optimize_streaming_latency": "3"},
                 json={
-                    "data": [
-                        clean,
-                        None,  # reference audio
-                        params["exaggeration"],
-                        params["temperature"],
-                        params["seed"],
-                        params["cfg_pace"],
-                        False,  # VAD trimming
-                    ]
+                    "text": clean,
+                    "model_id": "eleven_multilingual_v2",
+                    "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "style": 0.3},
                 },
-            )
+            ) as resp:
+                if resp.status_code != 200:
+                    body = await resp.aread()
+                    print(f"TTS ElevenLabs error {resp.status_code}: {body[:200]}")
+                    return None
+                async for chunk in resp.aiter_bytes(4096):
+                    audio_chunks.append(chunk)
 
-            if resp.status_code != 200:
-                print(f"TTS submit error {resp.status_code}: {resp.text[:200]}")
-                return None
+        audio_bytes = b"".join(audio_chunks)
+        if len(audio_bytes) < 100:
+            return None
 
-            event_id = resp.json().get("event_id")
-            if not event_id:
-                print("TTS: No event_id returned")
-                return None
+        print(f"TTS: {len(audio_bytes)//1000}KB for {agent_name}")
 
-            print(f"TTS: Job submitted for {agent_name}, event={event_id[:12]}...")
-
-            # Step 2: Poll for result (SSE stream)
-            result_resp = await client.get(
-                f"{CHATTERBOX_URL}/call/generate_tts_audio/{event_id}",
-                headers=headers,
-                timeout=90.0,
-            )
-
-            audio_url_hf = None
-            for line in result_resp.text.split("\n"):
-                if line.startswith("data: "):
-                    data_str = line[6:]
-                    if data_str == "null":
-                        continue
-                    try:
-                        data = json.loads(data_str)
-                        if isinstance(data, list) and len(data) > 0:
-                            audio_url_hf = data[0].get("url")
-                    except json.JSONDecodeError:
-                        pass
-
-            if not audio_url_hf:
-                print(f"TTS: No audio URL in response for {agent_name}")
-                return None
-
-            print(f"TTS: Audio ready for {agent_name}, downloading...")
-
-            # Step 3: Download the audio
-            audio_resp = await client.get(audio_url_hf, headers=headers)
-            if audio_resp.status_code != 200:
-                print(f"TTS: Download failed {audio_resp.status_code}")
-                return None
-
-            audio_bytes = audio_resp.content
-            print(f"TTS: Downloaded {len(audio_bytes)//1000}KB for {agent_name}")
-
-            # Step 4: Upload to Supabase Storage
-            public_url = await _upload_to_storage(audio_bytes, session_id)
-            return public_url
+        # Upload to Supabase Storage
+        return await _upload(audio_bytes, session_id)
 
     except Exception as e:
-        print(f"TTS exception for {agent_name}: {e}")
+        print(f"TTS error: {e}")
         return None
 
 
-async def _upload_to_storage(audio_bytes: bytes, session_id: str) -> str | None:
-    supabase_url = settings.supabase_url or os.environ.get("SUPABASE_URL", "")
-    supabase_key = _get_supabase_jwt()
-
-    if not supabase_url or not supabase_key:
-        print("TTS: Missing Supabase credentials")
+async def _upload(audio_bytes: bytes, session_id: str) -> str | None:
+    supa_url = settings.supabase_url or os.environ.get("SUPABASE_URL", "")
+    supa_key = _get_supabase_jwt()
+    if not supa_url or not supa_key:
         return None
 
-    file_name = f"{session_id}/{uuid.uuid4().hex[:8]}.wav"
-    upload_url = f"{supabase_url}/storage/v1/object/audio/{file_name}"
-    headers = {
-        "Authorization": f"Bearer {supabase_key}",
-        "Content-Type": "audio/wav",
-        "x-upsert": "true",
-    }
+    fname = f"{session_id}/{uuid.uuid4().hex[:8]}.mp3"
+    url = f"{supa_url}/storage/v1/object/audio/{fname}"
+    hdrs = {"Authorization": f"Bearer {supa_key}", "Content-Type": "audio/mpeg", "x-upsert": "true"}
 
     async with httpx.AsyncClient(timeout=15.0) as client:
-        resp = await client.post(upload_url, headers=headers, content=audio_bytes)
+        r = await client.post(url, headers=hdrs, content=audio_bytes)
+        if r.status_code in (200, 201):
+            return f"{supa_url}/storage/v1/object/public/audio/{fname}"
 
-        if resp.status_code in (200, 201):
-            return f"{supabase_url}/storage/v1/object/public/audio/{file_name}"
-
-        if resp.status_code in (404, 400):
-            # Create bucket
+        # Create bucket if missing
+        if r.status_code in (404, 400):
             await client.post(
-                f"{supabase_url}/storage/v1/bucket",
-                headers={"Authorization": f"Bearer {supabase_key}", "Content-Type": "application/json"},
+                f"{supa_url}/storage/v1/bucket",
+                headers={"Authorization": f"Bearer {supa_key}", "Content-Type": "application/json"},
                 json={"id": "audio", "name": "audio", "public": True},
             )
-            resp2 = await client.post(upload_url, headers=headers, content=audio_bytes)
-            if resp2.status_code in (200, 201):
-                return f"{supabase_url}/storage/v1/object/public/audio/{file_name}"
+            r2 = await client.post(url, headers=hdrs, content=audio_bytes)
+            if r2.status_code in (200, 201):
+                return f"{supa_url}/storage/v1/object/public/audio/{fname}"
 
-        print(f"TTS Storage error: {resp.status_code} {resp.text[:200]}")
+        print(f"Storage error: {r.status_code}")
         return None
