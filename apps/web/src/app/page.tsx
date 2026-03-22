@@ -2,298 +2,347 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { WaterParticles } from "@/components/water-particles";
 import { DemoMockup } from "@/components/demo-mockup";
 import {
-  Waves,
+  ArrowRight,
+  Droplets,
+  Brain,
   Users,
-  Zap,
-  Microscope,
-  MessageSquare,
   BarChart3,
   FileText,
-  ArrowRight,
-  Sparkles,
+  ExternalLink,
 } from "lucide-react";
 
 const fadeUp = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.6 },
-};
-
-const stagger = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.7, ease: "easeOut" as const },
 };
 
 export default function LandingPage() {
   return (
     <div className="relative">
       {/* ═══════════════════════════════════════════
-          HERO
+          HERO — Editorial provocation
           ═══════════════════════════════════════════ */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
-        {/* Particle canvas */}
-        <div className="absolute inset-0">
-          <WaterParticles className="absolute inset-0" />
-        </div>
+      <section className="relative min-h-screen flex flex-col justify-center px-6 py-24">
+        {/* Subtle top accent */}
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal via-teal-light to-transparent" />
 
-        {/* Hero glow */}
-        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="h-[500px] w-[500px] rounded-full bg-ocean/[0.06] blur-[120px]" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative z-10 mx-auto max-w-4xl text-center"
-        >
-          {/* Badge */}
+        <div className="mx-auto max-w-4xl">
+          {/* Kicker */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="glass mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8"
           >
-            <Sparkles className="h-3.5 w-3.5 text-ocean" />
-            <span className="text-xs font-medium text-muted-foreground">
-              Inspirado por{" "}
-              <a href="https://ai-2027.com" target="_blank" rel="noopener noreferrer" className="text-ocean hover:underline">AI-2027</a>
-              {" "}— Dos escenarios. Un recurso esencial. ¿Slowdown o Race?
-            </span>
+            <a
+              href="https://ai-2027.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-stone-500 hover:text-teal transition-colors border-b border-stone-300 hover:border-teal pb-0.5"
+            >
+              Inspirado por AI-2027
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </motion.div>
 
           {/* Headline */}
-          <h1 className="mb-6 text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl md:text-8xl">
-            <span className="text-foreground/60">El impacto de la</span>{" "}
-            <span className="text-gradient">IA</span>{" "}
-            <span className="text-foreground/60">en la</span>
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-editorial-display text-stone-900 mb-8"
+          >
+            Para 2027, la IA podria{" "}
+            <em className="text-teal">superar la inteligencia humana.</em>
             <br />
-            <span className="text-foreground">gestión del</span>{" "}
-            <span className="text-gradient-cyan">agua</span>
-          </h1>
+            <span className="text-stone-400">
+              Que significa eso para el agua?
+            </span>
+          </motion.h1>
 
-          {/* Subtitle */}
-          <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground sm:text-xl">
-            Panelistas IA debaten el impacto de la inteligencia artificial en la
-            gestión del agua. Moderación autónoma. Análisis experto. Tiempo real.
-          </p>
+          {/* Lead paragraph */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="max-w-2xl mb-12"
+          >
+            <p className="text-lg leading-relaxed text-stone-600 mb-6">
+              AquaForum AI es un experimento: agentes de inteligencia artificial
+              debaten entre si sobre el impacto de la IA en la gestion del agua.
+              Es meta y es provocador. La IA reflexionando sobre su propio
+              futuro en el recurso mas esencial de la humanidad.
+            </p>
+            <p className="text-base leading-relaxed text-stone-500">
+              Cuatro expertos artificiales. Un moderador autonomo. Debate en
+              tiempo real. Analisis multidimensional. Todo impulsado por
+              LangGraph y Claude.
+            </p>
+          </motion.div>
 
-          {/* CTAs */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-start gap-4"
+          >
             <Link
               href="/setup"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ocean to-sky px-8 py-3.5 text-sm font-semibold text-[#030712] glow-btn transition-all hover:brightness-110"
+              className="group inline-flex items-center gap-3 btn-primary rounded-lg px-7 py-3.5 text-sm font-semibold"
             >
-              Crear Foro
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              Iniciar un debate
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <a
-              href="#demo"
-              className="glass glass-hover inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-medium text-foreground/70"
+              href="#how-it-works"
+              className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium text-stone-500 hover:text-stone-700 transition-colors"
             >
-              Ver Demo
+              Como funciona
             </a>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll cue */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          className="absolute bottom-12 left-1/2 -translate-x-1/2"
         >
           <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="h-8 w-5 rounded-full border border-white/10 flex items-start justify-center pt-1.5"
-          >
-            <div className="h-1.5 w-1 rounded-full bg-white/20" />
-          </motion.div>
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+            className="h-8 w-[1px] bg-gradient-to-b from-stone-300 to-transparent"
+          />
         </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════════
-          DEMO SECTION
+          THE PROVOCATION
           ═══════════════════════════════════════════ */}
-      <section id="demo" className="relative py-32 px-6">
-        <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-16">
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            IA debatiendo sobre{" "}
-            <span className="text-gradient">IA y agua.</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Observa cómo expertos IA debaten el impacto de la inteligencia artificial
-            en la gestión hídrica: gemelos digitales, optimización de EDAR, detección de fugas y más.
-          </p>
-        </motion.div>
+      <section className="py-24 px-6">
+        <div className="mx-auto max-w-3xl">
+          <div className="section-divider mb-16" />
 
-        <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2 }}>
-          <DemoMockup />
-        </motion.div>
+          <motion.div {...fadeUp}>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal mb-6">
+              La premisa
+            </p>
+            <blockquote className="editorial-quote text-xl leading-relaxed mb-8">
+              El escenario AI-2027 predice que la inteligencia artificial
+              alcanzara capacidades sobrehumanas antes del final de esta decada.
+              Si eso ocurre, cada sector se transformara. Pero pocos sectores son
+              tan criticos — y tan vulnerables — como el del agua.
+            </blockquote>
+            <p className="text-base leading-relaxed text-stone-600 mb-6">
+              Gemelos digitales que predicen roturas en redes. Algoritmos de ML
+              que optimizan depuradoras. Gobernanza algortimica de un recurso
+              publico. Modelos de inversion para infraestructura inteligente.
+              Estas no son ideas futuristas: estan ocurriendo ahora.
+            </p>
+            <p className="text-base leading-relaxed text-stone-600">
+              AquaForum AI pone a debatir a agentes de IA con distintas
+              perspectivas — tecnologica, regulatoria, cientifica, economica —
+              para explorar que significa realmente la irrupcion de la IA en el
+              sector hidrico. Y lo hace en tiempo real, con moderacion autonoma y
+              analisis experto.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          DEMO
+          ═══════════════════════════════════════════ */}
+      <section id="demo" className="py-24 px-6 bg-white">
+        <div className="mx-auto max-w-4xl">
+          <motion.div {...fadeUp} className="text-center mb-14">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal mb-4">
+              En accion
+            </p>
+            <h2 className="text-editorial-headline text-stone-900 mb-4">
+              IA debatiendo sobre IA y agua
+            </h2>
+            <p className="text-base text-stone-500 max-w-lg mx-auto">
+              Asi se ve un debate en tiempo real. Cada agente aporta su
+              perspectiva, interpela a los demas, y el moderador guia la
+              conversacion.
+            </p>
+          </motion.div>
+
+          <motion.div {...fadeUp} transition={{ duration: 0.7, delay: 0.2 }}>
+            <DemoMockup />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          HOW IT WORKS — Three Acts
+          ═══════════════════════════════════════════ */}
+      <section id="how-it-works" className="py-24 px-6">
+        <div className="mx-auto max-w-4xl">
+          <motion.div {...fadeUp} className="text-center mb-20">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal mb-4">
+              Tres actos
+            </p>
+            <h2 className="text-editorial-headline text-stone-900">
+              Configura, observa, comprende
+            </h2>
+          </motion.div>
+
+          <div className="grid gap-16 md:grid-cols-3 md:gap-8">
+            {[
+              {
+                step: "I",
+                icon: Users,
+                title: "Configura el panel",
+                desc: "Define el tema de debate y configura a los panelistas: su nombre, su rol, su perspectiva. Cada agente de IA tendra una voz unica.",
+              },
+              {
+                step: "II",
+                icon: Brain,
+                title: "Observa el debate",
+                desc: "Los agentes debaten en tiempo real. Se interpelan, responden, construyen consensos. El moderador IA gestiona turnos y dinamica.",
+              },
+              {
+                step: "III",
+                icon: BarChart3,
+                title: "Obten insights",
+                desc: "Un panel de analistas IA evalua cada ronda: viabilidad tecnica, impacto economico, regulacion, sostenibilidad. Exporta el reporte completo.",
+              },
+            ].map((act, i) => (
+              <motion.div
+                key={act.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.15 }}
+                className="text-center md:text-left"
+              >
+                <div className="inline-flex items-center justify-center h-14 w-14 rounded-full border-2 border-teal/20 text-teal font-editorial text-xl mb-6">
+                  {act.step}
+                </div>
+                <h3 className="text-lg font-semibold text-stone-900 mb-3">
+                  {act.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-stone-500">
+                  {act.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════
           FEATURES
           ═══════════════════════════════════════════ */}
-      <section className="py-32 px-6">
-        <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-20">
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            Todo lo que necesitas para un{" "}
-            <span className="text-gradient">debate experto</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Diseñado para profesionales del agua que buscan insights profundos
-            desde múltiples perspectivas.
-          </p>
-        </motion.div>
-
-        <div className="mx-auto max-w-5xl grid gap-6 md:grid-cols-3">
-          {[
-            {
-              icon: Users,
-              title: "Expertos en IA + Agua",
-              desc: "Panelistas especializados en IA aplicada al sector hídrico: gemelos digitales, ML para EDAR, gobernanza algorítmica, ROI de digitalización.",
-              color: "#06B6D4",
-            },
-            {
-              icon: Zap,
-              title: "Debate en Tiempo Real",
-              desc: "Observa cómo los agentes debaten, se interpelan y construyen consensos sobre el impacto de la IA en la gestión del agua.",
-              color: "#FBBF24",
-            },
-            {
-              icon: Microscope,
-              title: "Análisis Multi-Dimensional",
-              desc: "Panel experto analiza cada ronda desde 4 ejes: viabilidad técnica de la IA, impacto económico, regulación y sostenibilidad.",
-              color: "#A78BFA",
-            },
-          ].map((f, i) => (
-            <motion.div
-              key={f.title}
-              {...stagger}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="glass glass-hover rounded-2xl p-8 group"
-            >
-              <div
-                className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl"
-                style={{ backgroundColor: `${f.color}10` }}
-              >
-                <f.icon className="h-6 w-6" style={{ color: f.color }} />
-              </div>
-              <h3 className="mb-3 text-lg font-semibold">{f.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════
-          HOW IT WORKS
-          ═══════════════════════════════════════════ */}
-      <section className="py-32 px-6">
-        <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-20">
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            Tres pasos.{" "}
-            <span className="text-gradient">Un foro completo.</span>
-          </h2>
-        </motion.div>
-
-        <div className="mx-auto max-w-3xl">
-          {[
-            {
-              step: "01",
-              icon: MessageSquare,
-              title: "Define el debate",
-              desc: "Elige el tema, configura los panelistas con sus roles y perspectivas, establece las reglas del foro.",
-              color: "#06B6D4",
-            },
-            {
-              step: "02",
-              icon: BarChart3,
-              title: "Observa el debate",
-              desc: "Los agentes debaten en tiempo real. El moderador gestiona turnos, interpelaciones y síntesis. Tú observas.",
-              color: "#34D399",
-            },
-            {
-              step: "03",
-              icon: FileText,
-              title: "Obtén insights",
-              desc: "Análisis experto por ronda, integración de perspectivas, y reporte final exportable con todas las conclusiones.",
-              color: "#A78BFA",
-            },
-          ].map((s, i) => (
-            <motion.div
-              key={s.step}
-              {...stagger}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="group relative flex gap-6 pb-12 last:pb-0"
-            >
-              {/* Vertical line */}
-              {i < 2 && (
-                <div className="absolute left-[23px] top-[52px] h-[calc(100%-52px)] w-px bg-gradient-to-b from-white/[0.06] to-transparent" />
-              )}
-
-              {/* Step number */}
-              <div
-                className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold"
-                style={{ backgroundColor: `${s.color}10`, color: s.color }}
-              >
-                {s.step}
-              </div>
-
-              <div className="pt-1">
-                <h3 className="mb-2 text-lg font-semibold">{s.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground max-w-md">{s.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════
-          CTA FINAL
-          ═══════════════════════════════════════════ */}
-      <section className="py-32 px-6">
-        <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
-          <div className="gradient-border glass rounded-3xl p-12">
-            <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-ocean to-violet/50">
-              <Waves className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold mb-4">
-              El futuro del agua se decide ahora
-            </h2>
-            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-              Si la IA alcanza capacidades sobrehumanas en 2027, ¿está preparado el sector del agua?
-              Lanza un debate y descúbrelo.
+      <section className="py-24 px-6 bg-white">
+        <div className="mx-auto max-w-4xl">
+          <motion.div {...fadeUp} className="mb-16">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal mb-4">
+              Capacidades
             </p>
-            <Link
-              href="/setup"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ocean to-sky px-8 py-3.5 text-sm font-semibold text-[#030712] glow-btn transition-all hover:brightness-110"
-            >
-              Comenzar ahora
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            <h2 className="text-editorial-headline text-stone-900 max-w-xl">
+              Construido para profesionales del agua que piensan en el futuro
+            </h2>
+          </motion.div>
+
+          <div className="grid gap-px bg-stone-200 md:grid-cols-2 border border-stone-200 rounded-lg overflow-hidden">
+            {[
+              {
+                icon: Brain,
+                title: "Agentes con personalidad",
+                desc: "Cada panelista tiene un perfil unico: experiencia, sesgo, estilo de argumentacion. No son chatbots; son voces con perspectiva.",
+              },
+              {
+                icon: Droplets,
+                title: "Especializados en agua + IA",
+                desc: "Gemelos digitales, ML para EDAR, gobernanza algoritmica, ROI de digitalizacion. Los agentes conocen ambos mundos.",
+              },
+              {
+                icon: BarChart3,
+                title: "Analisis multidimensional",
+                desc: "Cada ronda se analiza desde cuatro ejes: viabilidad tecnica, impacto economico, cumplimiento regulatorio, sostenibilidad ambiental.",
+              },
+              {
+                icon: FileText,
+                title: "Reporte exportable",
+                desc: "Al finalizar, exporta el debate completo con todos los analisis y la integracion de perspectivas en formato Markdown.",
+              },
+            ].map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="bg-white p-8"
+              >
+                <f.icon className="h-5 w-5 text-teal mb-4" />
+                <h3 className="text-base font-semibold text-stone-900 mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-stone-500">
+                  {f.desc}
+                </p>
+              </motion.div>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          CTA FINAL — Dark section
+          ═══════════════════════════════════════════ */}
+      <section className="dark-section py-24 px-6">
+        <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <Droplets className="h-8 w-8 text-teal-light mx-auto mb-8" />
+          <h2 className="font-editorial text-3xl sm:text-4xl text-stone-100 mb-6 leading-tight">
+            El futuro del agua se decide{" "}
+            <em className="text-teal-light">ahora</em>
+          </h2>
+          <p className="text-stone-400 mb-10 max-w-md mx-auto leading-relaxed">
+            Si la IA alcanza capacidades sobrehumanas en 2027, el sector del
+            agua no sera el mismo. Lanza un debate y explora las posibilidades.
+          </p>
+          <Link
+            href="/setup"
+            className="group inline-flex items-center gap-3 bg-teal-light hover:bg-teal text-stone-900 rounded-lg px-7 py-3.5 text-sm font-semibold transition-all"
+          >
+            Comenzar ahora
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════════
           FOOTER
           ═══════════════════════════════════════════ */}
-      <footer className="border-t border-white/[0.04] py-8 px-6">
+      <footer className="border-t border-stone-200 py-8 px-6">
         <div className="mx-auto max-w-4xl flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <Waves className="h-4 w-4 text-ocean/60" />
-            <span className="text-sm text-muted-foreground/50">AquaForum AI</span>
+            <Droplets className="h-4 w-4 text-teal" />
+            <span className="text-sm font-semibold text-stone-700">
+              AquaForum AI
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground/30">
-            Powered by Claude AI · LangGraph · Supabase
+          <p className="text-xs text-stone-400">
+            Claude AI &middot; LangGraph &middot; Supabase &middot; Inspirado
+            por{" "}
+            <a
+              href="https://ai-2027.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-teal hover:underline"
+            >
+              ai-2027.com
+            </a>
           </p>
         </div>
       </footer>

@@ -17,7 +17,7 @@ import {
   Download,
   Pause,
   Play,
-  Waves,
+  Droplets,
   Radio,
   ChevronRight,
   PanelRightOpen,
@@ -77,14 +77,22 @@ export default function ForumView() {
 
   const handleNextCycle = async () => {
     setLoading(true);
-    try { await api.nextCycle(sessionId); }
-    catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    try {
+      await api.nextCycle(sessionId);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleStop = async () => {
-    try { await api.stopForum(sessionId); setStatus("paused"); }
-    catch (e) { console.error(e); }
+    try {
+      await api.stopForum(sessionId);
+      setStatus("paused");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleExport = async () => {
@@ -98,92 +106,137 @@ export default function ForumView() {
       a.download = `aquaforum-${sessionId.slice(0, 8)}.md`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const discussionMessages = messages.filter(
     (m) => !["analysis", "integration"].includes(m.message_type)
   );
 
-  // ─── Loading state ───
+  // Loading state
   if (initialLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-          <div className="relative mx-auto mb-8 h-24 w-24">
-            <motion.div animate={{ scale: [1, 1.3], opacity: [0.15, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="absolute inset-0 rounded-2xl bg-ocean/20" />
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-2xl glass">
-              <Waves className="h-10 w-10 text-ocean/60" />
-            </div>
+      <div className="flex min-h-screen items-center justify-center bg-stone-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-white border border-stone-200 shadow-sm">
+            <Droplets className="h-8 w-8 text-teal" />
           </div>
-          <p className="text-sm text-muted-foreground/50">Conectando al foro...</p>
+          <p className="text-sm text-stone-400">Conectando al foro...</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      {/* ═══ Header ═══ */}
-      <header className="glass-strong relative z-20 flex items-center justify-between px-4 py-2.5 border-b border-white/[0.03]">
+    <div className="flex h-screen flex-col bg-stone-50">
+      {/* Header */}
+      <header className="relative z-20 flex items-center justify-between px-4 py-3 border-b border-stone-200 bg-white">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="h-8 w-8 rounded-lg p-0 text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.04]">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/")}
+            className="h-8 w-8 rounded-lg p-0 text-stone-400 hover:text-stone-700 hover:bg-stone-100"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
 
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-ocean/20 to-violet/10">
-            <Waves className="h-4 w-4 text-ocean/70" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal/10">
+            <Droplets className="h-4 w-4 text-teal" />
           </div>
 
           <div className="hidden sm:block">
-            <h1 className="text-xs font-semibold text-foreground/80">AquaForum AI</h1>
-            <p className="max-w-xs truncate text-[11px] text-muted-foreground/30">{topic}</p>
+            <h1 className="text-xs font-semibold text-stone-800">
+              AquaForum AI
+            </h1>
+            <p className="max-w-xs truncate text-[11px] text-stone-400">
+              {topic}
+            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Round badge */}
-          <div className="flex items-center gap-1.5 rounded-full bg-white/[0.02] border border-white/[0.04] px-3 py-1">
-            <span className="text-[11px] text-muted-foreground/40">Ronda</span>
-            <span className="text-sm font-bold text-ocean">{currentRound}</span>
-            <span className="text-[11px] text-muted-foreground/30">/ {maxRounds}</span>
+          <div className="flex items-center gap-1.5 rounded-full bg-stone-100 border border-stone-200 px-3 py-1">
+            <span className="text-[11px] text-stone-400">Ronda</span>
+            <span className="text-sm font-bold text-teal">
+              {currentRound}
+            </span>
+            <span className="text-[11px] text-stone-400">
+              / {maxRounds}
+            </span>
           </div>
 
           {/* Status */}
-          <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
-            status === "running" ? "bg-emerald/[0.06] text-emerald/70" :
-            status === "completed" ? "bg-ocean/[0.06] text-ocean/70" :
-            status === "error" ? "bg-coral/[0.06] text-coral/70" :
-            "bg-amber/[0.06] text-amber/70"
-          }`}>
-            {status === "running" && <Radio className="h-2.5 w-2.5 animate-pulse" />}
-            {status === "running" ? "En curso" : status === "completed" ? "Completado" : status === "error" ? "Error" : "Pausado"}
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+              status === "running"
+                ? "bg-teal-50 text-teal"
+                : status === "completed"
+                ? "bg-stone-100 text-stone-600"
+                : status === "error"
+                ? "bg-red-50 text-red-600"
+                : "bg-amber-50 text-amber-700"
+            }`}
+          >
+            {status === "running" && (
+              <Radio className="h-2.5 w-2.5 animate-pulse" />
+            )}
+            {status === "running"
+              ? "En curso"
+              : status === "completed"
+              ? "Completado"
+              : status === "error"
+              ? "Error"
+              : "Pausado"}
           </div>
 
           {/* Sidebar toggle */}
-          <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:flex h-8 w-8 rounded-lg p-0 text-muted-foreground/30 hover:text-foreground">
-            {sidebarOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="hidden lg:flex h-8 w-8 rounded-lg p-0 text-stone-400 hover:text-stone-700"
+          >
+            {sidebarOpen ? (
+              <PanelRightClose className="h-4 w-4" />
+            ) : (
+              <PanelRightOpen className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </header>
 
-      {/* ═══ Main ═══ */}
+      {/* Main */}
       <div className="flex flex-1 overflow-hidden">
         {/* Messages column */}
         <div className="flex flex-1 flex-col min-w-0">
           {/* Agent bar */}
           {config && (
-            <div className="flex flex-wrap gap-2 border-b border-white/[0.03] px-4 py-2 bg-white/[0.005]">
+            <div className="flex flex-wrap gap-2 border-b border-stone-200 px-4 py-2.5 bg-white">
               {config.panelists.map((p) => (
-                <AgentBadge key={p.name} name={p.name} role={p.role} color={p.color} active={status === "running"} />
+                <AgentBadge
+                  key={p.name}
+                  name={p.name}
+                  role={p.role}
+                  color={p.color}
+                  active={status === "running"}
+                />
               ))}
             </div>
           )}
 
           {/* Feed */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-3xl space-y-3 px-4 py-6">
+            <div className="mx-auto max-w-3xl space-y-4 px-4 py-6">
               <AnimatePresence mode="popLayout">
                 {discussionMessages.map((msg) => (
                   <MessageBubble
@@ -192,7 +245,9 @@ export default function ForumView() {
                     agentRole={msg.agent_role}
                     content={msg.content}
                     messageType={msg.message_type}
-                    color={(msg.metadata?.color as string) || "#06B6D4"}
+                    color={
+                      (msg.metadata?.color as string) || "#0F766E"
+                    }
                     timestamp={msg.created_at}
                   />
                 ))}
@@ -201,49 +256,55 @@ export default function ForumView() {
               {/* Typing indicator */}
               {status === "running" && messages.length > 0 && (
                 <TypingIndicator
-                  agentName={config?.panelists[0]?.name || "Agente"}
-                  color={config?.panelists[0]?.color || "#06B6D4"}
+                  agentName={
+                    config?.panelists[0]?.name || "Agente"
+                  }
+                  color={config?.panelists[0]?.color || "#0F766E"}
                 />
               )}
 
               {/* Empty state */}
               {messages.length === 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-32 text-center">
-                  <div className="relative mx-auto mb-8 h-28 w-28">
-                    <motion.div
-                      animate={{ scale: [1, 1.15, 1], opacity: [0.05, 0.1, 0.05] }}
-                      transition={{ duration: 4, repeat: Infinity }}
-                      className="absolute inset-0 rounded-full bg-ocean/10"
-                    />
-                    <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-white/[0.03]">
-                      <Waves className="h-14 w-14 text-ocean/10" />
-                    </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-32 text-center"
+                >
+                  <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-white border border-stone-200">
+                    <Droplets className="h-10 w-10 text-stone-300" />
                   </div>
-                  <p className="text-lg font-medium text-muted-foreground/30">El debate comenzará en breve</p>
-                  <p className="mt-2 text-sm text-muted-foreground/20">Haz clic en &quot;Siguiente Ronda&quot; para iniciar</p>
+                  <p className="text-lg font-editorial text-stone-400">
+                    El debate comenzar\u00e1 en breve
+                  </p>
+                  <p className="mt-2 text-sm text-stone-400">
+                    Haz clic en &quot;Siguiente Ronda&quot; para
+                    iniciar
+                  </p>
                 </motion.div>
               )}
             </div>
           </div>
 
           {/* Controls */}
-          <div className="glass-strong flex items-center gap-3 px-4 py-3 border-t border-white/[0.03]">
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-stone-200 bg-white">
             {status !== "completed" && (
               <>
                 <Button
                   onClick={handleNextCycle}
                   disabled={loading || status === "running"}
-                  className="group rounded-full bg-gradient-to-r from-ocean to-sky px-5 text-[#030712] text-sm font-semibold glow-btn transition-all hover:brightness-110 disabled:opacity-30 disabled:shadow-none"
+                  className="group btn-primary rounded-lg px-5 text-sm font-semibold disabled:opacity-30"
                 >
                   <Play className="mr-1.5 h-3.5 w-3.5" />
-                  {currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}
-                  <ChevronRight className="ml-1 h-3.5 w-3.5 opacity-40 group-hover:translate-x-0.5 transition-transform" />
+                  {currentRound < maxRounds
+                    ? "Siguiente Ronda"
+                    : "Ronda Final"}
+                  <ChevronRight className="ml-1 h-3.5 w-3.5 opacity-50 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
                 <Button
                   variant="ghost"
                   onClick={handleStop}
                   disabled={status !== "running"}
-                  className="rounded-full text-muted-foreground/40 hover:text-foreground"
+                  className="rounded-lg text-stone-400 hover:text-stone-700"
                 >
                   <Pause className="mr-1.5 h-3.5 w-3.5" />
                   Pausar
@@ -254,7 +315,7 @@ export default function ForumView() {
               variant="ghost"
               onClick={handleExport}
               disabled={loading || messages.length === 0}
-              className="ml-auto rounded-full text-muted-foreground/40 hover:text-foreground"
+              className="ml-auto rounded-lg text-stone-400 hover:text-stone-700"
             >
               <Download className="mr-1.5 h-3.5 w-3.5" />
               Exportar
@@ -262,7 +323,7 @@ export default function ForumView() {
           </div>
         </div>
 
-        {/* ═══ Sidebar ═══ */}
+        {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.aside
@@ -270,27 +331,42 @@ export default function ForumView() {
               animate={{ width: 320, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-white/[0.03] bg-white/[0.005] p-4"
+              className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-stone-200 bg-white p-4"
             >
               {/* Active panelists */}
               {config && (
-                <div className="glass rounded-xl p-4">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/40 mb-3">Panelistas</h3>
-                  <div className="space-y-2">
+                <div className="editorial-card rounded-xl p-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-500 mb-3">
+                    Panelistas
+                  </h3>
+                  <div className="space-y-2.5">
                     {config.panelists.map((p) => (
-                      <div key={p.name} className="flex items-center gap-2.5">
+                      <div
+                        key={p.name}
+                        className="flex items-center gap-2.5"
+                      >
                         <div
-                          className="flex h-7 w-7 items-center justify-center rounded-full text-[9px] font-bold"
-                          style={{ backgroundColor: `${p.color}12`, color: p.color }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                          style={{
+                            backgroundColor: p.color,
+                          }}
                         >
-                          {p.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                          {p.name
+                            .split(" ")
+                            .map((w) => w[0])
+                            .join("")
+                            .slice(0, 2)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <span className="text-xs font-medium text-foreground/70 block truncate">{p.name}</span>
-                          <span className="text-[10px] text-muted-foreground/30">{p.role}</span>
+                          <span className="text-xs font-medium text-stone-700 block truncate">
+                            {p.name}
+                          </span>
+                          <span className="text-[10px] text-stone-400">
+                            {p.role}
+                          </span>
                         </div>
                         {status === "running" && (
-                          <div className="h-1.5 w-1.5 rounded-full bg-emerald/40 animate-pulse" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-teal animate-pulse" />
                         )}
                       </div>
                     ))}
@@ -298,7 +374,10 @@ export default function ForumView() {
                 </div>
               )}
 
-              <PipelineDisplay currentNode={pipeline.current_node} progress={pipeline.progress} />
+              <PipelineDisplay
+                currentNode={pipeline.current_node}
+                progress={pipeline.progress}
+              />
               <AnalysisPanel messages={messages} />
             </motion.aside>
           )}

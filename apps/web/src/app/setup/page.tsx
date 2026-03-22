@@ -14,35 +14,65 @@ import {
   ArrowRight,
   Plus,
   Trash2,
-  Waves,
-  Zap,
+  Droplets,
+  Check,
+  MessageSquare,
   Users,
   Settings,
-  Rocket,
-  Check,
 } from "lucide-react";
 import Link from "next/link";
 
 const DEFAULT_PANELISTS = [
-  { name: "Elena Ríos", role: "CTO Water Utility · IA", persona: "CTO de una utility de agua que lidera la transformación digital con IA. Experta en gemelos digitales de redes hidráulicas, mantenimiento predictivo con ML y optimización de operaciones con algoritmos de IA. 15 años en el sector.", color: "#06B6D4" },
-  { name: "Marco Vallejo", role: "Regulador · Gobernanza IA", persona: "Especialista en regulación de IA aplicada a servicios públicos esenciales. Experto en el AI Act europeo, gobernanza algorítmica y marcos éticos para el uso de IA en gestión de recursos hídricos. Asesor de la Comisión Europea.", color: "#A78BFA" },
-  { name: "Sofía Chen", role: "Data Scientist · EDAR", persona: "Data scientist especializada en machine learning para optimización de estaciones depuradoras (EDAR). Desarrolla modelos de IA para dosificación de reactivos, predicción de calidad de efluente y reducción energética. PhD en ingeniería ambiental computacional.", color: "#34D399" },
-  { name: "Carlos Mendoza", role: "Economista · ROI de IA", persona: "Economista especializado en análisis de retorno de inversión de tecnologías de IA en el sector del agua. Consultor del Banco Mundial en proyectos de digitalización hídrica. Experto en modelos de financiación de infraestructura inteligente.", color: "#FBBF24" },
+  {
+    name: "Elena R\u00edos",
+    role: "CTO Water Utility \u00b7 IA/Gemelos Digitales",
+    persona:
+      "CTO de una utility de agua que lidera la transformaci\u00f3n digital con IA. Experta en gemelos digitales de redes hidr\u00e1ulicas, mantenimiento predictivo con ML y optimizaci\u00f3n de operaciones con algoritmos de IA. 15 a\u00f1os en el sector.",
+    color: "#0F766E",
+  },
+  {
+    name: "Marco Vallejo",
+    role: "Gobernanza IA \u00b7 Pol\u00edtica H\u00eddrica",
+    persona:
+      "Especialista en regulaci\u00f3n de IA aplicada a servicios p\u00fablicos esenciales. Experto en el AI Act europeo, gobernanza algor\u00edtmica y marcos \u00e9ticos para el uso de IA en gesti\u00f3n de recursos h\u00eddricos. Asesor de la Comisi\u00f3n Europea.",
+    color: "#4338CA",
+  },
+  {
+    name: "Sof\u00eda Chen",
+    role: "Data Scientist \u00b7 EDAR/ML",
+    persona:
+      "Data scientist especializada en machine learning para optimizaci\u00f3n de estaciones depuradoras (EDAR). Desarrolla modelos de IA para dosificaci\u00f3n de reactivos, predicci\u00f3n de calidad de efluente y reducci\u00f3n energ\u00e9tica. PhD en ingenier\u00eda ambiental computacional.",
+    color: "#059669",
+  },
+  {
+    name: "Carlos Mendoza",
+    role: "Economista \u00b7 ROI de IA en Agua",
+    persona:
+      "Economista especializado en an\u00e1lisis de retorno de inversi\u00f3n de tecnolog\u00edas de IA en el sector del agua. Consultor del Banco Mundial en proyectos de digitalizaci\u00f3n h\u00eddrica. Experto en modelos de financiaci\u00f3n de infraestructura inteligente.",
+    color: "#D97706",
+  },
 ];
 
 const DEFAULT_RULES = [
-  "Mantén las intervenciones concisas y fundamentadas.",
+  "Mant\u00e9n las intervenciones concisas y fundamentadas.",
   "Cita datos reales cuando sea posible.",
   "Respeta las posiciones de otros panelistas incluso al interpelar.",
   "El moderador puede intervenir para redirigir el debate.",
 ];
 
-const COLORS = ["#06B6D4", "#34D399", "#38BDF8", "#A78BFA", "#FBBF24", "#F87171"];
+const COLORS = [
+  "#0F766E",
+  "#059669",
+  "#4338CA",
+  "#D97706",
+  "#DC2626",
+  "#78716C",
+];
 
 const STEPS = [
-  { id: 1, label: "Tema", icon: Zap },
+  { id: 1, label: "Tema", icon: MessageSquare },
   { id: 2, label: "Panelistas", icon: Users },
-  { id: 3, label: "Configuración", icon: Settings },
+  { id: 3, label: "Configuraci\u00f3n", icon: Settings },
 ];
 
 export default function SetupPage() {
@@ -51,7 +81,7 @@ export default function SetupPage() {
 
   const [step, setStep] = useState(1);
   const [topic, setTopic] = useState(
-    "Impacto de la Inteligencia Artificial en la gestión del agua: oportunidades, riesgos y transformación del sector hídrico"
+    "Impacto de la Inteligencia Artificial en la gesti\u00f3n del agua: oportunidades, riesgos y transformaci\u00f3n del sector h\u00eddrico"
   );
   const [panelists, setPanelists] = useState(DEFAULT_PANELISTS);
   const [maxRounds, setMaxRounds] = useState(3);
@@ -61,7 +91,15 @@ export default function SetupPage() {
 
   const addPanelist = () => {
     if (panelists.length >= 8) return;
-    setPanelists([...panelists, { name: "", role: "", persona: "", color: COLORS[panelists.length % COLORS.length] }]);
+    setPanelists([
+      ...panelists,
+      {
+        name: "",
+        role: "",
+        persona: "",
+        color: COLORS[panelists.length % COLORS.length],
+      },
+    ]);
   };
 
   const removePanelist = (i: number) => {
@@ -77,7 +115,10 @@ export default function SetupPage() {
 
   const canProceed = () => {
     if (step === 1) return topic.trim().length > 10;
-    if (step === 2) return panelists.every((p) => p.name && p.role) && panelists.length >= 2;
+    if (step === 2)
+      return (
+        panelists.every((p) => p.name && p.role) && panelists.length >= 2
+      );
     return true;
   };
 
@@ -95,7 +136,9 @@ export default function SetupPage() {
       setSession(session_id, config);
       router.push(`/forum/${session_id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al iniciar el foro");
+      setError(
+        err instanceof Error ? err.message : "Error al iniciar el foro"
+      );
     } finally {
       setLoading(false);
     }
@@ -104,40 +147,62 @@ export default function SetupPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+      <header className="flex items-center justify-between px-6 py-5 border-b border-stone-200">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 text-stone-500 hover:text-stone-800 transition-colors"
+        >
           <ArrowLeft className="h-4 w-4" />
-          <Waves className="h-5 w-5 text-ocean/60" />
-          <span className="text-sm font-medium">AquaForum</span>
+          <Droplets className="h-4 w-4 text-teal" />
+          <span className="text-sm font-semibold text-stone-700">
+            AquaForum
+          </span>
         </Link>
       </header>
 
       {/* Step indicator */}
-      <div className="mx-auto w-full max-w-2xl px-6 pt-4 pb-8">
+      <div className="mx-auto w-full max-w-2xl px-6 pt-8 pb-6">
         <div className="flex items-center justify-between">
           {STEPS.map((s, i) => (
-            <div key={s.id} className="flex items-center flex-1 last:flex-none">
+            <div
+              key={s.id}
+              className="flex items-center flex-1 last:flex-none"
+            >
               <button
                 onClick={() => s.id < step && setStep(s.id)}
-                className={`flex items-center gap-2 transition-all ${
-                  s.id === step ? "text-ocean" : s.id < step ? "text-emerald" : "text-muted-foreground/30"
+                className={`flex items-center gap-2.5 transition-all ${
+                  s.id === step
+                    ? "text-teal"
+                    : s.id < step
+                    ? "text-teal/60"
+                    : "text-stone-300"
                 }`}
               >
                 <div
                   className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-all ${
                     s.id === step
-                      ? "bg-ocean/15 text-ocean ring-2 ring-ocean/20"
+                      ? "bg-teal text-white"
                       : s.id < step
-                      ? "bg-emerald/15 text-emerald"
-                      : "bg-white/[0.03] text-muted-foreground/30"
+                      ? "bg-teal/10 text-teal"
+                      : "bg-stone-100 text-stone-400"
                   }`}
                 >
-                  {s.id < step ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
+                  {s.id < step ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <s.icon className="h-4 w-4" />
+                  )}
                 </div>
-                <span className="text-sm font-medium hidden sm:block">{s.label}</span>
+                <span className="text-sm font-medium hidden sm:block">
+                  {s.label}
+                </span>
               </button>
               {i < STEPS.length - 1 && (
-                <div className={`mx-4 h-px flex-1 ${s.id < step ? "bg-emerald/20" : "bg-white/[0.04]"}`} />
+                <div
+                  className={`mx-4 h-px flex-1 transition-colors ${
+                    s.id < step ? "bg-teal/30" : "bg-stone-200"
+                  }`}
+                />
               )}
             </div>
           ))}
@@ -150,32 +215,60 @@ export default function SetupPage() {
           <AnimatePresence mode="wait">
             {/* Step 1: Topic */}
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 className="text-3xl font-bold mb-2">¿Sobre qué quieres debatir?</h2>
-                <p className="text-muted-foreground mb-8">Define el tema central del foro. Cuanto más específico, mejores serán las intervenciones.</p>
-                <div className="glass rounded-2xl p-6">
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-editorial-subheadline text-stone-900 mb-2">
+                  Sobre que quieres debatir?
+                </h2>
+                <p className="text-stone-500 mb-8">
+                  Define el tema central del foro. Cuanto mas especifico,
+                  mejores seran las intervenciones.
+                </p>
+                <div className="editorial-card rounded-xl p-6">
                   <Textarea
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    placeholder="Ej: Estrategias para la reutilización de aguas residuales en zonas de estrés hídrico..."
-                    className="min-h-[140px] rounded-xl border-white/[0.04] bg-white/[0.02] text-lg placeholder:text-muted-foreground/30 focus:border-ocean/20 resize-none"
+                    placeholder="Ej: Estrategias para la reutilizaci\u00f3n de aguas residuales en zonas de estr\u00e9s h\u00eddrico..."
+                    className="min-h-[140px] rounded-lg border-stone-200 bg-stone-50 text-lg text-stone-800 placeholder:text-stone-400 focus:border-teal/40 focus:ring-teal/20 resize-none"
                   />
-                  <div className="mt-3 text-right text-xs text-muted-foreground/30">{topic.length} caracteres</div>
+                  <div className="mt-3 text-right text-xs text-stone-400">
+                    {topic.length} caracteres
+                  </div>
                 </div>
               </motion.div>
             )}
 
             {/* Step 2: Panelists */}
             {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <h2 className="text-3xl font-bold mb-2">Panelistas</h2>
-                    <p className="text-muted-foreground">Configura los expertos que participarán en el debate.</p>
+                    <h2 className="text-editorial-subheadline text-stone-900 mb-2">
+                      Panelistas
+                    </h2>
+                    <p className="text-stone-500">
+                      Configura los expertos que participaran en el debate.
+                    </p>
                   </div>
-                  <Button onClick={addPanelist} disabled={panelists.length >= 8} className="rounded-xl bg-ocean/10 text-ocean border-0 hover:bg-ocean/20">
+                  <Button
+                    onClick={addPanelist}
+                    disabled={panelists.length >= 8}
+                    variant="outline"
+                    className="rounded-lg border-stone-300 text-stone-600 hover:bg-stone-100"
+                  >
                     <Plus className="mr-1.5 h-4 w-4" />
-                    Añadir
+                    Anadir
                   </Button>
                 </div>
 
@@ -184,42 +277,55 @@ export default function SetupPage() {
                     <motion.div
                       key={i}
                       layout
-                      initial={{ opacity: 0, scale: 0.97 }}
+                      initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="glass rounded-2xl p-5 group"
+                      className="editorial-card rounded-xl p-5"
                       style={{ borderLeft: `3px solid ${p.color}` }}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div
-                            className="flex h-10 w-10 items-center justify-center rounded-full font-bold text-sm"
-                            style={{ backgroundColor: `${p.color}12`, color: p.color }}
+                            className="flex h-10 w-10 items-center justify-center rounded-full font-bold text-sm text-white"
+                            style={{ backgroundColor: p.color }}
                           >
-                            {(p.name || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+                            {(p.name || "?")
+                              .split(" ")
+                              .map((w) => w[0])
+                              .join("")
+                              .slice(0, 2)
+                              .toUpperCase()}
                           </div>
                           <div>
-                            <div className="text-sm font-semibold">{p.name || "Nuevo panelista"}</div>
-                            <div className="text-xs text-muted-foreground/40">{p.role || "Sin rol"}</div>
+                            <div className="text-sm font-semibold text-stone-800">
+                              {p.name || "Nuevo panelista"}
+                            </div>
+                            <div className="text-xs text-stone-400">
+                              {p.role || "Sin rol"}
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {COLORS.map((c) => (
                             <button
                               key={c}
-                              onClick={() => updatePanelist(i, "color", c)}
+                              onClick={() =>
+                                updatePanelist(i, "color", c)
+                              }
                               className={`h-4 w-4 rounded-full transition-all hover:scale-125 ${
-                                p.color === c ? "ring-2 ring-white/50 ring-offset-1 ring-offset-[#030712]" : "opacity-40 hover:opacity-100"
+                                p.color === c
+                                  ? "ring-2 ring-stone-400 ring-offset-2"
+                                  : "opacity-40 hover:opacity-100"
                               }`}
                               style={{ backgroundColor: c }}
                             />
                           ))}
-                          <div className="ml-2 h-4 w-px bg-white/[0.06]" />
+                          <div className="ml-2 h-4 w-px bg-stone-200" />
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removePanelist(i)}
                             disabled={panelists.length <= 2}
-                            className="h-7 w-7 p-0 text-muted-foreground/30 hover:text-coral hover:bg-coral/10 rounded-lg"
+                            className="h-7 w-7 p-0 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -227,14 +333,30 @@ export default function SetupPage() {
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <Input value={p.name} onChange={(e) => updatePanelist(i, "name", e.target.value)} placeholder="Nombre" className="rounded-lg border-white/[0.04] bg-white/[0.02] placeholder:text-muted-foreground/25" />
-                        <Input value={p.role} onChange={(e) => updatePanelist(i, "role", e.target.value)} placeholder="Rol (CEO, Analista...)" className="rounded-lg border-white/[0.04] bg-white/[0.02] placeholder:text-muted-foreground/25" />
+                        <Input
+                          value={p.name}
+                          onChange={(e) =>
+                            updatePanelist(i, "name", e.target.value)
+                          }
+                          placeholder="Nombre"
+                          className="rounded-lg border-stone-200 bg-stone-50 placeholder:text-stone-400"
+                        />
+                        <Input
+                          value={p.role}
+                          onChange={(e) =>
+                            updatePanelist(i, "role", e.target.value)
+                          }
+                          placeholder="Rol (CTO, Analista...)"
+                          className="rounded-lg border-stone-200 bg-stone-50 placeholder:text-stone-400"
+                        />
                       </div>
                       <Textarea
                         value={p.persona}
-                        onChange={(e) => updatePanelist(i, "persona", e.target.value)}
+                        onChange={(e) =>
+                          updatePanelist(i, "persona", e.target.value)
+                        }
                         placeholder="Describe la perspectiva y experiencia de este panelista..."
-                        className="mt-3 min-h-[60px] rounded-lg border-white/[0.04] bg-white/[0.02] text-sm placeholder:text-muted-foreground/25 resize-none"
+                        className="mt-3 min-h-[60px] rounded-lg border-stone-200 bg-stone-50 text-sm placeholder:text-stone-400 resize-none"
                       />
                     </motion.div>
                   ))}
@@ -244,47 +366,88 @@ export default function SetupPage() {
 
             {/* Step 3: Settings */}
             {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 className="text-3xl font-bold mb-2">Configuración</h2>
-                <p className="text-muted-foreground mb-8">Ajusta los parámetros del debate.</p>
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-editorial-subheadline text-stone-900 mb-2">
+                  Configuraci\u00f3n
+                </h2>
+                <p className="text-stone-500 mb-8">
+                  Ajusta los par\u00e1metros del debate.
+                </p>
 
                 <div className="space-y-6">
-                  <div className="glass rounded-2xl p-6">
+                  <div className="editorial-card rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <label className="text-sm font-medium">Rondas de debate</label>
-                      <span className="text-2xl font-bold text-ocean">{maxRounds}</span>
+                      <label className="text-sm font-medium text-stone-700">
+                        Rondas de debate
+                      </label>
+                      <span className="text-2xl font-bold text-teal font-editorial">
+                        {maxRounds}
+                      </span>
                     </div>
-                    <Slider value={[maxRounds]} onValueChange={(v) => setMaxRounds(Array.isArray(v) ? v[0] : v)} min={1} max={5} step={1} />
-                    <p className="mt-3 text-xs text-muted-foreground/40">Cada ronda incluye debate + análisis experto + integración.</p>
+                    <Slider
+                      value={[maxRounds]}
+                      onValueChange={(v) =>
+                        setMaxRounds(Array.isArray(v) ? v[0] : v)
+                      }
+                      min={1}
+                      max={5}
+                      step={1}
+                    />
+                    <p className="mt-3 text-xs text-stone-400">
+                      Cada ronda incluye debate + an\u00e1lisis experto +
+                      integraci\u00f3n.
+                    </p>
                   </div>
 
-                  <div className="glass rounded-2xl p-6">
-                    <label className="text-sm font-medium mb-3 block">Reglas del debate</label>
-                    <Textarea value={rules} onChange={(e) => setRules(e.target.value)} className="min-h-[120px] rounded-lg border-white/[0.04] bg-white/[0.02] text-sm placeholder:text-muted-foreground/25 resize-none" />
+                  <div className="editorial-card rounded-xl p-6">
+                    <label className="text-sm font-medium text-stone-700 mb-3 block">
+                      Reglas del debate
+                    </label>
+                    <Textarea
+                      value={rules}
+                      onChange={(e) => setRules(e.target.value)}
+                      className="min-h-[120px] rounded-lg border-stone-200 bg-stone-50 text-sm placeholder:text-stone-400 resize-none"
+                    />
                   </div>
 
                   {/* Summary */}
-                  <div className="glass rounded-2xl p-6 gradient-border">
-                    <h3 className="text-sm font-semibold mb-4">Resumen</h3>
+                  <div className="editorial-card rounded-xl p-6 border-t-3 border-t-teal accent-top">
+                    <h3 className="text-sm font-semibold text-stone-800 mb-4">
+                      Resumen
+                    </h3>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Tema</span>
-                        <span className="text-right max-w-[60%] truncate text-foreground/80">{topic}</span>
+                        <span className="text-stone-500">Tema</span>
+                        <span className="text-right max-w-[60%] truncate text-stone-700">
+                          {topic}
+                        </span>
                       </div>
-                      <div className="h-px bg-white/[0.04]" />
+                      <div className="h-px bg-stone-100" />
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Panelistas</span>
-                        <span className="text-foreground/80">{panelists.length} expertos</span>
+                        <span className="text-stone-500">Panelistas</span>
+                        <span className="text-stone-700">
+                          {panelists.length} expertos
+                        </span>
                       </div>
-                      <div className="h-px bg-white/[0.04]" />
+                      <div className="h-px bg-stone-100" />
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Rondas</span>
-                        <span className="text-foreground/80">{maxRounds}</span>
+                        <span className="text-stone-500">Rondas</span>
+                        <span className="text-stone-700">{maxRounds}</span>
                       </div>
-                      <div className="h-px bg-white/[0.04]" />
+                      <div className="h-px bg-stone-100" />
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Duración estimada</span>
-                        <span className="text-foreground/80">~{maxRounds * 3} minutos</span>
+                        <span className="text-stone-500">
+                          Duraci\u00f3n estimada
+                        </span>
+                        <span className="text-stone-700">
+                          ~{maxRounds * 3} minutos
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -296,7 +459,12 @@ export default function SetupPage() {
           {/* Error */}
           <AnimatePresence>
             {error && (
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-4 rounded-xl border border-coral/10 bg-coral/5 p-4 text-sm text-coral">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+              >
                 {error}
               </motion.div>
             )}
@@ -308,7 +476,7 @@ export default function SetupPage() {
               variant="ghost"
               onClick={() => setStep((s) => s - 1)}
               disabled={step === 1}
-              className="rounded-xl text-muted-foreground"
+              className="rounded-lg text-stone-500"
             >
               <ArrowLeft className="mr-1.5 h-4 w-4" />
               Anterior
@@ -318,7 +486,7 @@ export default function SetupPage() {
               <Button
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canProceed()}
-                className="rounded-xl bg-ocean/10 text-ocean border-0 hover:bg-ocean/20 disabled:opacity-30"
+                className="rounded-lg bg-teal text-white hover:bg-teal-dark disabled:opacity-30"
               >
                 Siguiente
                 <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -327,18 +495,17 @@ export default function SetupPage() {
               <Button
                 onClick={handleStart}
                 disabled={loading || !canProceed()}
-                className="group rounded-full bg-gradient-to-r from-ocean to-sky px-8 py-3 text-sm font-semibold text-[#030712] glow-btn transition-all hover:brightness-110 disabled:opacity-30 disabled:shadow-none"
+                className="group btn-primary rounded-lg px-8 py-3 text-sm font-semibold disabled:opacity-30"
               >
                 {loading ? (
                   <>
-                    <Waves className="mr-2 h-4 w-4 animate-pulse" />
+                    <Droplets className="mr-2 h-4 w-4 animate-pulse" />
                     Iniciando...
                   </>
                 ) : (
                   <>
-                    <Rocket className="mr-2 h-4 w-4" />
                     Lanzar Foro
-                    <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </>
                 )}
               </Button>

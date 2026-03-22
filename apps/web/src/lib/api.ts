@@ -1,8 +1,6 @@
+// Production Railway URL as default — override with NEXT_PUBLIC_API_URL for local dev
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== "undefined" && window.location.hostname !== "localhost"
-    ? "https://aquaforum-ai-production.up.railway.app"
-    : "http://localhost:8000");
+  process.env.NEXT_PUBLIC_API_URL || "https://aquaforum-ai-production.up.railway.app";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {

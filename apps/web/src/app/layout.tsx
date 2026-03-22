@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AquaForum AI — Foro de Expertos con Inteligencia Artificial",
+  title: "AquaForum AI — El futuro del agua, debatido por inteligencia artificial",
   description:
-    "Plataforma de debate multi-agente para el sector del agua. Panelistas IA con personalidades únicas debaten temas hídricos en tiempo real.",
+    "Agentes de IA debaten el impacto de la inteligencia artificial en la gesti\u00f3n del agua. Inspirado en AI-2027. Un experimento en el que la IA reflexiona sobre s\u00ed misma.",
 };
 
 export default function RootLayout({
@@ -28,19 +28,8 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="relative min-h-full">
-        {/* Orbital gradient orbs */}
-        <div className="bg-orbs">
-          <div className="orb orb-1" />
-          <div className="orb orb-2" />
-          <div className="orb orb-3" />
-        </div>
-
-        {/* Dot grid */}
-        <div className="dot-grid" />
-
-        {/* Content */}
-        <div className="relative z-10">{children}</div>
+      <body className="relative min-h-full bg-stone-50 text-stone-900 paper-texture">
+        {children}
       </body>
     </html>
   );
