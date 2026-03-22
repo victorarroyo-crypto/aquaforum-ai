@@ -23,14 +23,14 @@ export function AudioPlayer({ messages }: AudioPlayerProps) {
 
   // Find messages with audio that haven't been played yet
   const audioMessages = messages.filter(
-    (m) => m.metadata?.audio_b64 && !playedIdsRef.current.has(m.id)
+    (m) => m.metadata?.audio_url && !playedIdsRef.current.has(m.id)
   );
 
   // When new audio messages arrive, add them to queue
   useEffect(() => {
     const newIndices: number[] = [];
     messages.forEach((m, i) => {
-      if (m.metadata?.audio_b64 && !playedIdsRef.current.has(m.id)) {
+      if (m.metadata?.audio_url && !playedIdsRef.current.has(m.id)) {
         if (!queueRef.current.includes(i)) {
           newIndices.push(i);
         }
@@ -71,7 +71,7 @@ export function AudioPlayer({ messages }: AudioPlayerProps) {
       audioRef.current.src = "";
     }
 
-    const audio = new Audio(`data:audio/mpeg;base64,${msg.metadata.audio_b64}`);
+    const audio = new Audio(msg.metadata.audio_url as string);
     audioRef.current = audio;
     audio.volume = muted ? 0 : 1;
 
@@ -119,7 +119,7 @@ export function AudioPlayer({ messages }: AudioPlayerProps) {
   };
 
   const currentMsg = currentIndex >= 0 ? messages[currentIndex] : null;
-  const hasAudioMessages = messages.some((m) => m.metadata?.audio_b64);
+  const hasAudioMessages = messages.some((m) => m.metadata?.audio_url);
 
   if (!hasAudioMessages) return null;
 

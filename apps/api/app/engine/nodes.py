@@ -62,12 +62,15 @@ async def _update_pipeline(session_id: str, node: str):
 
 
 async def _persist_message(session_id: str, msg: ForumMessage) -> str:
-    # Generate audio for this message
+    # Generate audio and upload to Supabase Storage
     from app.services.tts import generate_speech
-    audio_b64 = await generate_speech(msg["content"], msg["agent_name"])
     metadata = msg.get("metadata", {})
-    if audio_b64:
-        metadata["audio_b64"] = audio_b64
+    try:
+        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
+        if audio_url:
+            metadata["audio_url"] = audio_url
+    except Exception as e:
+        print(f"TTS failed for {msg['agent_name']}: {e}")
 
     return await db.add_message(
         session_id=session_id,
