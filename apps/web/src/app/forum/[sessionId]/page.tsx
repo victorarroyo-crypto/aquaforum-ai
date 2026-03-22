@@ -42,6 +42,7 @@ export default function ForumView() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [sidebar, setSidebar] = useState(true);
+  const [revealCount, setRevealCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useForumRealtime(sessionId);
@@ -83,9 +84,11 @@ export default function ForumView() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages.length]);
 
-  const discussionMessages = messages.filter(
+  const allDiscussion = messages.filter(
     (m) => !["analysis", "integration"].includes(m.message_type)
   );
+  // Only show messages that audio player has revealed
+  const discussionMessages = allDiscussion.slice(0, revealCount);
 
   const handleNextCycle = async () => {
     setLoading(true);
@@ -278,8 +281,8 @@ export default function ForumView() {
             </div>
           </div>
 
-          {/* Audio Player */}
-          <AudioPlayer messages={messages} />
+          {/* Audio Player — controls which messages are visible */}
+          <AudioPlayer messages={allDiscussion} onRevealUpTo={setRevealCount} />
 
           {/* Controls */}
           <div className="flex items-center gap-3 px-5 py-3 border-t border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
@@ -324,7 +327,7 @@ export default function ForumView() {
               className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.06)] p-4 bg-[#0C0C0F]"
             >
               <DebateInsights
-                messages={messages}
+                messages={discussionMessages}
                 panelists={config?.panelists || []}
                 status={status}
                 currentRound={currentRound}

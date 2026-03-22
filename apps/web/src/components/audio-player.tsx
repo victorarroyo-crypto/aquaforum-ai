@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX, SkipForward } from "lucide-react";
 import type { ForumMessage } from "@/lib/api";
@@ -9,59 +9,81 @@ function initials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-export function AudioPlayer({ messages }: { messages: ForumMessage[] }) {
+interface AudioPlayerProps {
+  messages: ForumMessage[];
+  onRevealUpTo: (count: number) => void; // tells parent how many messages to show
+}
+
+export function AudioPlayer({ messages, onRevealUpTo }: AudioPlayerProps) {
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [agent, setAgent] = useState<string | null>(null);
   const [color, setColor] = useState("#14B8A6");
 
-  const played = useRef(new Set<string>());
-  const queue = useRef<ForumMessage[]>([]);
   const audio = useRef<HTMLAudioElement | null>(null);
-  const busy = useRef(false);
+  const currentIdx = useRef(0); // index of message currently playing / next to play
   const isMuted = useRef(true);
 
   useEffect(() => { isMuted.current = muted; }, [muted]);
 
-  // Queue messages with audio_url
+  // When muted, reveal all messages immediately
   useEffect(() => {
-    for (const msg of messages) {
-      if (msg.metadata?.audio_url && !played.current.has(msg.id) && !queue.current.some((q) => q.id === msg.id)) {
-        queue.current.push(msg);
-      }
+    if (muted) {
+      onRevealUpTo(messages.length);
     }
-    if (!busy.current && !isMuted.current && queue.current.length > 0) {
-      next();
-    }
-  }, [messages, messages.length]);
+  }, [muted, messages.length, onRevealUpTo]);
 
-  function next() {
-    stop();
-    const msg = queue.current.shift();
-    if (!msg || isMuted.current) {
-      busy.current = false;
+  // When new messages arrive and we're unmuted, start playing if idle
+  useEffect(() => {
+    if (!isMuted.current && currentIdx.current < messages.length && !playing) {
+      playMessage(currentIdx.current);
+    }
+  }, [messages.length]);
+
+  const playMessage = useCallback((idx: number) => {
+    if (idx >= messages.length || isMuted.current) {
       setPlaying(false);
       setAgent(null);
       return;
     }
 
-    const url = msg.metadata?.audio_url as string;
-    if (!url) { next(); return; }
+    const msg = messages[idx];
+    const url = msg.metadata?.audio_url as string | undefined;
 
-    played.current.add(msg.id);
-    busy.current = true;
+    // Reveal this message on screen
+    onRevealUpTo(idx + 1);
+    currentIdx.current = idx;
+
     setAgent(msg.agent_name);
     setColor((msg.metadata?.color as string) || "#14B8A6");
     setPlaying(true);
 
-    const a = new Audio(url);
-    audio.current = a;
-    a.onended = () => { setTimeout(next, 600); }; // 600ms pause between speakers
-    a.onerror = () => { setTimeout(next, 200); };
-    a.play().catch(() => next());
-  }
+    if (url) {
+      // Play audio from URL
+      stopAudio();
+      const a = new Audio(url);
+      audio.current = a;
+      a.onended = () => {
+        currentIdx.current = idx + 1;
+        setTimeout(() => playMessage(idx + 1), 600);
+      };
+      a.onerror = () => {
+        currentIdx.current = idx + 1;
+        setTimeout(() => playMessage(idx + 1), 200);
+      };
+      a.play().catch(() => {
+        // Autoplay blocked — reveal message anyway, move to next
+        currentIdx.current = idx + 1;
+        setTimeout(() => playMessage(idx + 1), 1000);
+      });
+    } else {
+      // No audio — show message and move to next after a pause
+      currentIdx.current = idx + 1;
+      setTimeout(() => playMessage(idx + 1), 2000);
+    }
+  }, [messages, onRevealUpTo]);
 
-  function stop() {
+  function stopAudio() {
     if (audio.current) {
       audio.current.pause();
       audio.current.src = "";
@@ -70,27 +92,34 @@ export function AudioPlayer({ messages }: { messages: ForumMessage[] }) {
   }
 
   function toggle() {
-    const on = !muted;
-    setMuted(on);
-    isMuted.current = on;
-    if (on) {
-      stop();
-      busy.current = false;
+    const nowMuted = !muted;
+    setMuted(nowMuted);
+    isMuted.current = nowMuted;
+
+    if (nowMuted) {
+      stopAudio();
       setPlaying(false);
       setAgent(null);
-    } else if (queue.current.length > 0) {
-      next();
+      // Show all messages
+      onRevealUpTo(messages.length);
+    } else {
+      // Start from first unplayed message
+      if (currentIdx.current < messages.length) {
+        playMessage(currentIdx.current);
+      }
     }
   }
 
   function skip() {
-    stop();
-    busy.current = false;
-    next();
+    stopAudio();
+    const next = currentIdx.current + 1;
+    currentIdx.current = next;
+    onRevealUpTo(next);
+    playMessage(next);
   }
 
+  const pending = messages.length - currentIdx.current;
   const hasAudio = messages.some((m) => m.metadata?.audio_url);
-  const pending = queue.current.length;
 
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 border-t border-[rgba(255,255,255,0.06)] bg-[#111113]">
@@ -136,7 +165,7 @@ export function AudioPlayer({ messages }: { messages: ForumMessage[] }) {
         <span className="flex-1 text-[12px] text-[#3F3F46]">
           {muted
             ? hasAudio ? "Pulsa 🔊 para escuchar el debate" : "Audio disponible cuando inicie el debate"
-            : pending > 0 ? "Preparando audio..." : "Esperando intervenciones..."}
+            : pending > 0 ? "Preparando..." : "Esperando intervenciones..."}
         </span>
       )}
 
