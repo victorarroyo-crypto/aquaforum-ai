@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     tavily_api_key: str = ""
     supabase_url: str = ""
     supabase_service_role_key: str = ""
-    cors_origins: list[str] = ["http://localhost:3000"]
+    cors_origins: list[str] = ["*"]  # Allow all origins for now
     langchain_tracing_v2: bool = False
     langchain_api_key: str = ""
     langchain_project: str = "aquaforum-ai"
