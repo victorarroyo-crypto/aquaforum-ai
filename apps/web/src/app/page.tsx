@@ -67,17 +67,18 @@ export default function LandingPage() {
 
           {/* Headline */}
           <h1 className="mb-6 text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl md:text-8xl">
-            <span className="text-gradient">Debate</span>{" "}
-            <span className="text-foreground">inteligente</span>
+            <span className="text-foreground/60">El impacto de la</span>{" "}
+            <span className="text-gradient">IA</span>{" "}
+            <span className="text-foreground/60">en la</span>
             <br />
-            <span className="text-foreground/60">para el sector del</span>{" "}
+            <span className="text-foreground">gestión del</span>{" "}
             <span className="text-gradient-cyan">agua</span>
           </h1>
 
           {/* Subtitle */}
           <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground sm:text-xl">
-            Panelistas IA con personalidades únicas debaten temas hídricos en
-            tiempo real. Moderación autónoma. Análisis experto. Todo en un foro.
+            Panelistas IA debaten el impacto de la inteligencia artificial en la
+            gestión del agua. Moderación autónoma. Análisis experto. Tiempo real.
           </p>
 
           {/* CTAs */}
@@ -121,12 +122,12 @@ export default function LandingPage() {
       <section id="demo" className="relative py-32 px-6">
         <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-16">
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            Debate autónomo.{" "}
-            <span className="text-gradient">En tiempo real.</span>
+            IA debatiendo sobre{" "}
+            <span className="text-gradient">IA y agua.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Observa cómo panelistas IA con perspectivas únicas debaten, se interpelan
-            y construyen consensos sobre temas complejos del agua.
+            Observa cómo expertos IA debaten el impacto de la inteligencia artificial
+            en la gestión hídrica: gemelos digitales, optimización de EDAR, detección de fugas y más.
           </p>
         </motion.div>
 
@@ -154,20 +155,20 @@ export default function LandingPage() {
           {[
             {
               icon: Users,
-              title: "Multi-Agente IA",
-              desc: "Hasta 8 panelistas con personalidades, roles y estilos de debate únicos. CEOs, reguladores, ingenieros, economistas.",
+              title: "Expertos en IA + Agua",
+              desc: "Panelistas especializados en IA aplicada al sector hídrico: gemelos digitales, ML para EDAR, gobernanza algorítmica, ROI de digitalización.",
               color: "#06B6D4",
             },
             {
               icon: Zap,
-              title: "Tiempo Real",
-              desc: "Los mensajes aparecen en vivo mientras los agentes debaten. WebSocket powered by Supabase Realtime.",
+              title: "Debate en Tiempo Real",
+              desc: "Observa cómo los agentes debaten, se interpelan y construyen consensos sobre el impacto de la IA en la gestión del agua.",
               color: "#FBBF24",
             },
             {
               icon: Microscope,
-              title: "Análisis Experto",
-              desc: "Panel de expertos analiza cada ronda: viabilidad técnica, impacto económico, cumplimiento regulatorio.",
+              title: "Análisis Multi-Dimensional",
+              desc: "Panel experto analiza cada ronda desde 4 ejes: viabilidad técnica de la IA, impacto económico, regulación y sostenibilidad.",
               color: "#A78BFA",
             },
           ].map((f, i) => (

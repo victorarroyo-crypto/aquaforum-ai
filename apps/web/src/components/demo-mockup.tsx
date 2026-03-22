@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const DEMO_MESSAGES = [
-  { name: "Elena Ríos", role: "CEO Utility", color: "#06B6D4", type: "statement", text: "La digitalización del sector hídrico requiere una inversión de €2.5B en los próximos 5 años según la IWA..." },
-  { name: "Marco Vallejo", role: "Regulador", color: "#A78BFA", type: "challenge", text: "¿Cómo conciliamos esa inversión con el principio de recuperación de costes de la DMA?" },
-  { name: "Elena Ríos", role: "CEO Utility", color: "#06B6D4", type: "response", text: "Proponemos un modelo de financiación mixta: tarifa + fondos europeos + colaboración público-privada..." },
-  { name: "Sofía Chen", role: "Ing. Ambiental", color: "#34D399", type: "statement", text: "Las soluciones basadas en la naturaleza reducen costes un 30% frente a infraestructura gris convencional..." },
-  { name: "Moderador", role: "IA", color: "#FBBF24", type: "moderation", text: "Punto interesante. Carlos, ¿qué opinas desde la perspectiva económica?" },
+  { name: "Elena Ríos", role: "CEO Utility", color: "#06B6D4", type: "statement", text: "La IA predictiva ya reduce las pérdidas de agua no contabilizada en un 25%. Nuestros gemelos digitales anticipan roturas antes de que ocurran..." },
+  { name: "Marco Vallejo", role: "Regulador", color: "#A78BFA", type: "challenge", text: "¿Qué marcos regulatorios necesitamos para gobernar algoritmos que toman decisiones sobre un recurso público esencial?" },
+  { name: "Elena Ríos", role: "CEO Utility", color: "#06B6D4", type: "response", text: "Proponemos un sandbox regulatorio específico para IA hídrica, similar al modelo fintech, con auditorías algorítmicas obligatorias..." },
+  { name: "Sofía Chen", role: "Ing. Ambiental", color: "#34D399", type: "statement", text: "El machine learning optimiza la dosificación de reactivos en EDAR con un ahorro del 30% en químicos y una reducción del 40% en fangos..." },
+  { name: "Moderador", role: "IA", color: "#FBBF24", type: "moderation", text: "Carlos, ¿cómo valoramos económicamente el retorno de inversión en IA para utilities de agua?" },
 ];
 
 export function DemoMockup() {

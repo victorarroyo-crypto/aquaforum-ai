@@ -24,10 +24,10 @@ import {
 import Link from "next/link";
 
 const DEFAULT_PANELISTS = [
-  { name: "Elena Ríos", role: "CEO Utility", persona: "CEO de una empresa de servicios de agua con 20 años de experiencia. Enfocada en eficiencia operativa, sostenibilidad financiera y transformación digital del sector.", color: "#06B6D4" },
-  { name: "Marco Vallejo", role: "Analista Regulatorio", persona: "Experto en regulación del agua con experiencia en la Directiva Marco del Agua de la UE. Conoce profundamente el marco normativo y las políticas hídricas.", color: "#A78BFA" },
-  { name: "Sofía Chen", role: "Ingeniera Ambiental", persona: "Ingeniera especializada en tratamiento de aguas y economía circular. Defensora de soluciones basadas en la naturaleza y tecnologías de reutilización.", color: "#34D399" },
-  { name: "Carlos Mendoza", role: "Economista del Agua", persona: "Economista especializado en valoración de recursos hídricos, tarifas del agua y financiación de infraestructuras. Consultor del Banco Mundial.", color: "#FBBF24" },
+  { name: "Elena Ríos", role: "CTO Water Utility · IA", persona: "CTO de una utility de agua que lidera la transformación digital con IA. Experta en gemelos digitales de redes hidráulicas, mantenimiento predictivo con ML y optimización de operaciones con algoritmos de IA. 15 años en el sector.", color: "#06B6D4" },
+  { name: "Marco Vallejo", role: "Regulador · Gobernanza IA", persona: "Especialista en regulación de IA aplicada a servicios públicos esenciales. Experto en el AI Act europeo, gobernanza algorítmica y marcos éticos para el uso de IA en gestión de recursos hídricos. Asesor de la Comisión Europea.", color: "#A78BFA" },
+  { name: "Sofía Chen", role: "Data Scientist · EDAR", persona: "Data scientist especializada en machine learning para optimización de estaciones depuradoras (EDAR). Desarrolla modelos de IA para dosificación de reactivos, predicción de calidad de efluente y reducción energética. PhD en ingeniería ambiental computacional.", color: "#34D399" },
+  { name: "Carlos Mendoza", role: "Economista · ROI de IA", persona: "Economista especializado en análisis de retorno de inversión de tecnologías de IA en el sector del agua. Consultor del Banco Mundial en proyectos de digitalización hídrica. Experto en modelos de financiación de infraestructura inteligente.", color: "#FBBF24" },
 ];
 
 const DEFAULT_RULES = [
@@ -51,7 +51,7 @@ export default function SetupPage() {
 
   const [step, setStep] = useState(1);
   const [topic, setTopic] = useState(
-    "Estrategias innovadoras para la gestión sostenible del agua urbana en el contexto del cambio climático"
+    "Impacto de la Inteligencia Artificial en la gestión del agua: oportunidades, riesgos y transformación del sector hídrico"
   );
   const [panelists, setPanelists] = useState(DEFAULT_PANELISTS);
   const [maxRounds, setMaxRounds] = useState(3);
