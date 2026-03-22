@@ -79,28 +79,33 @@ export function AudioPlayer({ messages }: { messages: ForumMessage[] }) {
     // CRITICAL: cancel any pending speech first
     window.speechSynthesis.cancel();
 
-    const clean = msg.content
+    let clean = msg.content
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/\[CHALLENGE:[^\]]+\]/g, "")
       .replace(/#{1,3}\s/g, "")
-      .trim()
-      .slice(0, 300);
+      .replace(/^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*/i, "")
+      .trim();
 
     if (clean.length < 5) { processQueue(); return; }
 
-    const utt = new SpeechSynthesisUtterance(clean);
+    // Split into sentences to avoid browser TTS cutting long text
+    const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+    speakSentences(sentences, 0);
+  }
+
+  function speakSentences(sentences: string[], index: number) {
+    if (mutedRef.current || index >= sentences.length) {
+      setTimeout(() => processQueue(), 500);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(sentences[index].trim());
     utt.lang = "es-ES";
     utt.rate = 0.9;
     utt.pitch = 1.0;
-
-    // Wait for speech to actually finish before next
-    utt.onend = () => {
-      setTimeout(() => processQueue(), 500); // 500ms pause between speakers
-    };
-    utt.onerror = () => {
-      setTimeout(() => processQueue(), 200);
-    };
-
+    utt.onend = () => speakSentences(sentences, index + 1);
+    utt.onerror = () => speakSentences(sentences, index + 1);
     window.speechSynthesis.speak(utt);
   }
 
