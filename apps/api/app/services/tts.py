@@ -33,9 +33,16 @@ def _get_supabase_url() -> str:
 
 
 def _get_supabase_key() -> str:
-    # Storage API needs the full JWT, not the sb_secret_ format
-    key = os.environ.get("SUPABASE_JWT_KEY", "") or settings.supabase_service_role_key or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
-    return key
+    # Storage API needs the full JWT (eyJ...), not sb_secret_ format
+    # Prioritize SUPABASE_JWT_KEY which is always the full JWT
+    jwt = os.environ.get("SUPABASE_JWT_KEY", "")
+    if jwt:
+        return jwt
+    # Fallback: use service role key only if it's a JWT
+    srk = settings.supabase_service_role_key or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    if srk.startswith("eyJ"):
+        return srk
+    return ""
 
 
 async def generate_speech(text: str, agent_name: str, session_id: str) -> str | None:
