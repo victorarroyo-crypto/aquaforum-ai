@@ -37,8 +37,8 @@ export function MessageBubble({ agentName, agentRole, content, messageType, colo
         className="mx-auto max-w-lg text-center py-6"
       >
         <div className="rule w-8 mx-auto mb-4" />
-        <p className="text-sm leading-[1.8] text-ink-muted font-serif italic">{content}</p>
-        <p className="text-[10px] text-ink-ghost mt-3 uppercase tracking-widest">{cfg.label}</p>
+        <p className="text-sm leading-[1.8] text-ink-muted italic">{content}</p>
+        <p className="text-[10px] text-ink-ghost mt-3 uppercase tracking-widest font-bold">{cfg.label}</p>
         {timestamp && (
           <p className="text-[10px] text-ink-ghost mt-1">
             {new Date(timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
@@ -63,14 +63,14 @@ export function MessageBubble({ agentName, agentRole, content, messageType, colo
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-sm font-semibold text-ink">{agentName}</span>
+          <span className="text-sm font-bold text-ink">{agentName}</span>
           <span className="text-xs text-ink-faint">{agentRole}</span>
-          <span className={`ml-auto text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${cfg.badge}`}>
+          <span className={`ml-auto text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${cfg.badge}`}>
             <Icon className="inline h-2.5 w-2.5 mr-0.5 -mt-px" />
             {cfg.label}
           </span>
         </div>
-        <div className="text-sm leading-[1.8] text-ink-light whitespace-pre-wrap">{content}</div>
+        <div className="text-[15px] leading-[1.8] text-ink-light whitespace-pre-wrap">{content}</div>
         {timestamp && (
           <div className="mt-2 text-[10px] text-ink-ghost">
             {new Date(timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}

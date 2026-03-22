@@ -54,15 +54,15 @@ export function DemoMockup() {
   }, [visibleCount]);
 
   return (
-    <div className="border border-rule rounded overflow-hidden mx-auto max-w-2xl">
+    <div className="border border-white/10 rounded-lg overflow-hidden mx-auto max-w-2xl bg-white shadow-2xl shadow-black/20">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-rule bg-paper-warm">
-        <span className="text-[11px] text-ink-faint font-medium tracking-wide uppercase">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-100 bg-neutral-50">
+        <span className="text-[11px] text-neutral-500 font-bold tracking-wide uppercase">
           AquaForum AI — Debate en curso
         </span>
         <div className="flex items-center gap-1.5">
           <div className="h-1.5 w-1.5 rounded-full bg-teal animate-pulse" />
-          <span className="text-[10px] text-teal font-medium">En vivo</span>
+          <span className="text-[10px] text-teal font-bold">En vivo</span>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export function DemoMockup() {
               className={msg.type === "moderation" ? "text-center py-2" : "flex gap-3"}
             >
               {msg.type === "moderation" ? (
-                <p className="text-xs italic text-ink-faint font-serif leading-relaxed max-w-md mx-auto">
+                <p className="text-xs italic text-neutral-400 leading-relaxed max-w-md mx-auto">
                   {msg.text}
                 </p>
               ) : (
@@ -92,15 +92,15 @@ export function DemoMockup() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-ink">{msg.name}</span>
-                      <span className="text-[10px] text-ink-faint">{msg.role}</span>
+                      <span className="text-xs font-bold text-neutral-900">{msg.name}</span>
+                      <span className="text-[10px] text-neutral-400">{msg.role}</span>
                       {msg.type === "challenge" && (
-                        <span className="text-[9px] uppercase tracking-wider font-semibold text-challenge bg-challenge-bg px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
                           Interpelación
                         </span>
                       )}
                     </div>
-                    <p className="text-xs leading-relaxed text-ink-muted">{msg.text}</p>
+                    <p className="text-xs leading-relaxed text-neutral-600">{msg.text}</p>
                   </div>
                 </>
               )}
@@ -110,9 +110,9 @@ export function DemoMockup() {
 
         {visibleCount > 0 && visibleCount < DEMO_MESSAGES.length && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1.5 pl-10">
-            <div className="typing-dot h-1 w-1 rounded-full bg-ink-ghost" />
-            <div className="typing-dot h-1 w-1 rounded-full bg-ink-ghost" />
-            <div className="typing-dot h-1 w-1 rounded-full bg-ink-ghost" />
+            <div className="typing-dot h-1 w-1 rounded-full bg-neutral-300" />
+            <div className="typing-dot h-1 w-1 rounded-full bg-neutral-300" />
+            <div className="typing-dot h-1 w-1 rounded-full bg-neutral-300" />
           </motion.div>
         )}
       </div>

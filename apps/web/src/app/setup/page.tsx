@@ -100,24 +100,24 @@ export default function SetupPage() {
       <header className="flex items-center justify-between px-6 sm:px-12 py-5 border-b border-rule">
         <Link href="/" className="flex items-center gap-2 text-ink-faint hover:text-ink transition-colors">
           <ArrowLeft className="h-4 w-4" />
-          <span className="text-xs font-medium uppercase tracking-widest">AquaForum</span>
+          <span className="section-kicker">AquaForum</span>
         </Link>
       </header>
 
       {/* Steps */}
-      <div className="mx-auto w-full max-w-2xl px-6 pt-8 pb-4">
+      <div className="mx-auto w-full max-w-3xl px-6 pt-8 pb-4">
         <div className="flex items-center justify-center gap-8">
           {STEPS.map((s, i) => (
             <div key={s.id} className="flex items-center gap-3">
               <button
                 onClick={() => s.id < step && setStep(s.id)}
-                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-all ${
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
                   s.id === step ? "bg-ink text-paper" : s.id < step ? "bg-teal/10 text-teal" : "border border-rule text-ink-ghost"
                 }`}
               >
-                {s.id < step ? <Check className="h-3 w-3" /> : s.id}
+                {s.id < step ? <Check className="h-3.5 w-3.5" /> : s.id}
               </button>
-              <span className={`text-xs ${s.id === step ? "font-semibold text-ink" : "text-ink-ghost"}`}>{s.label}</span>
+              <span className={`text-sm ${s.id === step ? "font-bold text-ink" : "text-ink-ghost"}`}>{s.label}</span>
               {i < STEPS.length - 1 && <div className={`w-12 h-px ${s.id < step ? "bg-teal" : "bg-rule"}`} />}
             </div>
           ))}
@@ -126,12 +126,12 @@ export default function SetupPage() {
 
       {/* Content */}
       <div className="flex-1 px-6 sm:px-12 pb-8">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-3xl">
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 className="text-headline text-ink mb-2 mt-8">¿Sobre qué debatimos?</h2>
-                <p className="text-ink-muted mb-8">Define el tema central. Los 4 ciclos del debate serán progresivos.</p>
+                <h2 className="text-headline text-ink mb-3 mt-8">¿Sobre qué debatimos?</h2>
+                <p className="text-ink-muted text-base mb-8">Define el tema central. Los 4 ciclos del debate serán progresivos.</p>
                 <Textarea
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
@@ -139,11 +139,11 @@ export default function SetupPage() {
                   className="min-h-[120px] rounded border-rule bg-paper text-ink text-base placeholder:text-ink-ghost focus:border-teal/40 resize-none"
                 />
                 <div className="mt-6 border border-rule rounded p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal mb-4">4 ciclos progresivos</p>
+                  <p className="section-kicker text-teal mb-4">4 ciclos progresivos</p>
                   <div className="space-y-3">
                     {CYCLE_TOPICS.map((c, i) => (
                       <div key={i} className="flex items-start gap-3">
-                        <span className="text-xs font-serif text-teal/40 pt-0.5">{i + 1}</span>
+                        <span className="text-sm font-bold text-teal/40 pt-0.5">{i + 1}</span>
                         <span className="text-sm text-ink-muted">{c}</span>
                       </div>
                     ))}
@@ -172,7 +172,7 @@ export default function SetupPage() {
                             {(p.name || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <div className="text-sm font-semibold text-ink">{p.name || "Nuevo"}</div>
+                            <div className="text-sm font-bold text-ink">{p.name || "Nuevo"}</div>
                             <div className="text-[11px] text-ink-faint">{p.role || "Sin rol"}</div>
                           </div>
                         </div>
@@ -199,23 +199,23 @@ export default function SetupPage() {
 
             {step === 3 && (
               <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 className="text-headline text-ink mb-2 mt-8">Configuración</h2>
-                <p className="text-ink-muted mb-8">Ajusta los parámetros del debate.</p>
+                <h2 className="text-headline text-ink mb-3 mt-8">Configuración</h2>
+                <p className="text-ink-muted text-base mb-8">Ajusta los parámetros del debate.</p>
                 <div className="space-y-6">
                   <div className="border border-rule rounded p-5">
                     <div className="flex items-center justify-between mb-4">
-                      <label className="text-sm text-ink-muted">Rondas</label>
-                      <span className="text-2xl font-serif text-teal">{maxRounds}</span>
+                      <label className="text-sm font-medium text-ink-muted">Rondas</label>
+                      <span className="text-3xl font-black text-teal">{maxRounds}</span>
                     </div>
                     <Slider value={[maxRounds]} onValueChange={(v) => setMaxRounds(Array.isArray(v) ? v[0] : v)} min={1} max={5} step={1} />
                   </div>
                   <div className="border border-rule rounded p-5">
-                    <label className="text-sm text-ink-muted mb-3 block">Reglas del debate</label>
+                    <label className="text-sm font-medium text-ink-muted mb-3 block">Reglas del debate</label>
                     <Textarea value={rules} onChange={(e) => setRules(e.target.value)} className="min-h-[100px] rounded border-rule bg-paper text-sm placeholder:text-ink-ghost resize-none" />
                   </div>
                   {/* Summary */}
-                  <div className="border-t-2 border-t-teal border border-rule rounded p-5">
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-ink mb-4">Resumen</h3>
+                  <div className="border-t-[3px] border-t-teal border border-rule rounded p-5">
+                    <h3 className="section-kicker text-ink mb-4">Resumen</h3>
                     <div className="space-y-2.5 text-sm">
                       {[
                         ["Tema", topic.slice(0, 60) + (topic.length > 60 ? "..." : "")],
@@ -226,7 +226,7 @@ export default function SetupPage() {
                       ].map(([k, v]) => (
                         <div key={k} className="flex justify-between">
                           <span className="text-ink-faint">{k}</span>
-                          <span className="text-ink text-right max-w-[55%] truncate">{v}</span>
+                          <span className="text-ink font-medium text-right max-w-[55%] truncate">{v}</span>
                         </div>
                       ))}
                     </div>
@@ -249,11 +249,11 @@ export default function SetupPage() {
               <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Anterior
             </Button>
             {step < 3 ? (
-              <Button onClick={() => setStep((s) => s + 1)} disabled={!canProceed()} className="bg-ink text-paper hover:bg-teal-dark disabled:opacity-30 rounded px-6">
+              <Button onClick={() => setStep((s) => s + 1)} disabled={!canProceed()} className="bg-ink text-paper hover:bg-teal-dark disabled:opacity-30 rounded px-6 font-bold">
                 Siguiente <ArrowRight className="ml-1 h-3.5 w-3.5" />
               </Button>
             ) : (
-              <Button onClick={handleStart} disabled={loading || !canProceed()} className="group bg-ink text-paper hover:bg-teal-dark disabled:opacity-30 rounded px-8 py-3 text-sm font-medium uppercase tracking-wide">
+              <Button onClick={handleStart} disabled={loading || !canProceed()} className="group bg-ink text-paper hover:bg-teal-dark disabled:opacity-30 rounded px-8 py-3 text-sm font-bold uppercase tracking-wide">
                 {loading ? "Iniciando..." : <>Lanzar Foro <ArrowRight className="ml-2 h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" /></>}
               </Button>
             )}

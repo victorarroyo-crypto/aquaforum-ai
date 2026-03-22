@@ -20,10 +20,10 @@ export function InsightCard({ title, content, type = "technical" }: InsightCardP
     <div className="border border-rule rounded p-4 hover:border-ink-ghost transition-colors" style={{ borderLeft: `2px solid ${c.color}` }}>
       <div className="flex items-center gap-2 mb-2">
         <Icon className="h-3.5 w-3.5" style={{ color: c.color }} />
-        <h4 className="text-xs font-semibold text-ink">{title}</h4>
-        <span className="ml-auto text-[9px] font-semibold uppercase tracking-wider" style={{ color: c.color }}>{c.label}</span>
+        <h4 className="text-xs font-bold text-ink">{title}</h4>
+        <span className="ml-auto text-[9px] font-bold uppercase tracking-wider" style={{ color: c.color }}>{c.label}</span>
       </div>
-      <p className="text-xs leading-relaxed text-ink-muted pl-5">{content}</p>
+      <p className="text-[13px] leading-relaxed text-ink-muted pl-5">{content}</p>
     </div>
   );
 }

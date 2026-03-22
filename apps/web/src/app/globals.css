@@ -111,54 +111,60 @@
   }
 }
 
-/* ══════ SERIF ══════ */
-.font-serif {
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-}
-
-/* ══════ MANIFESTO TYPOGRAPHY ══════ */
+/* ====== BOLD DISPLAY TYPOGRAPHY ====== */
 .text-display {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  font-weight: 400;
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 900;
 }
 
 .text-headline {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-weight: 400;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 800;
 }
 
 .text-subhead {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(1.1rem, 2vw, 1.5rem);
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-  font-weight: 400;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
-/* ══════ THIN RULE ══════ */
+/* ====== SECTION KICKER ====== */
+.section-kicker {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+}
+
+/* ====== DARK SECTION ====== */
+.section-dark {
+  background-color: #0A0A0A;
+  color: #FFFFFF;
+}
+
+/* ====== THIN RULE ====== */
 .rule {
   height: 1px;
   background: #E5E5E5;
 }
 
 .rule-thick {
-  height: 2px;
+  height: 3px;
   background: #111;
 }
 
-/* ══════ SCROLLBAR ══════ */
+/* ====== SCROLLBAR ====== */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #DDD; border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: #BBB; }
 
-/* ══════ TYPING DOTS ══════ */
+/* ====== TYPING DOTS ====== */
 @keyframes typing-dot {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.25; }
   30% { transform: translateY(-3px); opacity: 0.7; }

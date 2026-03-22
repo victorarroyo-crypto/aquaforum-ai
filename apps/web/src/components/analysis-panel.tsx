@@ -22,7 +22,7 @@ export function AnalysisPanel({ messages }: AnalysisPanelProps) {
     return (
       <div className="border border-rule rounded p-6 text-center">
         <Microscope className="h-5 w-5 text-ink-ghost mx-auto mb-3" />
-        <p className="text-xs text-ink-ghost leading-relaxed">
+        <p className="text-xs text-ink-ghost leading-relaxed font-medium">
           Los análisis aparecerán al finalizar cada ronda.
         </p>
       </div>
@@ -33,10 +33,10 @@ export function AnalysisPanel({ messages }: AnalysisPanelProps) {
     <div className="border border-rule rounded p-4">
       <Tabs defaultValue="analysis" className="w-full">
         <TabsList className="w-full rounded bg-paper-warm p-0.5 h-7">
-          <TabsTrigger value="analysis" className="flex-1 gap-1 rounded text-[10px] h-6 data-[state=active]:bg-paper data-[state=active]:shadow-sm text-ink-faint data-[state=active]:text-ink">
+          <TabsTrigger value="analysis" className="flex-1 gap-1 rounded text-[10px] h-6 data-[state=active]:bg-paper data-[state=active]:shadow-sm text-ink-faint data-[state=active]:text-ink font-bold">
             <Microscope className="h-2.5 w-2.5" /> Análisis
           </TabsTrigger>
-          <TabsTrigger value="integration" className="flex-1 gap-1 rounded text-[10px] h-6 data-[state=active]:bg-paper data-[state=active]:shadow-sm text-ink-faint data-[state=active]:text-ink">
+          <TabsTrigger value="integration" className="flex-1 gap-1 rounded text-[10px] h-6 data-[state=active]:bg-paper data-[state=active]:shadow-sm text-ink-faint data-[state=active]:text-ink font-bold">
             <Layers className="h-2.5 w-2.5" /> Integración
           </TabsTrigger>
         </TabsList>

@@ -20,8 +20,8 @@ export function PipelineDisplay({ currentNode, progress }: PipelineDisplayProps)
   return (
     <div className="border border-rule rounded p-5">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-faint">Pipeline</h3>
-        <span className="text-[10px] font-mono text-teal">{Math.round(progress * 100)}%</span>
+        <h3 className="section-kicker text-ink-faint">Pipeline</h3>
+        <span className="text-[11px] font-mono font-bold text-teal">{Math.round(progress * 100)}%</span>
       </div>
       <div className="space-y-0">
         {PIPELINE_NODES.map((node, i) => {
@@ -43,7 +43,7 @@ export function PipelineDisplay({ currentNode, progress }: PipelineDisplayProps)
                   {done ? <Check className="h-3 w-3 text-teal" /> : <Icon className={`h-3 w-3 ${active ? "text-teal" : "text-ink-ghost"}`} />}
                 </motion.div>
               </div>
-              <span className={`text-xs pt-0.5 ${active ? "font-semibold text-teal" : done ? "text-ink-muted" : "text-ink-ghost"}`}>
+              <span className={`text-xs pt-0.5 ${active ? "font-bold text-teal" : done ? "text-ink-muted" : "text-ink-ghost"}`}>
                 {node.label}
               </span>
             </div>
