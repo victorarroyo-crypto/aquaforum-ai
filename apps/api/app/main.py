@@ -21,6 +21,23 @@ app.add_middleware(
 app.include_router(forum.router, prefix="/forum", tags=["forum"])
 
 
+@app.get("/test-tts")
+async def test_tts():
+    """Test TTS pipeline end to end."""
+    import os
+    from app.services.tts import generate_speech
+    try:
+        url = await generate_speech("Hola, esto es una prueba de audio.", "Moderador", "test-session")
+        return {
+            "audio_url": url,
+            "elevenlabs_key": bool(os.environ.get("ELEVENLABS_API_KEY")),
+            "supabase_jwt": bool(os.environ.get("SUPABASE_JWT_KEY")),
+            "supabase_url": bool(os.environ.get("SUPABASE_URL")),
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.get("/health")
 async def health():
     import os
