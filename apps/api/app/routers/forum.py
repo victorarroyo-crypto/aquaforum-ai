@@ -171,9 +171,13 @@ async def get_message_audio(session_id: str, message_id: str):
         return {"audio_url": existing_url}
 
     # Generate audio
-    audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
-    if audio_url:
-        await db.update_message_metadata(message_id, {"audio_url": audio_url})
-        return {"audio_url": audio_url}
-
-    raise HTTPException(status_code=500, detail="Audio generation failed")
+    try:
+        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
+        if audio_url:
+            await db.update_message_metadata(message_id, {"audio_url": audio_url})
+            return {"audio_url": audio_url}
+        raise HTTPException(status_code=500, detail="generate_speech returned None")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
