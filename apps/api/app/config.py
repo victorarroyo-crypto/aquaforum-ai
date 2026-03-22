@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     langchain_api_key: str = ""
     langchain_project: str = "aquaforum-ai"
     elevenlabs_api_key: str = ""
+    hf_token: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

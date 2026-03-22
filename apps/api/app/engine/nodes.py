@@ -63,6 +63,13 @@ async def _update_pipeline(session_id: str, node: str):
 
 async def _persist_message(session_id: str, msg: ForumMessage) -> str:
     metadata = msg.get("metadata", {})
+    try:
+        from app.services.tts import generate_speech
+        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
+        if audio_url:
+            metadata["audio_url"] = audio_url
+    except Exception as e:
+        print(f"TTS skip: {e}")
 
     return await db.add_message(
         session_id=session_id,
