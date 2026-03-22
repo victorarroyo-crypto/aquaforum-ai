@@ -21,6 +21,22 @@ app.add_middleware(
 app.include_router(forum.router, prefix="/forum", tags=["forum"])
 
 
+@app.get("/test-tts-persist")
+async def test_tts_persist():
+    """Test TTS exactly as _persist_message does it."""
+    try:
+        from app.services.tts import generate_speech
+        url = await generate_speech(
+            "Esta es una prueba de audio desde persist message.",
+            "Elena Vásquez",
+            "test-persist"
+        )
+        return {"audio_url": url, "status": "ok" if url else "failed"}
+    except Exception as e:
+        import traceback
+        return {"error": str(e), "trace": traceback.format_exc()}
+
+
 @app.get("/test-tts")
 async def test_tts():
     """Test TTS pipeline step by step."""
