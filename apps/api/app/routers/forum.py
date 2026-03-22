@@ -156,13 +156,13 @@ async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
 
 @router.get("/{session_id}/audio/{message_id}")
 async def get_message_audio(session_id: str, message_id: str):
-    """Generate audio for a specific message on demand."""
+    """Generate audio on demand via Chatterbox (HuggingFace) — FREE."""
+    import json as jsonlib
     import os
     import re
     import uuid
     import httpx as hx
 
-    # Get message
     result = db.get_supabase().table("forum_messages").select("metadata,content,agent_name").eq("id", message_id).execute()
     if not result.data:
         raise HTTPException(status_code=404, detail="Message not found")
@@ -172,57 +172,83 @@ async def get_message_audio(session_id: str, message_id: str):
     if existing_url:
         return {"audio_url": existing_url}
 
-    # Voice mapping
-    voices = {
-        "Elena Vásquez": "EXAVITQu4vr4xnSDxMaL", "Marcus Chen": "onwK4e9ZLuTAKqWW03F9",
-        "Sofia Andersen": "Xb7hH8MSUJpSbSDYk0k2", "Ahmed Al-Rashid": "JBFqnCBsd6RMkjVDRZzb",
-        "Dr. Ingrid Hoffmann": "XrExE9yKIg1WjnnlVkGX", "James Okafor": "nPczCjzI2devNBz1zQrb",
-        "Moderador": "CwhRBWXzGAHq8TQ4Fs17", "Integrador": "cjVigY5qzO86Huf0OWal",
-    }
-    voice_id = voices.get(msg["agent_name"], "CwhRBWXzGAHq8TQ4Fs17")
-
-    # Clean text
+    # Clean text (max 300 chars for Chatterbox)
     text = re.sub(r"\*\*([^*]+)\*\*", r"\1", msg["content"])
     text = re.sub(r"\[CHALLENGE:[^\]]+\]", "", text)
     text = re.sub(r"#{1,3}\s", "", text)
-    text = re.sub(r"^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*", "", text, flags=re.IGNORECASE).strip()
+    text = re.sub(r"^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*", "", text, flags=re.IGNORECASE).strip()[:300]
 
-    el_key = os.environ.get("ELEVENLABS_API_KEY", "")
+    if len(text) < 5:
+        raise HTTPException(status_code=400, detail="Text too short")
+
+    # Voice params per agent (different seed = different voice)
+    seeds = {"Elena Vásquez": 42, "Marcus Chen": 137, "Sofia Andersen": 256, "Ahmed Al-Rashid": 789, "Dr. Ingrid Hoffmann": 512, "James Okafor": 333, "Moderador": 100, "Integrador": 200}
+    seed = seeds.get(msg["agent_name"], 42)
+
+    hf_token = os.environ.get("HF_TOKEN", "")
     jwt = os.environ.get("SUPABASE_JWT_KEY", "")
     supa_url = os.environ.get("SUPABASE_URL", "")
 
-    if not el_key or not jwt or not supa_url:
-        raise HTTPException(status_code=500, detail="Missing credentials")
+    headers = {"Content-Type": "application/json"}
+    if hf_token:
+        headers["Authorization"] = f"Bearer {hf_token}"
 
     try:
-        # Generate audio
-        with hx.Client(timeout=45.0) as client:
+        with hx.Client(timeout=90.0) as client:
+            # Step 1: Submit to Chatterbox
             resp = client.post(
-                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream",
-                headers={"xi-api-key": el_key, "Content-Type": "application/json"},
-                params={"output_format": "mp3_44100_128"},
-                json={"text": text, "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": 0.35, "similarity_boost": 0.8, "style": 0.45, "use_speaker_boost": True}},
+                "https://resembleai-chatterbox.hf.space/gradio_api/call/generate_tts_audio",
+                headers=headers,
+                json={"data": [text, None, 0.4, 0.9, seed, 0.5, False]},
             )
             if resp.status_code != 200:
-                raise HTTPException(status_code=500, detail=f"ElevenLabs {resp.status_code}: {resp.text[:100]}")
-            audio = resp.content
+                raise HTTPException(status_code=500, detail=f"Chatterbox submit: {resp.status_code}")
 
-        # Upload to Supabase Storage
-        fname = f"{session_id}/{uuid.uuid4().hex[:8]}.mp3"
-        with hx.Client(timeout=15.0) as client:
+            event_id = resp.json().get("event_id")
+            if not event_id:
+                raise HTTPException(status_code=500, detail="No event_id")
+
+            # Step 2: Get result
+            result_resp = client.get(
+                f"https://resembleai-chatterbox.hf.space/gradio_api/call/generate_tts_audio/{event_id}",
+                headers=headers,
+                timeout=90.0,
+            )
+
+            audio_hf_url = None
+            for line in result_resp.text.split("\n"):
+                if line.startswith("data: ") and line[6:] != "null":
+                    try:
+                        data = jsonlib.loads(line[6:])
+                        if isinstance(data, list) and data:
+                            audio_hf_url = data[0].get("url")
+                    except (jsonlib.JSONDecodeError, TypeError):
+                        pass
+
+            if not audio_hf_url:
+                raise HTTPException(status_code=500, detail="No audio URL from Chatterbox")
+
+            # Step 3: Download audio
+            audio_resp = client.get(audio_hf_url, headers=headers)
+            if audio_resp.status_code != 200:
+                raise HTTPException(status_code=500, detail="Download failed")
+            audio_bytes = audio_resp.content
+
+            # Step 4: Upload to Supabase Storage
+            if not jwt or not supa_url:
+                raise HTTPException(status_code=500, detail="Missing Supabase creds")
+
+            fname = f"{session_id}/{uuid.uuid4().hex[:8]}.wav"
             r = client.post(
                 f"{supa_url}/storage/v1/object/audio/{fname}",
-                headers={"Authorization": f"Bearer {jwt}", "Content-Type": "audio/mpeg", "x-upsert": "true"},
-                content=audio,
+                headers={"Authorization": f"Bearer {jwt}", "Content-Type": "audio/wav", "x-upsert": "true"},
+                content=audio_bytes,
             )
             if r.status_code not in (200, 201):
-                raise HTTPException(status_code=500, detail=f"Storage {r.status_code}")
+                raise HTTPException(status_code=500, detail=f"Storage: {r.status_code}")
 
         audio_url = f"{supa_url}/storage/v1/object/public/audio/{fname}"
-
-        # Update message metadata
         await db.update_message_metadata(message_id, {"audio_url": audio_url})
-
         return {"audio_url": audio_url}
 
     except HTTPException:
