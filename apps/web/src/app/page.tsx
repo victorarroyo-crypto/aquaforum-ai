@@ -1,377 +1,299 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
-import { AgentBadge } from "@/components/agent-badge";
-import { api, type ForumConfig } from "@/lib/api";
-import { useForumStore } from "@/store/forum-store";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { WaterParticles } from "@/components/water-particles";
+import { DemoMockup } from "@/components/demo-mockup";
 import {
-  Plus,
-  Trash2,
   Waves,
-  Droplets,
-  Zap,
   Users,
-  Settings,
-  ChevronRight,
+  Zap,
+  Microscope,
+  MessageSquare,
+  BarChart3,
+  FileText,
+  ArrowRight,
   Sparkles,
 } from "lucide-react";
 
-const DEFAULT_PANELISTS = [
-  {
-    name: "Elena Ríos",
-    role: "CEO Utility",
-    persona:
-      "CEO de una empresa de servicios de agua con 20 años de experiencia. Enfocada en eficiencia operativa, sostenibilidad financiera y transformación digital del sector.",
-    color: "#06B6D4",
-  },
-  {
-    name: "Marco Vallejo",
-    role: "Analista Regulatorio",
-    persona:
-      "Experto en regulación del agua con experiencia en la Directiva Marco del Agua de la UE. Conoce profundamente el marco normativo y las políticas hídricas.",
-    color: "#A78BFA",
-  },
-  {
-    name: "Sofía Chen",
-    role: "Ingeniera Ambiental",
-    persona:
-      "Ingeniera especializada en tratamiento de aguas y economía circular. Defensora de soluciones basadas en la naturaleza y tecnologías de reutilización.",
-    color: "#34D399",
-  },
-  {
-    name: "Carlos Mendoza",
-    role: "Economista del Agua",
-    persona:
-      "Economista especializado en valoración de recursos hídricos, tarifas del agua y financiación de infraestructuras. Consultor del Banco Mundial.",
-    color: "#FBBF24",
-  },
-];
+const fadeUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.6 },
+};
 
-const DEFAULT_RULES = [
-  "Mantén las intervenciones concisas y fundamentadas.",
-  "Cita datos reales cuando sea posible.",
-  "Respeta las posiciones de otros panelistas incluso al interpelar.",
-  "El moderador puede intervenir para redirigir el debate.",
-];
+const stagger = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+};
 
-const COLORS = ["#06B6D4", "#34D399", "#38BDF8", "#A78BFA", "#FBBF24", "#F87171"];
-
-export default function ConfigScreen() {
-  const router = useRouter();
-  const setSession = useForumStore((s) => s.setSession);
-
-  const [topic, setTopic] = useState(
-    "Estrategias innovadoras para la gestión sostenible del agua urbana en el contexto del cambio climático"
-  );
-  const [panelists, setPanelists] = useState(DEFAULT_PANELISTS);
-  const [maxRounds, setMaxRounds] = useState(3);
-  const [rules, setRules] = useState(DEFAULT_RULES.join("\n"));
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const addPanelist = () => {
-    if (panelists.length >= 8) return;
-    setPanelists([
-      ...panelists,
-      {
-        name: "",
-        role: "",
-        persona: "",
-        color: COLORS[panelists.length % COLORS.length],
-      },
-    ]);
-  };
-
-  const removePanelist = (index: number) => {
-    if (panelists.length <= 2) return;
-    setPanelists(panelists.filter((_, i) => i !== index));
-  };
-
-  const updatePanelist = (index: number, field: string, value: string) => {
-    const updated = [...panelists];
-    updated[index] = { ...updated[index], [field]: value };
-    setPanelists(updated);
-  };
-
-  const handleStart = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const config: ForumConfig = {
-        topic,
-        panelists,
-        max_rounds: maxRounds,
-        rules: rules.split("\n").filter((r) => r.trim()),
-      };
-
-      const { session_id } = await api.startForum(config);
-      setSession(session_id, config);
-      router.push(`/forum/${session_id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al iniciar el foro");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function LandingPage() {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-10">
-      {/* ─── Hero header ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="mb-12 text-center"
-      >
-        <div className="mb-6 flex items-center justify-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-ocean/20 blur-xl" />
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-ocean to-violet/60">
-              <Waves className="h-8 w-8 text-white" />
-            </div>
-          </div>
+    <div className="relative">
+      {/* ═══════════════════════════════════════════
+          HERO
+          ═══════════════════════════════════════════ */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
+        {/* Particle canvas */}
+        <div className="absolute inset-0">
+          <WaterParticles className="absolute inset-0" />
         </div>
-        <h1 className="mb-2 text-5xl font-bold tracking-tight">
-          Aqua<span className="text-gradient">Forum</span>{" "}
-          <span className="text-foreground/50 font-light">AI</span>
-        </h1>
-        <p className="mx-auto max-w-lg text-lg text-muted-foreground">
-          Foro de expertos con inteligencia artificial para el sector del agua.
-          Debate multi-agente en tiempo real.
-        </p>
 
-        {/* Feature pills */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          {[
-            { icon: Sparkles, label: "IA Multi-Agente", color: "ocean" },
-            { icon: Droplets, label: "Sector Hídrico", color: "sky" },
-            { icon: Zap, label: "Tiempo Real", color: "amber" },
-          ].map((f) => (
-            <div
-              key={f.label}
-              className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm text-muted-foreground"
+        {/* Hero glow */}
+        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="h-[500px] w-[500px] rounded-full bg-ocean/[0.06] blur-[120px]" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-10 mx-auto max-w-4xl text-center"
+        >
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="glass mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-ocean" />
+            <span className="text-xs font-medium text-muted-foreground">
+              Foro de expertos impulsado por IA
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <h1 className="mb-6 text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl md:text-8xl">
+            <span className="text-gradient">Debate</span>{" "}
+            <span className="text-foreground">inteligente</span>
+            <br />
+            <span className="text-foreground/60">para el sector del</span>{" "}
+            <span className="text-gradient-cyan">agua</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground sm:text-xl">
+            Panelistas IA con personalidades únicas debaten temas hídricos en
+            tiempo real. Moderación autónoma. Análisis experto. Todo en un foro.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/setup"
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ocean to-sky px-8 py-3.5 text-sm font-semibold text-[#030712] glow-btn transition-all hover:brightness-110"
             >
-              <f.icon className={`h-3.5 w-3.5 text-${f.color}`} />
-              {f.label}
-            </div>
+              Crear Foro
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <a
+              href="#demo"
+              className="glass glass-hover inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-medium text-foreground/70"
+            >
+              Ver Demo
+            </a>
+          </div>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="h-8 w-5 rounded-full border border-white/10 flex items-start justify-center pt-1.5"
+          >
+            <div className="h-1.5 w-1 rounded-full bg-white/20" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          DEMO SECTION
+          ═══════════════════════════════════════════ */}
+      <section id="demo" className="relative py-32 px-6">
+        <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-16">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
+            Debate autónomo.{" "}
+            <span className="text-gradient">En tiempo real.</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Observa cómo panelistas IA con perspectivas únicas debaten, se interpelan
+            y construyen consensos sobre temas complejos del agua.
+          </p>
+        </motion.div>
+
+        <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2 }}>
+          <DemoMockup />
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          FEATURES
+          ═══════════════════════════════════════════ */}
+      <section className="py-32 px-6">
+        <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-20">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
+            Todo lo que necesitas para un{" "}
+            <span className="text-gradient">debate experto</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Diseñado para profesionales del agua que buscan insights profundos
+            desde múltiples perspectivas.
+          </p>
+        </motion.div>
+
+        <div className="mx-auto max-w-5xl grid gap-6 md:grid-cols-3">
+          {[
+            {
+              icon: Users,
+              title: "Multi-Agente IA",
+              desc: "Hasta 8 panelistas con personalidades, roles y estilos de debate únicos. CEOs, reguladores, ingenieros, economistas.",
+              color: "#06B6D4",
+            },
+            {
+              icon: Zap,
+              title: "Tiempo Real",
+              desc: "Los mensajes aparecen en vivo mientras los agentes debaten. WebSocket powered by Supabase Realtime.",
+              color: "#FBBF24",
+            },
+            {
+              icon: Microscope,
+              title: "Análisis Experto",
+              desc: "Panel de expertos analiza cada ronda: viabilidad técnica, impacto económico, cumplimiento regulatorio.",
+              color: "#A78BFA",
+            },
+          ].map((f, i) => (
+            <motion.div
+              key={f.title}
+              {...stagger}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
+              className="glass glass-hover rounded-2xl p-8 group"
+            >
+              <div
+                className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl"
+                style={{ backgroundColor: `${f.color}10` }}
+              >
+                <f.icon className="h-6 w-6" style={{ color: f.color }} />
+              </div>
+              <h3 className="mb-3 text-lg font-semibold">{f.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+            </motion.div>
           ))}
         </div>
-      </motion.div>
+      </section>
 
-      {/* ─── Topic card ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="glass glow-sm mb-6 rounded-2xl p-6"
-      >
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ocean/10">
-            <Zap className="h-4 w-4 text-ocean" />
-          </div>
-          <h2 className="text-lg font-semibold">Tema del Debate</h2>
-        </div>
-        <Textarea
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="Describe el tema a debatir..."
-          className="min-h-[80px] rounded-xl border-white/6 bg-white/[0.02] text-foreground/90 placeholder:text-muted-foreground/50 focus:border-ocean/30 focus:ring-ocean/10"
-        />
-      </motion.div>
+      {/* ═══════════════════════════════════════════
+          HOW IT WORKS
+          ═══════════════════════════════════════════ */}
+      <section className="py-32 px-6">
+        <motion.div {...fadeUp} className="mx-auto max-w-4xl text-center mb-20">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
+            Tres pasos.{" "}
+            <span className="text-gradient">Un foro completo.</span>
+          </h2>
+        </motion.div>
 
-      {/* ─── Panelists card ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="glass mb-6 rounded-2xl p-6"
-      >
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet/10">
-              <Users className="h-4 w-4 text-violet" />
-            </div>
-            <h2 className="text-lg font-semibold">Panelistas</h2>
-            <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-muted-foreground">
-              {panelists.length}/8
-            </span>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={addPanelist}
-            disabled={panelists.length >= 8}
-            className="rounded-xl border-ocean/20 bg-ocean/5 text-ocean hover:bg-ocean/10 hover:border-ocean/30 transition-all"
-          >
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Añadir
-          </Button>
-        </div>
+        <div className="mx-auto max-w-3xl">
+          {[
+            {
+              step: "01",
+              icon: MessageSquare,
+              title: "Define el debate",
+              desc: "Elige el tema, configura los panelistas con sus roles y perspectivas, establece las reglas del foro.",
+              color: "#06B6D4",
+            },
+            {
+              step: "02",
+              icon: BarChart3,
+              title: "Observa el debate",
+              desc: "Los agentes debaten en tiempo real. El moderador gestiona turnos, interpelaciones y síntesis. Tú observas.",
+              color: "#34D399",
+            },
+            {
+              step: "03",
+              icon: FileText,
+              title: "Obtén insights",
+              desc: "Análisis experto por ronda, integración de perspectivas, y reporte final exportable con todas las conclusiones.",
+              color: "#A78BFA",
+            },
+          ].map((s, i) => (
+            <motion.div
+              key={s.step}
+              {...stagger}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
+              className="group relative flex gap-6 pb-12 last:pb-0"
+            >
+              {/* Vertical line */}
+              {i < 2 && (
+                <div className="absolute left-[23px] top-[52px] h-[calc(100%-52px)] w-px bg-gradient-to-b from-white/[0.06] to-transparent" />
+              )}
 
-        <div className="space-y-4">
-          <AnimatePresence mode="popLayout">
-            {panelists.map((p, i) => (
-              <motion.div
-                key={i}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="glass-subtle rounded-xl p-5 transition-all hover:border-white/10"
-                style={{
-                  borderLeft: `3px solid ${p.color}`,
-                }}
+              {/* Step number */}
+              <div
+                className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold"
+                style={{ backgroundColor: `${s.color}10`, color: s.color }}
               >
-                <div className="mb-4 flex items-center gap-3">
-                  <AgentBadge name={p.name || "Nuevo"} role={p.role || "Rol"} color={p.color} />
-                  <div className="ml-auto flex items-center gap-1.5">
-                    {COLORS.map((c) => (
-                      <button
-                        key={c}
-                        onClick={() => updatePanelist(i, "color", c)}
-                        className={`h-4 w-4 rounded-full transition-all hover:scale-125 ${
-                          p.color === c
-                            ? "ring-2 ring-white/60 ring-offset-2 ring-offset-deep"
-                            : ""
-                        }`}
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
-                    <div className="mx-1 h-4 w-px bg-white/10" />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removePanelist(i)}
-                      disabled={panelists.length <= 2}
-                      className="h-7 w-7 p-0 text-muted-foreground hover:text-coral hover:bg-coral/10 rounded-lg"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Input
-                    value={p.name}
-                    onChange={(e) => updatePanelist(i, "name", e.target.value)}
-                    placeholder="Nombre"
-                    className="rounded-lg border-white/6 bg-white/[0.02] placeholder:text-muted-foreground/40 focus:border-white/15"
-                  />
-                  <Input
-                    value={p.role}
-                    onChange={(e) => updatePanelist(i, "role", e.target.value)}
-                    placeholder="Rol (ej: CEO, Analista)"
-                    className="rounded-lg border-white/6 bg-white/[0.02] placeholder:text-muted-foreground/40 focus:border-white/15"
-                  />
-                </div>
-                <Textarea
-                  value={p.persona}
-                  onChange={(e) => updatePanelist(i, "persona", e.target.value)}
-                  placeholder="Describe el perfil y perspectiva de este panelista..."
-                  className="mt-3 min-h-[60px] rounded-lg border-white/6 bg-white/[0.02] text-sm placeholder:text-muted-foreground/40 focus:border-white/15"
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+                {s.step}
+              </div>
 
-      {/* ─── Settings card ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="glass mb-8 rounded-2xl p-6"
-      >
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald/10">
-            <Settings className="h-4 w-4 text-emerald" />
-          </div>
-          <h2 className="text-lg font-semibold">Configuración</h2>
+              <div className="pt-1">
+                <h3 className="mb-2 text-lg font-semibold">{s.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground max-w-md">{s.desc}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
+      </section>
 
-        <div className="space-y-6">
-          <div>
-            <div className="mb-3 flex items-center justify-between">
-              <label className="text-sm text-muted-foreground">Rondas de debate</label>
-              <span className="rounded-lg bg-ocean/10 px-3 py-1 text-sm font-semibold text-ocean">
-                {maxRounds}
-              </span>
+      {/* ═══════════════════════════════════════════
+          CTA FINAL
+          ═══════════════════════════════════════════ */}
+      <section className="py-32 px-6">
+        <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <div className="gradient-border glass rounded-3xl p-12">
+            <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-ocean to-violet/50">
+              <Waves className="h-8 w-8 text-white" />
             </div>
-            <Slider
-              value={[maxRounds]}
-              onValueChange={(v) => setMaxRounds(Array.isArray(v) ? v[0] : v)}
-              min={1}
-              max={5}
-              step={1}
-              className="w-full"
-            />
+            <h2 className="text-3xl font-bold mb-4">
+              Crea tu primer foro
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              Configura panelistas, elige un tema y lanza un debate inteligente
+              en menos de 2 minutos.
+            </p>
+            <Link
+              href="/setup"
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ocean to-sky px-8 py-3.5 text-sm font-semibold text-[#030712] glow-btn transition-all hover:brightness-110"
+            >
+              Comenzar ahora
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          <div>
-            <label className="mb-2 block text-sm text-muted-foreground">
-              Reglas del debate
-            </label>
-            <Textarea
-              value={rules}
-              onChange={(e) => setRules(e.target.value)}
-              className="min-h-[100px] rounded-lg border-white/6 bg-white/[0.02] text-sm placeholder:text-muted-foreground/40 focus:border-white/15"
-            />
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          FOOTER
+          ═══════════════════════════════════════════ */}
+      <footer className="border-t border-white/[0.04] py-8 px-6">
+        <div className="mx-auto max-w-4xl flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="flex items-center gap-2">
+            <Waves className="h-4 w-4 text-ocean/60" />
+            <span className="text-sm text-muted-foreground/50">AquaForum AI</span>
           </div>
+          <p className="text-xs text-muted-foreground/30">
+            Powered by Claude AI · LangGraph · Supabase
+          </p>
         </div>
-      </motion.div>
-
-      {/* ─── Error ─── */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="mb-4 rounded-xl border border-coral/20 bg-coral/5 p-4 text-sm text-coral"
-          >
-            {error}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ─── Launch button ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <Button
-          onClick={handleStart}
-          disabled={loading || !topic.trim() || panelists.some((p) => !p.name || !p.role)}
-          className="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-ocean to-ocean-light py-7 text-lg font-semibold text-deep shadow-lg shadow-ocean/20 transition-all hover:shadow-xl hover:shadow-ocean/30 hover:brightness-110 disabled:opacity-40 disabled:shadow-none"
-          size="lg"
-        >
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            {loading ? (
-              <>
-                <Waves className="h-5 w-5 animate-pulse" />
-                Iniciando foro...
-              </>
-            ) : (
-              <>
-                Iniciar Foro
-                <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </>
-            )}
-          </span>
-        </Button>
-      </motion.div>
-
-      {/* Footer */}
-      <div className="mt-8 text-center text-xs text-muted-foreground/50">
-        Powered by Claude AI &middot; LangGraph &middot; Supabase
-      </div>
+      </footer>
     </div>
   );
 }

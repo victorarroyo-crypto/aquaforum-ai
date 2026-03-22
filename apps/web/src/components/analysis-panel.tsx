@@ -22,12 +22,12 @@ export function AnalysisPanel({ messages }: AnalysisPanelProps) {
 
   if (analyses.length === 0 && integrations.length === 0) {
     return (
-      <div className="glass rounded-xl p-5 text-center">
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.03]">
-          <Microscope className="h-5 w-5 text-muted-foreground/30" />
+      <div className="glass rounded-xl p-6 text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.02]">
+          <Microscope className="h-5 w-5 text-muted-foreground/20" />
         </div>
-        <p className="text-sm text-muted-foreground/50">
-          Los análisis aparecerán al finalizar cada ronda de debate.
+        <p className="text-xs text-muted-foreground/35 leading-relaxed">
+          Los análisis expertos aparecerán aquí al finalizar cada ronda de debate.
         </p>
       </div>
     );
@@ -36,17 +36,17 @@ export function AnalysisPanel({ messages }: AnalysisPanelProps) {
   return (
     <div className="glass rounded-xl p-4">
       <Tabs defaultValue="analysis" className="w-full">
-        <TabsList className="w-full rounded-lg bg-white/[0.03] p-0.5">
+        <TabsList className="w-full rounded-lg bg-white/[0.02] p-0.5 h-8">
           <TabsTrigger
             value="analysis"
-            className="flex-1 gap-1.5 rounded-md text-xs data-[state=active]:bg-white/[0.06] data-[state=active]:text-foreground"
+            className="flex-1 gap-1.5 rounded-md text-[11px] h-7 data-[state=active]:bg-white/[0.04] data-[state=active]:text-foreground"
           >
             <Microscope className="h-3 w-3" />
             Análisis
           </TabsTrigger>
           <TabsTrigger
             value="integration"
-            className="flex-1 gap-1.5 rounded-md text-xs data-[state=active]:bg-white/[0.06] data-[state=active]:text-foreground"
+            className="flex-1 gap-1.5 rounded-md text-[11px] h-7 data-[state=active]:bg-white/[0.04] data-[state=active]:text-foreground"
           >
             <Layers className="h-3 w-3" />
             Integración
