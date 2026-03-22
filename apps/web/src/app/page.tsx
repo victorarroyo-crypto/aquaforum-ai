@@ -63,7 +63,7 @@ export default function LandingPage() {
             <span className="text-xs font-medium text-muted-foreground">
               Inspirado por{" "}
               <a href="https://ai-2027.com" target="_blank" rel="noopener noreferrer" className="text-ocean hover:underline">AI-2027</a>
-              {" "}— La IA transforma todo. Incluido el agua.
+              {" "}— Dos escenarios. Un recurso esencial. ¿Slowdown o Race?
             </span>
           </motion.div>
 

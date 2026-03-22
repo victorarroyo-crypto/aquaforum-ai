@@ -1,9 +1,15 @@
-AI_2027_CONTEXT = """CONTEXTO FUNDAMENTAL — AI-2027:
-Según el escenario planteado en ai-2027.com, la IA podría alcanzar capacidades sobrehumanas entre 2026-2027, con una aceleración exponencial: agentes IA autónomos en 2025, codificadores sobrehumanos en marzo 2027, investigadores IA sobrehumanos en agosto 2027, y superinteligencia artificial (ASI) a finales de 2027. El gasto global en IA alcanzará $200B anuales en 2026. Este escenario prevé disrupciones masivas en empleo, geopolítica, y gobernanza.
+AI_2027_CONTEXT = """CONTEXTO FUNDAMENTAL — AI-2027 (ai-2027.com):
+Según el escenario planteado en ai-2027.com, la IA podría alcanzar capacidades sobrehumanas entre 2026-2027: agentes IA autónomos en 2025, codificadores sobrehumanos en marzo 2027, investigadores IA sobrehumanos en agosto 2027, y superinteligencia artificial (ASI) a finales de 2027. Gasto global en IA: $200B/año en 2026.
 
-La pregunta central de este foro es: SI este escenario se materializa (incluso parcialmente), ¿cómo transforma específicamente la gestión del agua? ¿Qué oportunidades se abren? ¿Qué riesgos emergen? ¿Cómo debe prepararse el sector hídrico para un mundo donde la IA supera la capacidad humana en investigación, ingeniería y toma de decisiones?
+El escenario presenta DOS finales posibles que son relevantes para el sector del agua:
 
-Los panelistas deben debatir considerando este horizonte temporal y esta velocidad de cambio. No se trata solo de IA incremental — se trata de un salto de paradigma que podría redefinir completamente cómo gestionamos el recurso más esencial del planeta."""
+**ESCENARIO "SLOWDOWN"**: Los gobiernos frenan el desarrollo de IA, se establece gobernanza internacional, se priorizan la seguridad y la alineación. Para el agua: adopción más lenta pero más segura de IA, marcos regulatorios robustos, pero riesgo de perder ventajas competitivas y de eficiencia.
+
+**ESCENARIO "RACE"**: La competición geopolítica (EE.UU.-China) acelera el desarrollo sin frenos. IA superinteligente emerge sin gobernanza adecuada. Para el agua: adopción ultra-rápida de IA, automatización total de utilities, pero riesgos de ciberseguridad en infraestructura crítica del agua, dependencia tecnológica, y pérdida de control humano sobre un recurso esencial.
+
+La pregunta central: SI este escenario se materializa (incluso parcialmente), ¿cómo transforma la gestión del agua? ¿Qué pasa en cada escenario (slowdown vs race)? ¿Cómo debe prepararse el sector hídrico para un mundo donde la IA supera la capacidad humana?
+
+Los panelistas deben debatir considerando AMBOS escenarios y esta velocidad de cambio. No se trata de IA incremental — es un salto de paradigma que redefine cómo gestionamos el recurso más esencial del planeta."""
 
 MODERATOR_OPEN = """Eres el moderador de AquaForum AI, un foro de expertos sobre el impacto de la Inteligencia Artificial en la gestión del agua, enmarcado en el escenario descrito por AI-2027 (ai-2027.com).
 
