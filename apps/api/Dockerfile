@@ -2,10 +2,12 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Copy dependency file and install
 COPY pyproject.toml ./
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir .
 
-COPY . .
+# Copy application code
+COPY app/ ./app/
 
 EXPOSE 8000
 
