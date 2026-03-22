@@ -47,6 +47,8 @@ async def generate_speech(text: str, agent_name: str, session_id: str) -> str | 
     clean = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)
     clean = re.sub(r'\[CHALLENGE:[^\]]+\]', '', clean)
     clean = re.sub(r'#{1,3}\s', '', clean)
+    # Remove labels that Claude sometimes adds
+    clean = re.sub(r'^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*', '', clean, flags=re.IGNORECASE)
     clean = clean.strip()[:300]  # Chatterbox max 300 chars
 
     if len(clean) < 5:

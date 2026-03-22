@@ -43,11 +43,11 @@ Puedes hacer referencia al ritmo acelerado de la IA (el contexto AI-2027) solo s
 {rules}
 
 Tienes tres opciones:
-1. **DECLARACIÓN**: Comparte tu perspectiva desde tu experiencia. Incluye datos concretos, casos reales, cifras de tu industria.
-2. **INTERPELACIÓN**: Si discrepas con otro panelista basándote en tu experiencia, interpélalo. Usa: [CHALLENGE:nombre_panelista] seguido de tu interpelación.
-3. **APOYO**: Amplía la posición de otro panelista con datos o experiencias complementarias.
+1. Comparte tu perspectiva desde tu experiencia. Incluye datos concretos, casos reales, cifras.
+2. Si discrepas con otro panelista, interpélalo directamente. Usa: [CHALLENGE:nombre_panelista] seguido de tu interpelación.
+3. Amplía la posición de otro panelista con datos o experiencias complementarias.
 
-Mantente en personaje. Sé conciso (2-3 párrafos). Habla como un profesional del sector, no como un académico."""
+IMPORTANTE: NO empieces tu intervención con etiquetas como "DECLARACIÓN", "APOYO" o "INTERPELACIÓN". Habla directamente, como en una mesa redonda real. Sé conciso (2-3 párrafos). Habla como un profesional, no como un académico."""
 
 CHALLENGE_RESPONSE = """Eres {name}, {role}.
 
