@@ -28,7 +28,7 @@ DEFAULT_VOICE = "CwhRBWXzGAHq8TQ4Fs17"
 
 
 def _get_el_key() -> str:
-    return settings.elevenlabs_api_key or os.environ.get("ELEVENLABS_API_KEY", "")
+    return os.environ.get("ELEVENLABS_API_KEY", "") or settings.elevenlabs_api_key
 
 
 def _get_supabase_jwt() -> str:
@@ -104,7 +104,7 @@ async def generate_speech(text: str, agent_name: str, session_id: str) -> str | 
 
 def _upload_sync(audio_bytes: bytes, session_id: str) -> str | None:
     """Upload MP3 to Supabase Storage synchronously."""
-    supa_url = settings.supabase_url or os.environ.get("SUPABASE_URL", "")
+    supa_url = os.environ.get("SUPABASE_URL", "") or settings.supabase_url
     supa_key = _get_supabase_jwt()
     if not supa_url or not supa_key:
         logger.error("TTS: Missing Supabase credentials for storage")
