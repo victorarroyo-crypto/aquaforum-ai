@@ -157,10 +157,12 @@ async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
 @router.get("/{session_id}/audio/{message_id}")
 async def get_message_audio(session_id: str, message_id: str):
     """Generate audio for a specific message on demand."""
-    from app.services import supabase_client as db
-    from app.services.tts import generate_speech
+    import os
+    import re
+    import uuid
+    import httpx as hx
 
-    # Check if already generated
+    # Get message
     result = db.get_supabase().table("forum_messages").select("metadata,content,agent_name").eq("id", message_id).execute()
     if not result.data:
         raise HTTPException(status_code=404, detail="Message not found")
@@ -170,14 +172,60 @@ async def get_message_audio(session_id: str, message_id: str):
     if existing_url:
         return {"audio_url": existing_url}
 
-    # Generate audio
+    # Voice mapping
+    voices = {
+        "Elena Vásquez": "EXAVITQu4vr4xnSDxMaL", "Marcus Chen": "onwK4e9ZLuTAKqWW03F9",
+        "Sofia Andersen": "Xb7hH8MSUJpSbSDYk0k2", "Ahmed Al-Rashid": "JBFqnCBsd6RMkjVDRZzb",
+        "Dr. Ingrid Hoffmann": "XrExE9yKIg1WjnnlVkGX", "James Okafor": "nPczCjzI2devNBz1zQrb",
+        "Moderador": "CwhRBWXzGAHq8TQ4Fs17", "Integrador": "cjVigY5qzO86Huf0OWal",
+    }
+    voice_id = voices.get(msg["agent_name"], "CwhRBWXzGAHq8TQ4Fs17")
+
+    # Clean text
+    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", msg["content"])
+    text = re.sub(r"\[CHALLENGE:[^\]]+\]", "", text)
+    text = re.sub(r"#{1,3}\s", "", text)
+    text = re.sub(r"^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*", "", text, flags=re.IGNORECASE).strip()
+
+    el_key = os.environ.get("ELEVENLABS_API_KEY", "")
+    jwt = os.environ.get("SUPABASE_JWT_KEY", "")
+    supa_url = os.environ.get("SUPABASE_URL", "")
+
+    if not el_key or not jwt or not supa_url:
+        raise HTTPException(status_code=500, detail="Missing credentials")
+
     try:
-        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
-        if audio_url:
-            await db.update_message_metadata(message_id, {"audio_url": audio_url})
-            return {"audio_url": audio_url}
-        raise HTTPException(status_code=500, detail="generate_speech returned None")
+        # Generate audio
+        with hx.Client(timeout=45.0) as client:
+            resp = client.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream",
+                headers={"xi-api-key": el_key, "Content-Type": "application/json"},
+                params={"output_format": "mp3_44100_128"},
+                json={"text": text, "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": 0.35, "similarity_boost": 0.8, "style": 0.45, "use_speaker_boost": True}},
+            )
+            if resp.status_code != 200:
+                raise HTTPException(status_code=500, detail=f"ElevenLabs {resp.status_code}: {resp.text[:100]}")
+            audio = resp.content
+
+        # Upload to Supabase Storage
+        fname = f"{session_id}/{uuid.uuid4().hex[:8]}.mp3"
+        with hx.Client(timeout=15.0) as client:
+            r = client.post(
+                f"{supa_url}/storage/v1/object/audio/{fname}",
+                headers={"Authorization": f"Bearer {jwt}", "Content-Type": "audio/mpeg", "x-upsert": "true"},
+                content=audio,
+            )
+            if r.status_code not in (200, 201):
+                raise HTTPException(status_code=500, detail=f"Storage {r.status_code}")
+
+        audio_url = f"{supa_url}/storage/v1/object/public/audio/{fname}"
+
+        # Update message metadata
+        await db.update_message_metadata(message_id, {"audio_url": audio_url})
+
+        return {"audio_url": audio_url}
+
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")

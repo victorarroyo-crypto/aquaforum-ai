@@ -63,16 +63,7 @@ async def _update_pipeline(session_id: str, node: str):
 
 async def _persist_message(session_id: str, msg: ForumMessage) -> str:
     metadata = msg.get("metadata", {})
-
-    # Generate audio (runs sync in thread — never blocks, never fails silently)
-    try:
-        from app.services.tts import generate_speech
-        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
-        if audio_url:
-            metadata["audio_url"] = audio_url
-    except Exception:
-        pass  # Audio is optional
-
+    # Audio generated on-demand via /forum/{id}/audio/{msg_id} endpoint
     return await db.add_message(
         session_id=session_id,
         agent_name=msg["agent_name"],
