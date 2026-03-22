@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX, SkipForward } from "lucide-react";
 import type { ForumMessage } from "@/lib/api";
@@ -9,108 +9,133 @@ function getInitials(name: string): string {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-interface AudioPlayerProps {
-  messages: ForumMessage[];
-}
-
-export function AudioPlayer({ messages }: AudioPlayerProps) {
-  const [muted, setMuted] = useState(false);
+export function AudioPlayer({ messages }: { messages: ForumMessage[] }) {
+  const [muted, setMuted] = useState(true); // Start muted — user activates
   const [playing, setPlaying] = useState(false);
-  const [currentAgent, setCurrentAgent] = useState<string | null>(null);
-  const [currentColor, setCurrentColor] = useState("#14B8A6");
-  const playedRef = useRef<Set<string>>(new Set());
-  const queueRef = useRef<ForumMessage[]>([]);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const busyRef = useRef(false);
+  const [agent, setAgent] = useState<string | null>(null);
+  const [color, setColor] = useState("#14B8A6");
 
-  // Queue new messages as they arrive
+  const playedRef = useRef(new Set<string>());
+  const queueRef = useRef<ForumMessage[]>([]);
+  const busyRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mutedRef = useRef(true);
+
+  // Keep mutedRef in sync
+  useEffect(() => { mutedRef.current = muted; }, [muted]);
+
+  // Queue new messages
   useEffect(() => {
+    let added = false;
     for (const msg of messages) {
-      if (!playedRef.current.has(msg.id) && !queueRef.current.find((q) => q.id === msg.id)) {
+      if (!playedRef.current.has(msg.id) && !queueRef.current.some((q) => q.id === msg.id)) {
         queueRef.current.push(msg);
+        added = true;
       }
     }
-    if (!busyRef.current && !muted && queueRef.current.length > 0) {
-      playNext();
+    if (added && !busyRef.current && !mutedRef.current) {
+      processQueue();
     }
   }, [messages.length]);
 
-  const playNext = useCallback(() => {
+  function processQueue() {
+    // Stop anything currently playing
+    stopAll();
+
     const msg = queueRef.current.shift();
-    if (!msg) {
+    if (!msg || mutedRef.current) {
       busyRef.current = false;
       setPlaying(false);
-      setCurrentAgent(null);
+      setAgent(null);
       return;
     }
 
     playedRef.current.add(msg.id);
     busyRef.current = true;
-    setCurrentAgent(msg.agent_name);
-    setCurrentColor((msg.metadata?.color as string) || "#14B8A6");
+    setAgent(msg.agent_name);
+    setColor((msg.metadata?.color as string) || "#14B8A6");
     setPlaying(true);
 
     const audioUrl = msg.metadata?.audio_url as string | undefined;
 
     if (audioUrl) {
-      // High-quality Chatterbox audio from URL
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-      }
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      audio.onended = () => playNext();
-      audio.onerror = () => {
-        // Fallback to Web Speech if audio URL fails
-        speakWithBrowser(msg);
-      };
-      audio.play().catch(() => speakWithBrowser(msg));
+      playFromUrl(audioUrl);
     } else {
-      // Fallback: Web Speech API
-      speakWithBrowser(msg);
+      playFromBrowser(msg);
     }
-  }, [muted]);
+  }
 
-  const speakWithBrowser = (msg: ForumMessage) => {
-    if (!window.speechSynthesis) {
-      playNext();
-      return;
-    }
+  function playFromUrl(url: string) {
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    audio.onended = () => processQueue();
+    audio.onerror = () => processQueue();
+    audio.play().catch(() => processQueue());
+  }
+
+  function playFromBrowser(msg: ForumMessage) {
+    if (!window.speechSynthesis) { processQueue(); return; }
+
+    // CRITICAL: cancel any pending speech first
+    window.speechSynthesis.cancel();
+
     const clean = msg.content
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/\[CHALLENGE:[^\]]+\]/g, "")
       .replace(/#{1,3}\s/g, "")
-      .slice(0, 400);
+      .trim()
+      .slice(0, 300);
+
+    if (clean.length < 5) { processQueue(); return; }
 
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = "es-ES";
-    utt.rate = 0.95;
-    utt.onend = () => playNext();
-    utt.onerror = () => playNext();
-    window.speechSynthesis.speak(utt);
-  };
+    utt.rate = 0.9;
+    utt.pitch = 1.0;
 
-  const toggleMute = () => {
+    // Wait for speech to actually finish before next
+    utt.onend = () => {
+      setTimeout(() => processQueue(), 500); // 500ms pause between speakers
+    };
+    utt.onerror = () => {
+      setTimeout(() => processQueue(), 200);
+    };
+
+    window.speechSynthesis.speak(utt);
+  }
+
+  function stopAll() {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+  }
+
+  function toggleMute() {
     const next = !muted;
     setMuted(next);
+    mutedRef.current = next;
+
     if (next) {
-      // Stop everything
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; }
-      window.speechSynthesis?.cancel();
+      stopAll();
       busyRef.current = false;
       setPlaying(false);
-    } else if (queueRef.current.length > 0) {
-      playNext();
+      setAgent(null);
+    } else {
+      // Start playing queue
+      if (queueRef.current.length > 0 && !busyRef.current) {
+        processQueue();
+      }
     }
-  };
+  }
 
-  const skip = () => {
-    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; }
-    window.speechSynthesis?.cancel();
+  function skip() {
+    stopAll();
     busyRef.current = false;
-    playNext();
-  };
+    processQueue();
+  }
 
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 border-t border-[rgba(255,255,255,0.06)] bg-[#111113]">
@@ -123,21 +148,21 @@ export function AudioPlayer({ messages }: AudioPlayerProps) {
         {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
       </button>
 
-      {playing && currentAgent ? (
+      {playing && agent ? (
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
-            style={{ backgroundColor: currentColor }}
+            style={{ backgroundColor: color }}
           >
-            {getInitials(currentAgent)}
+            {getInitials(agent)}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-[13px] font-semibold text-[#FAFAFA]">{currentAgent}</span>
+              <span className="text-[13px] font-semibold text-[#FAFAFA]">{agent}</span>
               <span className="text-[11px] text-[#52525B]">hablando</span>
             </div>
             <div className="flex items-end gap-[2px] h-3 mt-1">
-              {[...Array(12)].map((_, i) => (
+              {Array.from({ length: 12 }).map((_, i) => (
                 <motion.div
                   key={i}
                   animate={{ height: [3, 6 + Math.random() * 6, 3] }}
@@ -153,16 +178,14 @@ export function AudioPlayer({ messages }: AudioPlayerProps) {
           </button>
         </div>
       ) : (
-        <div className="flex-1">
-          <span className="text-[12px] text-[#3F3F46]">
-            {muted ? "Audio silenciado" : queueRef.current.length > 0 ? "Pulsa 🔊 para escuchar" : "Esperando intervenciones..."}
-          </span>
-        </div>
+        <span className="flex-1 text-[12px] text-[#3F3F46]">
+          {muted ? "Pulsa 🔊 para escuchar el debate" : queueRef.current.length > 0 ? "Preparando..." : "Esperando intervenciones..."}
+        </span>
       )}
 
       {queueRef.current.length > 0 && (
         <span className="text-[10px] text-[#52525B] bg-[#18181B] px-2 py-1 rounded-full">
-          {queueRef.current.length} en cola
+          {queueRef.current.length}
         </span>
       )}
     </div>

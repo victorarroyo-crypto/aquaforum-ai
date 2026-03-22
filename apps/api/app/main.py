@@ -82,4 +82,5 @@ async def health():
         "tts_settings": "yes" if settings.elevenlabs_api_key else "no",
         "tts_env": "yes" if env_key else "no",
         "tts_env_prefix": env_key[:8] + "..." if env_key else "empty",
+        "hf_token": "yes" if os.environ.get("HF_TOKEN") else "no",
     }
