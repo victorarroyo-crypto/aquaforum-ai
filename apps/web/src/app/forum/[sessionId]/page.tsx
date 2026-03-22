@@ -62,6 +62,22 @@ export default function ForumView() {
     })();
   }, [sessionId]);
 
+  // Poll for new messages every 3s as fallback for Realtime
+  useEffect(() => {
+    if (!sessionId) return;
+    const interval = setInterval(async () => {
+      try {
+        const s = await api.getState(sessionId);
+        if (s.messages.length > messages.length) {
+          setMessages(s.messages);
+        }
+        if (s.status !== status) setStatus(s.status);
+        if (s.current_round !== currentRound) setRound(s.current_round);
+      } catch { /* ignore */ }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [sessionId, messages.length, status, currentRound]);
+
   useEffect(() => {
     if (scrollRef.current)
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
