@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageBubble } from "@/components/message-bubble";
-import { PipelineDisplay } from "@/components/pipeline-display";
-import { AnalysisPanel } from "@/components/analysis-panel";
 import { AgentBadge } from "@/components/agent-badge";
+import { DebateInsights } from "@/components/debate-insights";
 import { TypingIndicator } from "@/components/typing-indicator";
 import { AudioPlayer } from "@/components/audio-player";
 import { useForumStore } from "@/store/forum-store";
@@ -324,52 +323,12 @@ export default function ForumView() {
               transition={{ duration: 0.25 }}
               className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.06)] p-4 bg-[#0C0C0F]"
             >
-              {/* Panelists */}
-              {config && (
-                <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-3">
-                    Panelistas
-                  </h3>
-                  {config.panelists.map((p) => (
-                    <div
-                      key={p.name}
-                      className="flex items-center gap-2.5 py-2"
-                    >
-                      <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-                        style={{ backgroundColor: p.color }}
-                      >
-                        {p.name
-                          .split(" ")
-                          .map((w) => w[0])
-                          .join("")
-                          .slice(0, 2)
-                          .toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[13px] font-semibold text-[#FAFAFA] block truncate">
-                          {p.name}
-                        </span>
-                        <span className="text-[11px] text-[#52525B]">
-                          {p.role}
-                        </span>
-                      </div>
-                      {status === "running" && (
-                        <div className="h-2 w-2 rounded-full bg-[#22C55E] status-pulse" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Pipeline */}
-              <PipelineDisplay
-                currentNode={pipeline.current_node}
-                progress={pipeline.progress}
+              <DebateInsights
+                messages={messages}
+                panelists={config?.panelists || []}
+                status={status}
+                currentRound={currentRound}
               />
-
-              {/* Analysis */}
-              <AnalysisPanel messages={messages} />
             </motion.aside>
           )}
         </AnimatePresence>
