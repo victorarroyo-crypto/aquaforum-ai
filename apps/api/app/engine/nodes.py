@@ -100,7 +100,7 @@ async def moderator_open(state: ForumState) -> dict:
     )
 
     llm = get_llm(temperature=0.5)
-    response = await llm.ainvoke([SystemMessage(content=prompt)])
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
 
     msg: ForumMessage = {
         "agent_name": "Moderador",
@@ -149,7 +149,7 @@ async def agent_turn(state: ForumState) -> dict:
     )
 
     llm = get_llm(temperature=0.8)
-    response = await llm.ainvoke([SystemMessage(content=prompt)])
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
     content = response.content
 
     # Detect challenge pattern
@@ -227,7 +227,7 @@ async def handle_challenge(state: ForumState) -> dict:
     )
 
     llm = get_llm(temperature=0.7)
-    response = await llm.ainvoke([SystemMessage(content=prompt)])
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
 
     msg: ForumMessage = {
         "agent_name": target["name"],
@@ -273,7 +273,7 @@ async def moderator_check(state: ForumState) -> dict:
     )
 
     llm = get_llm(temperature=0.3)
-    response = await llm.ainvoke([SystemMessage(content=prompt)])
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
 
     # Parse JSON response
     try:
@@ -329,7 +329,7 @@ async def expert_analysis(state: ForumState) -> dict:
         )
 
         llm = get_llm(temperature=0.5)
-        response = await llm.ainvoke([SystemMessage(content=prompt)])
+        response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
 
         msg: ForumMessage = {
             "agent_name": f"Experto en {expert_type}",
@@ -372,7 +372,7 @@ async def integration(state: ForumState) -> dict:
     )
 
     llm = get_llm(temperature=0.4)
-    response = await llm.ainvoke([SystemMessage(content=prompt)])
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
 
     msg: ForumMessage = {
         "agent_name": "Integrador",
@@ -413,7 +413,7 @@ async def final_summary(state: ForumState) -> dict:
     )
 
     llm = get_llm(temperature=0.4, max_tokens=4096)
-    response = await llm.ainvoke([SystemMessage(content=prompt)])
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Procede con tu intervención.")])
 
     msg: ForumMessage = {
         "agent_name": "Moderador",
