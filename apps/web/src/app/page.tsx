@@ -161,6 +161,71 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ━━━ PANELISTAS ━━━ */}
+      <section>
+        <div className="max-w-[1200px] mx-auto px-6 md:px-12 lg:px-20 py-24 md:py-32">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-6">
+              El panel
+            </p>
+            <h2 className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-tight text-dark">
+              6 agentes. 6 perspectivas.
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-14 max-w-3xl mx-auto">
+            {[
+              { name: "Elena Vásquez", role: "CEO Water Utility · IA", img: "https://randomuser.me/api/portraits/women/44.jpg", icon: "⚙️" },
+              { name: "Marcus Chen", role: "CEO Tecnología IA", img: "https://randomuser.me/api/portraits/men/32.jpg", icon: "🧠" },
+              { name: "Sofia Andersen", role: "CEO Química del Agua", img: "https://randomuser.me/api/portraits/women/65.jpg", icon: "🧪" },
+              { name: "Ahmed Al-Rashid", role: "CEO Desalación", img: "https://randomuser.me/api/portraits/men/75.jpg", icon: "🌊" },
+              { name: "Dr. Ingrid Hoffmann", role: "Analista Regulatoria", img: "https://randomuser.me/api/portraits/women/57.jpg", icon: "⚖️" },
+              { name: "James Okafor", role: "Analista Mercados", img: "https://randomuser.me/api/portraits/men/52.jpg", icon: "📊" },
+            ].map((p, i) => (
+              <motion.div
+                key={p.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="relative mb-4">
+                  <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-2 border-edge group-hover:border-accent transition-colors overflow-hidden">
+                    <img
+                      src={p.img}
+                      alt={p.name}
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white border border-edge rounded-full w-8 h-8 flex items-center justify-center text-sm shadow-sm">
+                    {p.icon}
+                  </div>
+                </div>
+                <h3 className="text-sm font-bold text-dark mt-1">{p.name}</h3>
+                <p className="text-xs text-light mt-0.5">{p.role}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="text-center text-xs text-faint mt-12"
+          >
+            + Moderador IA · Panel de Expertos oculto · Integrador Estratégico
+          </motion.p>
+        </div>
+      </section>
+
       {/* ━━━ 4 CAPACIDADES ━━━ */}
       <section>
         <div className="max-w-[1200px] mx-auto px-6 md:px-12 lg:px-20 py-24 md:py-32">
