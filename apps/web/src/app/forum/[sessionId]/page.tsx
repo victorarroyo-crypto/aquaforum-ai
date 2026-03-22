@@ -8,6 +8,7 @@ import { PipelineDisplay } from "@/components/pipeline-display";
 import { AnalysisPanel } from "@/components/analysis-panel";
 import { AgentBadge } from "@/components/agent-badge";
 import { TypingIndicator } from "@/components/typing-indicator";
+import { AudioPlayer } from "@/components/audio-player";
 import { useForumStore } from "@/store/forum-store";
 import { useForumRealtime } from "@/hooks/use-forum-realtime";
 import { api } from "@/lib/api";
@@ -277,6 +278,9 @@ export default function ForumView() {
               )}
             </div>
           </div>
+
+          {/* Audio Player */}
+          <AudioPlayer messages={messages} />
 
           {/* Controls */}
           <div className="flex items-center gap-3 px-5 py-3 border-t border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
