@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "@/components/message-bubble";
 import { PipelineDisplay } from "@/components/pipeline-display";
 import { AnalysisPanel } from "@/components/analysis-panel";
@@ -18,6 +17,8 @@ import {
   Pause,
   Play,
   Waves,
+  Radio,
+  ChevronRight,
 } from "lucide-react";
 
 export default function ForumView() {
@@ -43,10 +44,8 @@ export default function ForumView() {
   const [initialLoading, setInitialLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Subscribe to Supabase Realtime
   useForumRealtime(sessionId);
 
-  // Load initial state
   useEffect(() => {
     async function load() {
       try {
@@ -66,7 +65,6 @@ export default function ForumView() {
     load();
   }, [sessionId]);
 
-  // Auto-scroll on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -97,7 +95,6 @@ export default function ForumView() {
     setLoading(true);
     try {
       const result = await api.exportForum(sessionId);
-      // Download as markdown file
       const blob = new Blob([result.content], { type: "text/markdown" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -112,7 +109,6 @@ export default function ForumView() {
     }
   };
 
-  // Separate discussion messages from analysis messages
   const discussionMessages = messages.filter(
     (m) => !["analysis", "integration"].includes(m.message_type)
   );
@@ -120,46 +116,68 @@ export default function ForumView() {
   if (initialLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <Waves className="mx-auto mb-4 h-12 w-12 animate-pulse text-ocean" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="relative mx-auto mb-6 h-20 w-20">
+            <div className="absolute inset-0 animate-ping rounded-full bg-ocean/20" />
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-ocean/20 to-violet/10 backdrop-blur-xl">
+              <Waves className="h-10 w-10 text-ocean" />
+            </div>
+          </div>
           <p className="text-muted-foreground">Cargando foro...</p>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <div className="flex h-screen flex-col">
-      {/* Header bar */}
-      <header className="flex items-center justify-between border-b border-white/10 bg-white/5 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
+      {/* ─── Header ─── */}
+      <header className="glass relative z-20 flex items-center justify-between px-5 py-3">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/")}
+            className="h-8 w-8 rounded-lg p-0 hover:bg-white/5"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <Waves className="h-6 w-6 text-ocean" />
-          <div>
-            <h1 className="text-sm font-semibold">AquaForum AI</h1>
-            <p className="max-w-md truncate text-xs text-muted-foreground">
-              {topic}
-            </p>
+
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ocean to-violet/60">
+              <Waves className="h-4.5 w-4.5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-sm font-semibold tracking-tight">AquaForum AI</h1>
+              <p className="max-w-sm truncate text-xs text-muted-foreground">{topic}</p>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">
-            Ronda {currentRound}/{maxRounds}
-          </span>
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+        <div className="flex items-center gap-3">
+          <div className="glass-subtle flex items-center gap-2 rounded-full px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Ronda</span>
+            <span className="text-sm font-semibold text-ocean">
+              {currentRound}/{maxRounds}
+            </span>
+          </div>
+
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${
               status === "running"
-                ? "bg-emerald/20 text-emerald"
+                ? "bg-emerald/10 text-emerald"
                 : status === "completed"
-                ? "bg-ocean/20 text-ocean"
+                ? "bg-ocean/10 text-ocean"
                 : status === "error"
-                ? "bg-coral/20 text-coral"
-                : "bg-amber/20 text-amber"
+                ? "bg-coral/10 text-coral"
+                : "bg-amber/10 text-amber"
             }`}
           >
+            {status === "running" && <Radio className="h-3 w-3 animate-pulse" />}
             {status === "running"
               ? "En curso"
               : status === "completed"
@@ -167,17 +185,17 @@ export default function ForumView() {
               : status === "error"
               ? "Error"
               : "Pausado"}
-          </span>
+          </div>
         </div>
       </header>
 
-      {/* Main content */}
+      {/* ─── Main content ─── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Messages column */}
         <div className="flex flex-1 flex-col">
-          {/* Agent badges */}
+          {/* Agent strip */}
           {config && (
-            <div className="flex flex-wrap gap-2 border-b border-white/10 px-4 py-2">
+            <div className="flex flex-wrap gap-2 border-b border-white/[0.04] bg-white/[0.01] px-5 py-2.5">
               {config.panelists.map((p) => (
                 <AgentBadge key={p.name} name={p.name} role={p.role} color={p.color} />
               ))}
@@ -185,8 +203,8 @@ export default function ForumView() {
           )}
 
           {/* Message feed */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
-            <div className="space-y-3">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5">
+            <div className="mx-auto max-w-3xl space-y-4">
               <AnimatePresence mode="popLayout">
                 {discussionMessages.map((msg) => (
                   <MessageBubble
@@ -202,35 +220,48 @@ export default function ForumView() {
               </AnimatePresence>
 
               {messages.length === 0 && (
-                <div className="py-20 text-center">
-                  <Waves className="mx-auto mb-4 h-16 w-16 text-ocean/30" />
-                  <p className="text-muted-foreground">
-                    El debate comenzará en breve...
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-24 text-center"
+                >
+                  <div className="relative mx-auto mb-6 h-24 w-24">
+                    <div className="absolute inset-0 rounded-full bg-ocean/5 blur-2xl" />
+                    <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-white/[0.04]">
+                      <Waves className="h-12 w-12 text-ocean/20" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-medium text-muted-foreground/60">
+                    El debate comenzará en breve
                   </p>
-                </div>
+                  <p className="mt-1 text-sm text-muted-foreground/40">
+                    Los panelistas se están preparando...
+                  </p>
+                </motion.div>
               )}
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-3 border-t border-white/10 px-4 py-3">
+          {/* ─── Controls ─── */}
+          <div className="glass flex items-center gap-3 px-5 py-3">
             {status !== "completed" && (
               <>
                 <Button
                   onClick={handleNextCycle}
                   disabled={loading || status === "running"}
-                  className="bg-ocean text-deep hover:bg-ocean/80"
+                  className="group rounded-xl bg-gradient-to-r from-ocean to-ocean-light px-5 text-deep shadow-md shadow-ocean/20 hover:shadow-lg hover:shadow-ocean/30 hover:brightness-110 transition-all disabled:opacity-40 disabled:shadow-none"
                 >
-                  <Play className="mr-1 h-4 w-4" />
+                  <Play className="mr-1.5 h-4 w-4" />
                   {currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}
+                  <ChevronRight className="ml-1 h-4 w-4 opacity-50 transition-transform group-hover:translate-x-0.5" />
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleStop}
                   disabled={status !== "running"}
-                  className="border-white/10"
+                  className="rounded-xl border-white/6 bg-white/[0.02] hover:bg-white/5"
                 >
-                  <Pause className="mr-1 h-4 w-4" />
+                  <Pause className="mr-1.5 h-4 w-4" />
                   Pausar
                 </Button>
               </>
@@ -239,16 +270,16 @@ export default function ForumView() {
               variant="outline"
               onClick={handleExport}
               disabled={loading || messages.length === 0}
-              className="ml-auto border-white/10"
+              className="ml-auto rounded-xl border-white/6 bg-white/[0.02] hover:bg-white/5"
             >
-              <Download className="mr-1 h-4 w-4" />
+              <Download className="mr-1.5 h-4 w-4" />
               Exportar
             </Button>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <aside className="hidden w-80 flex-col gap-4 overflow-y-auto border-l border-white/10 bg-white/[0.02] p-4 lg:flex">
+        {/* ─── Sidebar ─── */}
+        <aside className="hidden w-80 flex-col gap-4 overflow-y-auto border-l border-white/[0.04] bg-white/[0.01] p-4 lg:flex">
           <PipelineDisplay
             currentNode={pipeline.current_node}
             progress={pipeline.progress}

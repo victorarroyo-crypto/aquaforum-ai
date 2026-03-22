@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AquaForum AI",
-  description: "Multi-agent expert forum for the water industry",
+  title: "AquaForum AI — Foro de Expertos con IA",
+  description:
+    "Plataforma de debate inteligente multi-agente para el sector del agua. Panelistas IA con personalidades únicas debaten temas hídricos en tiempo real.",
 };
 
 export default function RootLayout({
@@ -27,7 +28,16 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="relative min-h-full flex flex-col">
+        {/* Aurora background */}
+        <div className="aurora-bg" />
+        <div className="grid-pattern fixed inset-0 pointer-events-none z-0" />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col min-h-full">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

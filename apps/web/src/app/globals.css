@@ -11,16 +11,19 @@
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
 
-  /* AquaForum palette */
+  /* AquaForum premium palette */
   --color-ocean: #06B6D4;
+  --color-ocean-light: #22D3EE;
   --color-emerald: #34D399;
   --color-sky: #38BDF8;
   --color-violet: #A78BFA;
   --color-amber: #FBBF24;
   --color-coral: #F87171;
-  --color-deep: #0B1221;
-  --color-deep-light: #111827;
-  --color-deep-lighter: #1F2937;
+  --color-deep: #050A18;
+  --color-deep-light: #0A1628;
+  --color-deep-lighter: #111D35;
+  --color-glass: rgba(255, 255, 255, 0.03);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
 
   /* shadcn theme tokens */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -61,39 +64,38 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* AquaForum uses dark theme by default */
 :root {
-  --background: #0B1221;
-  --foreground: #F1F5F9;
-  --card: #111827;
-  --card-foreground: #F1F5F9;
-  --popover: #111827;
-  --popover-foreground: #F1F5F9;
+  --background: #050A18;
+  --foreground: #E8EDF5;
+  --card: rgba(10, 22, 40, 0.6);
+  --card-foreground: #E8EDF5;
+  --popover: #0A1628;
+  --popover-foreground: #E8EDF5;
   --primary: #06B6D4;
-  --primary-foreground: #0B1221;
-  --secondary: #1F2937;
-  --secondary-foreground: #F1F5F9;
-  --muted: #1F2937;
-  --muted-foreground: #94A3B8;
-  --accent: #1F2937;
-  --accent-foreground: #F1F5F9;
+  --primary-foreground: #050A18;
+  --secondary: rgba(255, 255, 255, 0.04);
+  --secondary-foreground: #E8EDF5;
+  --muted: rgba(255, 255, 255, 0.04);
+  --muted-foreground: #7B8BA5;
+  --accent: rgba(6, 182, 212, 0.08);
+  --accent-foreground: #E8EDF5;
   --destructive: #F87171;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.06);
   --ring: #06B6D4;
   --chart-1: #06B6D4;
   --chart-2: #34D399;
   --chart-3: #A78BFA;
   --chart-4: #FBBF24;
   --chart-5: #F87171;
-  --radius: 0.625rem;
-  --sidebar: #111827;
-  --sidebar-foreground: #F1F5F9;
+  --radius: 0.75rem;
+  --sidebar: #0A1628;
+  --sidebar-foreground: #E8EDF5;
   --sidebar-primary: #06B6D4;
-  --sidebar-primary-foreground: #0B1221;
-  --sidebar-accent: #1F2937;
-  --sidebar-accent-foreground: #F1F5F9;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-primary-foreground: #050A18;
+  --sidebar-accent: rgba(255, 255, 255, 0.04);
+  --sidebar-accent-foreground: #E8EDF5;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: #06B6D4;
 }
 
@@ -106,5 +108,118 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
+}
+
+/* ─── Animated gradient background ─── */
+@keyframes aurora {
+  0%,100% { opacity: 0.3; transform: translateY(0) scale(1); }
+  50% { opacity: 0.5; transform: translateY(-30px) scale(1.05); }
+}
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: aurora 12s ease-in-out infinite;
+}
+
+.aurora-bg::before {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(6,182,212,0.15), transparent 70%);
+  top: -200px;
+  left: -100px;
+}
+
+.aurora-bg::after {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(167,139,250,0.1), transparent 70%);
+  bottom: -200px;
+  right: -100px;
+  animation-delay: 6s;
+}
+
+/* ─── Glass card ─── */
+.glass {
+  background: rgba(10, 22, 40, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ─── Glow effects ─── */
+.glow-ocean {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.15), 0 0 60px rgba(6, 182, 212, 0.05);
+}
+
+.glow-sm {
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.1);
+}
+
+/* ─── Agent dot pulse ─── */
+@keyframes dot-pulse {
+  0%,100% { box-shadow: 0 0 0 0 currentColor; }
+  50% { box-shadow: 0 0 0 4px transparent; }
+}
+
+.dot-pulse {
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Gradient text ─── */
+.text-gradient {
+  background: linear-gradient(135deg, #06B6D4, #A78BFA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-warm {
+  background: linear-gradient(135deg, #06B6D4, #34D399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ─── Grid pattern (subtle) ─── */
+.grid-pattern {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
 }

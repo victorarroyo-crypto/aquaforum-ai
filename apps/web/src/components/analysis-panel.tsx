@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InsightCard } from "@/components/insight-card";
+import { Microscope, Layers } from "lucide-react";
 import type { ForumMessage } from "@/lib/api";
 
 interface AnalysisPanelProps {
@@ -21,8 +22,11 @@ export function AnalysisPanel({ messages }: AnalysisPanelProps) {
 
   if (analyses.length === 0 && integrations.length === 0) {
     return (
-      <div className="rounded-lg border border-white/10 bg-white/5 p-4 text-center">
-        <p className="text-sm text-muted-foreground">
+      <div className="glass rounded-xl p-5 text-center">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.03]">
+          <Microscope className="h-5 w-5 text-muted-foreground/30" />
+        </div>
+        <p className="text-sm text-muted-foreground/50">
           Los análisis aparecerán al finalizar cada ronda de debate.
         </p>
       </div>
@@ -30,37 +34,47 @@ export function AnalysisPanel({ messages }: AnalysisPanelProps) {
   }
 
   return (
-    <Tabs defaultValue="analysis" className="w-full">
-      <TabsList className="w-full bg-white/5">
-        <TabsTrigger value="analysis" className="flex-1 text-xs">
-          Análisis Experto
-        </TabsTrigger>
-        <TabsTrigger value="integration" className="flex-1 text-xs">
-          Integración
-        </TabsTrigger>
-      </TabsList>
+    <div className="glass rounded-xl p-4">
+      <Tabs defaultValue="analysis" className="w-full">
+        <TabsList className="w-full rounded-lg bg-white/[0.03] p-0.5">
+          <TabsTrigger
+            value="analysis"
+            className="flex-1 gap-1.5 rounded-md text-xs data-[state=active]:bg-white/[0.06] data-[state=active]:text-foreground"
+          >
+            <Microscope className="h-3 w-3" />
+            Análisis
+          </TabsTrigger>
+          <TabsTrigger
+            value="integration"
+            className="flex-1 gap-1.5 rounded-md text-xs data-[state=active]:bg-white/[0.06] data-[state=active]:text-foreground"
+          >
+            <Layers className="h-3 w-3" />
+            Integración
+          </TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="analysis" className="mt-3 space-y-3">
-        {analyses.map((a) => (
-          <InsightCard
-            key={a.id}
-            title={a.agent_name}
-            content={a.content}
-            type={expertTypeMap[(a.metadata?.expert_type as string) || ""] || "technical"}
-          />
-        ))}
-      </TabsContent>
+        <TabsContent value="analysis" className="mt-3 space-y-3">
+          {analyses.map((a) => (
+            <InsightCard
+              key={a.id}
+              title={a.agent_name}
+              content={a.content}
+              type={expertTypeMap[(a.metadata?.expert_type as string) || ""] || "technical"}
+            />
+          ))}
+        </TabsContent>
 
-      <TabsContent value="integration" className="mt-3 space-y-3">
-        {integrations.map((i) => (
-          <InsightCard
-            key={i.id}
-            title={`Integración — Ronda ${i.round_number}`}
-            content={i.content}
-            type="technical"
-          />
-        ))}
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="integration" className="mt-3 space-y-3">
+          {integrations.map((i) => (
+            <InsightCard
+              key={i.id}
+              title={`Integración — Ronda ${i.round_number}`}
+              content={i.content}
+              type="technical"
+            />
+          ))}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
