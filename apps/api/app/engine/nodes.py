@@ -65,11 +65,17 @@ async def _persist_message(session_id: str, msg: ForumMessage) -> str:
     metadata = msg.get("metadata", {})
     try:
         from app.services.tts import generate_speech
+        print(f"TTS: generating for {msg['agent_name']}...")
         audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
         if audio_url:
             metadata["audio_url"] = audio_url
+            print(f"TTS: ✅ {audio_url[-30:]}")
+        else:
+            print(f"TTS: ❌ generate_speech returned None for {msg['agent_name']}")
     except Exception as e:
-        print(f"TTS skip: {e}")
+        import traceback
+        print(f"TTS ERROR for {msg['agent_name']}: {e}")
+        traceback.print_exc()
 
     return await db.add_message(
         session_id=session_id,
