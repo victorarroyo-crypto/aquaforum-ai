@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest apps/web --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack --use-npm)",
+      "Bash(npx create-next-app@latest apps/web --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack --yes)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init -y --defaults)",
+      "Bash(node -e \"console.log\\(require\\(''next/package.json''\\).version\\)\")",
+      "Bash(npx shadcn@latest add card input textarea badge dialog scroll-area separator avatar tabs select slider -y)",
+      "mcp__ec4b118b-6a15-4a0d-b200-3e30b068bc4f__get_cost",
+      "mcp__ec4b118b-6a15-4a0d-b200-3e30b068bc4f__confirm_cost",
+      "mcp__ec4b118b-6a15-4a0d-b200-3e30b068bc4f__create_project",
+      "mcp__ec4b118b-6a15-4a0d-b200-3e30b068bc4f__get_advisors",
+      "Bash(npx next:*)",
+      "Bash(python3 -m venv .venv)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(pip install:*)",
+      "Bash(timeout 10 uvicorn app.main:app --host 0.0.0.0 --port 8000)",
+      "Bash(python -c \"from app.main import app; print\\(''FastAPI app loaded successfully''\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(kill %1)"
+    ]
+  }
+}
