@@ -98,10 +98,8 @@ def generate_speech_sync(text: str, agent_name: str, session_id: str) -> str | N
 
 
 async def generate_speech(text: str, agent_name: str, session_id: str) -> str | None:
-    """Async wrapper — runs sync TTS in a thread to avoid event loop issues."""
-    import asyncio
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(None, generate_speech_sync, text, agent_name, session_id)
+    """Async wrapper — calls sync version directly (httpx sync works in any context)."""
+    return generate_speech_sync(text, agent_name, session_id)
 
 
 def _upload_sync(audio_bytes: bytes, session_id: str) -> str | None:
