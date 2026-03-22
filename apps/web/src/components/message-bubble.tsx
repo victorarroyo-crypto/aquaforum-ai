@@ -1,14 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  AlertTriangle,
-  MessageSquare,
-  Shield,
-  Crown,
-  Sparkles,
-  FileText,
-} from "lucide-react";
+import { AlertTriangle, MessageSquare, Shield, Crown, Sparkles, FileText } from "lucide-react";
 
 interface MessageBubbleProps {
   agentName: string;
@@ -19,155 +12,68 @@ interface MessageBubbleProps {
   timestamp?: string;
 }
 
-const typeConfig: Record<
-  string,
-  {
-    icon: React.ElementType;
-    label: string;
-    borderClass: string;
-    bgClass: string;
-    labelColor: string;
-  }
-> = {
-  statement: {
-    icon: MessageSquare,
-    label: "Declaraci\u00f3n",
-    borderClass: "border-l-stone-300",
-    bgClass: "",
-    labelColor: "text-stone-500 bg-stone-100",
-  },
-  challenge: {
-    icon: AlertTriangle,
-    label: "Interpelaci\u00f3n",
-    borderClass: "border-l-warm-amber",
-    bgClass: "msg-challenge",
-    labelColor: "text-amber-700 bg-amber-50",
-  },
-  response: {
-    icon: Shield,
-    label: "Respuesta",
-    borderClass: "border-l-teal",
-    bgClass: "",
-    labelColor: "text-teal bg-teal-50",
-  },
-  moderation: {
-    icon: Crown,
-    label: "Moderaci\u00f3n",
-    borderClass: "",
-    bgClass: "msg-moderation",
-    labelColor: "text-indigo bg-indigo-50",
-  },
-  analysis: {
-    icon: Sparkles,
-    label: "An\u00e1lisis",
-    borderClass: "border-l-warm-emerald",
-    bgClass: "msg-analysis",
-    labelColor: "text-emerald-700 bg-emerald-50",
-  },
-  integration: {
-    icon: FileText,
-    label: "Integraci\u00f3n",
-    borderClass: "border-l-teal",
-    bgClass: "msg-integration",
-    labelColor: "text-teal bg-teal-50",
-  },
-  summary: {
-    icon: Sparkles,
-    label: "Resumen Final",
-    borderClass: "",
-    bgClass: "msg-moderation",
-    labelColor: "text-indigo bg-indigo-50",
-  },
+const types: Record<string, { icon: React.ElementType; label: string; accent: string; badge: string }> = {
+  statement:   { icon: MessageSquare, label: "Declaración",   accent: "border-l-ink-ghost",    badge: "text-ink-faint bg-paper-warm" },
+  challenge:   { icon: AlertTriangle, label: "Interpelación", accent: "border-l-challenge",     badge: "text-challenge bg-challenge-bg" },
+  response:    { icon: Shield,        label: "Respuesta",     accent: "border-l-teal",          badge: "text-teal bg-teal/5" },
+  moderation:  { icon: Crown,         label: "Moderación",    accent: "",                        badge: "text-moderation bg-moderation-bg" },
+  analysis:    { icon: Sparkles,      label: "Análisis",      accent: "border-l-teal",          badge: "text-teal bg-teal/5" },
+  integration: { icon: FileText,      label: "Integración",   accent: "border-l-ink-muted",     badge: "text-ink-muted bg-paper-warm" },
+  summary:     { icon: Sparkles,      label: "Resumen Final", accent: "",                        badge: "text-moderation bg-moderation-bg" },
 };
 
-export function MessageBubble({
-  agentName,
-  agentRole,
-  content,
-  messageType,
-  color = "#0F766E",
-  timestamp,
-}: MessageBubbleProps) {
-  const cfg = typeConfig[messageType] || typeConfig.statement;
+export function MessageBubble({ agentName, agentRole, content, messageType, color = "#0D9488", timestamp }: MessageBubbleProps) {
+  const cfg = types[messageType] || types.statement;
   const Icon = cfg.icon;
   const isMod = messageType === "moderation" || messageType === "summary";
-
-  const initials = agentName
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = agentName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
   if (isMod) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        className="mx-auto max-w-xl"
+        transition={{ duration: 0.4 }}
+        className="mx-auto max-w-lg text-center py-6"
       >
-        <div className="rounded-xl border border-indigo/10 bg-indigo/[0.03] p-6 text-center">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Crown className="h-4 w-4 text-indigo" />
-            <span className="text-xs font-semibold text-indigo uppercase tracking-wider">
-              {cfg.label}
-            </span>
-          </div>
-          <p className="text-sm leading-relaxed text-stone-600 font-editorial italic">
-            {content}
+        <div className="rule w-8 mx-auto mb-4" />
+        <p className="text-sm leading-[1.8] text-ink-muted font-serif italic">{content}</p>
+        <p className="text-[10px] text-ink-ghost mt-3 uppercase tracking-widest">{cfg.label}</p>
+        {timestamp && (
+          <p className="text-[10px] text-ink-ghost mt-1">
+            {new Date(timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
           </p>
-          {timestamp && (
-            <div className="mt-3 text-[10px] text-stone-400">
-              {new Date(timestamp).toLocaleTimeString("es-ES", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
-          )}
-        </div>
+        )}
       </motion.div>
     );
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className={`flex gap-4 rounded-lg p-5 border-l-[3px] ${cfg.borderClass} ${cfg.bgClass} border border-l-0 border-stone-200 transition-all hover:shadow-sm`}
+      transition={{ duration: 0.4 }}
+      className={`flex gap-4 py-5 border-l-2 ${cfg.accent} pl-5`}
     >
-      {/* Avatar */}
       <div
-        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white mt-0.5"
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
         style={{ backgroundColor: color }}
       >
         {initials}
       </div>
-
-      {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-sm font-semibold text-stone-800">
-            {agentName}
-          </span>
-          <span className="text-xs text-stone-400">{agentRole}</span>
-          <span
-            className={`ml-auto inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${cfg.labelColor}`}
-          >
-            <Icon className="h-2.5 w-2.5" />
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-sm font-semibold text-ink">{agentName}</span>
+          <span className="text-xs text-ink-faint">{agentRole}</span>
+          <span className={`ml-auto text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${cfg.badge}`}>
+            <Icon className="inline h-2.5 w-2.5 mr-0.5 -mt-px" />
             {cfg.label}
           </span>
         </div>
-        <div className="whitespace-pre-wrap text-sm leading-[1.75] text-stone-600">
-          {content}
-        </div>
+        <div className="text-sm leading-[1.8] text-ink-light whitespace-pre-wrap">{content}</div>
         {timestamp && (
-          <div className="mt-2 text-[10px] text-stone-400">
-            {new Date(timestamp).toLocaleTimeString("es-ES", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+          <div className="mt-2 text-[10px] text-ink-ghost">
+            {new Date(timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
           </div>
         )}
       </div>
