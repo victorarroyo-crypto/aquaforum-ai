@@ -7,6 +7,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.engine.llm import get_llm
 from app.engine.prompts import (
+    AI_2027_CONTEXT,
     CHALLENGE_RESPONSE,
     EXPERT_ANALYSIS,
     FINAL_SUMMARY,
@@ -89,6 +90,7 @@ async def moderator_open(state: ForumState) -> dict:
             )
 
     prompt = MODERATOR_OPEN.format(
+        ai_2027_context=AI_2027_CONTEXT,
         topic=state["topic"],
         panelists_description=_format_panelists(state["panelists"]),
         rules=_format_rules(state["rules"]),
@@ -136,6 +138,7 @@ async def agent_turn(state: ForumState) -> dict:
         )
 
     prompt = PANELIST_TURN.format(
+        ai_2027_context=AI_2027_CONTEXT,
         name=panelist["name"],
         role=panelist["role"],
         persona=panelist["persona"],
@@ -214,6 +217,7 @@ async def handle_challenge(state: ForumState) -> dict:
         return {"pending_challenge": None}
 
     prompt = CHALLENGE_RESPONSE.format(
+        ai_2027_context=AI_2027_CONTEXT,
         name=target["name"],
         role=target["role"],
         persona=target["persona"],
@@ -316,6 +320,7 @@ async def expert_analysis(state: ForumState) -> dict:
 
     for expert_type in EXPERT_TYPES:
         prompt = EXPERT_ANALYSIS.format(
+            ai_2027_context=AI_2027_CONTEXT,
             expert_type=expert_type,
             topic=state["topic"],
             round_number=state["current_round"],
@@ -401,6 +406,7 @@ async def final_summary(state: ForumState) -> dict:
     key_text = _format_recent_messages(key_msgs[-15:])
 
     prompt = FINAL_SUMMARY.format(
+        ai_2027_context=AI_2027_CONTEXT,
         topic=state["topic"],
         all_integrations=integrations_text,
         key_messages=key_text,

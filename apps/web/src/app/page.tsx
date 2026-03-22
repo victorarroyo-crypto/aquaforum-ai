@@ -61,7 +61,9 @@ export default function LandingPage() {
           >
             <Sparkles className="h-3.5 w-3.5 text-ocean" />
             <span className="text-xs font-medium text-muted-foreground">
-              Foro de expertos impulsado por IA
+              Inspirado por{" "}
+              <a href="https://ai-2027.com" target="_blank" rel="noopener noreferrer" className="text-ocean hover:underline">AI-2027</a>
+              {" "}— La IA transforma todo. Incluido el agua.
             </span>
           </motion.div>
 
@@ -264,11 +266,11 @@ export default function LandingPage() {
               <Waves className="h-8 w-8 text-white" />
             </div>
             <h2 className="text-3xl font-bold mb-4">
-              Crea tu primer foro
+              El futuro del agua se decide ahora
             </h2>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-              Configura panelistas, elige un tema y lanza un debate inteligente
-              en menos de 2 minutos.
+              Si la IA alcanza capacidades sobrehumanas en 2027, ¿está preparado el sector del agua?
+              Lanza un debate y descúbrelo.
             </p>
             <Link
               href="/setup"
