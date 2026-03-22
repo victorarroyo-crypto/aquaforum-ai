@@ -74,6 +74,15 @@ async def add_message(
     return msg_id
 
 
+async def update_message_metadata(msg_id: str, extra_metadata: dict) -> None:
+    db = get_supabase()
+    # Get current metadata
+    result = db.table("forum_messages").select("metadata").eq("id", msg_id).execute()
+    current = result.data[0]["metadata"] if result.data else {}
+    current.update(extra_metadata)
+    db.table("forum_messages").update({"metadata": current}).eq("id", msg_id).execute()
+
+
 async def get_messages(session_id: str) -> list[dict]:
     db = get_supabase()
     result = (

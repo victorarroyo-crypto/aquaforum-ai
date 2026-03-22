@@ -63,21 +63,9 @@ async def _update_pipeline(session_id: str, node: str):
 
 async def _persist_message(session_id: str, msg: ForumMessage) -> str:
     metadata = msg.get("metadata", {})
-    try:
-        from app.services.tts import generate_speech
-        print(f"TTS: generating for {msg['agent_name']}...")
-        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
-        if audio_url:
-            metadata["audio_url"] = audio_url
-            print(f"TTS: ✅ {audio_url[-30:]}")
-        else:
-            print(f"TTS: ❌ generate_speech returned None for {msg['agent_name']}")
-    except Exception as e:
-        import traceback
-        print(f"TTS ERROR for {msg['agent_name']}: {e}")
-        traceback.print_exc()
 
-    return await db.add_message(
+    # Save message first (so it appears in UI immediately)
+    msg_id = await db.add_message(
         session_id=session_id,
         agent_name=msg["agent_name"],
         agent_role=msg["agent_role"],
@@ -87,6 +75,17 @@ async def _persist_message(session_id: str, msg: ForumMessage) -> str:
         turn_number=msg["turn_number"],
         metadata=metadata,
     )
+
+    # Then generate audio and update the message
+    try:
+        from app.services.tts import generate_speech
+        audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
+        if audio_url:
+            await db.update_message_metadata(msg_id, {"audio_url": audio_url})
+    except Exception:
+        pass  # Audio is optional, never block the debate
+
+    return msg_id
 
 
 async def moderator_open(state: ForumState) -> dict:
