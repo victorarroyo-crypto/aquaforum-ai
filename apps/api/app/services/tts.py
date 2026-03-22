@@ -54,6 +54,19 @@ async def generate_speech(text: str, agent_name: str, session_id: str) -> str | 
     voice_id = VOICE_MAP.get(agent_name, DEFAULT_VOICE)
     speech_text = text[:1500] if len(text) > 1500 else text
 
+    supabase_url = _get_supabase_url()
+    supabase_key = _get_supabase_key()
+    print(f"TTS: Starting for {agent_name} | EL key: {api_key[:8]}... | Supa URL: {bool(supabase_url)} | Supa JWT: {supabase_key[:15] if supabase_key else 'EMPTY'}...")
+
+    if not supabase_url or not supabase_key:
+        print(f"TTS: Missing Supabase credentials, skipping")
+        return None
+
+    # Clean text for TTS — remove markdown formatting
+    import re
+    speech_text = re.sub(r'\*\*([^*]+)\*\*', r'\1', speech_text)  # Remove **bold**
+    speech_text = re.sub(r'\[CHALLENGE:[^\]]+\]', '', speech_text)  # Remove challenge tags
+
     try:
         # 1. Stream audio from ElevenLabs
         audio_chunks: list[bytes] = []
