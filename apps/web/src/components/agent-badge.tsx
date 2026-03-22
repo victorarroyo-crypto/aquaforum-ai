@@ -1,21 +1,38 @@
 "use client";
 
-interface AgentBadgeProps { name: string; role: string; color: string; size?: "sm" | "md"; active?: boolean; }
+interface AgentBadgeProps {
+  name: string;
+  role: string;
+  color: string;
+  isActive?: boolean;
+}
 
-export function AgentBadge({ name, role, color, size = "sm", active }: AgentBadgeProps) {
-  const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
-  const d = size === "sm" ? 24 : 30;
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+export function AgentBadge({ name, role, color, isActive }: AgentBadgeProps) {
   return (
-    <div className="inline-flex items-center gap-2 border border-edge rounded-full px-3 py-1.5 hover:border-faint transition-colors">
+    <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#18181B] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.1)] transition-colors">
       <div className="relative">
-        <div className="flex items-center justify-center rounded-full text-white font-bold" style={{ width: d, height: d, backgroundColor: color, fontSize: size === "sm" ? 9 : 11 }}>
-          {initials}
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+          style={{ backgroundColor: color }}
+        >
+          {getInitials(name)}
         </div>
-        {active && <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-white bg-accent" />}
+        {isActive && (
+          <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#22C55E] border-2 border-[#18181B] status-pulse" />
+        )}
       </div>
-      <div className="flex flex-col leading-tight">
-        <span className="text-[13px] font-bold text-dark">{name}</span>
-        <span className="text-[10px] text-light">{role}</span>
+      <div className="flex flex-col">
+        <span className="text-[13px] font-semibold text-[#FAFAFA] leading-tight">{name}</span>
+        <span className="text-[10px] text-[#52525B] leading-tight">{role}</span>
       </div>
     </div>
   );

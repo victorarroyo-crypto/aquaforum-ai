@@ -3,79 +3,163 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const MSGS = [
-  { name: "Elena Vásquez", role: "CEO Water Utility", color: "#0D9488", type: "statement", text: "Nuestros gemelos digitales con IA predictiva reducen pérdidas de agua no contabilizada en un 25%. Anticipamos roturas 72 horas antes de que ocurran." },
-  { name: "Dr. Ingrid Hoffmann", role: "Reguladora", color: "#4338CA", type: "challenge", text: "Si un algoritmo prioriza el suministro a un hospital sobre un barrio residencial durante sequía extrema, ¿quién responde legalmente?" },
-  { name: "Marcus Chen", role: "CEO Tech IA", color: "#0A0A0A", type: "response", text: "La trazabilidad algorítmica resuelve eso. Cada decisión de la IA queda registrada. El problema no es técnico, es de voluntad política." },
-  { name: "Sofia Andersen", role: "CEO Química", color: "#059669", type: "statement", text: "ML optimiza dosificación de reactivos en EDAR: −30% químicos, −40% fangos. Los modelos aprenden en tiempo real de la composición del efluente." },
-  { name: "Moderador IA", role: "", color: "#A3A3A3", type: "moderation", text: "James, ¿cuál es el horizonte realista de ROI para una utility que invierte en IA hoy?" },
+const demoMessages = [
+  {
+    name: "Elena Vásquez",
+    role: "CEO Water Utility",
+    color: "#14B8A6",
+    content:
+      "Nuestros gemelos digitales con IA predictiva reducen pérdidas de agua no contabilizada en un 25%. Anticipamos roturas 72 horas antes.",
+    type: "statement",
+  },
+  {
+    name: "Marcus Chen",
+    role: "CEO Tecnología IA",
+    color: "#8B5CF6",
+    content:
+      "Los modelos predictivos de calidad del agua alcanzan 97% de precisión con datos en tiempo real de sensores IoT.",
+    type: "statement",
+  },
+  {
+    name: "Ahmed Al-Rashid",
+    role: "CEO Desalación",
+    color: "#F59E0B",
+    content:
+      "Interpelación a Elena: ¿Ese 25% incluye el costo de ciberseguridad para sistemas SCADA conectados a IA?",
+    type: "challenge",
+  },
+  {
+    name: "Elena Vásquez",
+    role: "CEO Water Utility",
+    color: "#14B8A6",
+    content:
+      "Excelente punto. El análisis incluye inversión en seguridad, pero reconozco que el riesgo evoluciona más rápido que nuestras defensas.",
+    type: "response",
+  },
+  {
+    name: "Dr. Ingrid Hoffmann",
+    role: "Analista Regulatoria",
+    color: "#6366F1",
+    content:
+      "Si un algoritmo prioriza el suministro a un hospital sobre un barrio residencial durante sequía extrema, ¿quién responde legalmente?",
+    type: "challenge",
+  },
 ];
 
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+const borderMap: Record<string, string> = {
+  statement: "#52525B",
+  challenge: "#F59E0B",
+  response: "#14B8A6",
+};
+
 export function DemoMockup() {
-  const [n, setN] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(0);
 
   useEffect(() => {
-    if (n >= MSGS.length) { const t = setTimeout(() => setN(0), 3000); return () => clearTimeout(t); }
-    const t = setTimeout(() => setN((v) => v + 1), 2400);
-    return () => clearTimeout(t);
-  }, [n]);
+    if (visibleCount >= demoMessages.length) {
+      const timer = setTimeout(() => setVisibleCount(0), 3500);
+      return () => clearTimeout(timer);
+    }
+    const timer = setTimeout(
+      () => setVisibleCount((c) => c + 1),
+      visibleCount === 0 ? 600 : 2200
+    );
+    return () => clearTimeout(timer);
+  }, [visibleCount]);
 
   return (
-    <div className="bg-white rounded-lg shadow-2xl shadow-black/25 border border-white/10 mx-auto max-w-2xl overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-100 bg-neutral-50">
+    <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0C0C0F] overflow-hidden shadow-2xl shadow-black/40 max-w-2xl mx-auto">
+      {/* Window chrome */}
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#18181B] border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <div className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <div className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-          </div>
-          <span className="ml-3 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Debate en curso</span>
+          <div className="w-3 h-3 rounded-full bg-[#EF4444]/60" />
+          <div className="w-3 h-3 rounded-full bg-[#F59E0B]/60" />
+          <div className="w-3 h-3 rounded-full bg-[#22C55E]/60" />
         </div>
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-bold text-emerald-600">EN VIVO</span>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-[#22C55E] status-pulse" />
+          <span className="text-[11px] font-bold text-[#22C55E] uppercase tracking-wider">
+            En vivo
+          </span>
         </div>
+        <span className="text-[11px] text-[#3F3F46] font-mono">AquaForum AI</span>
       </div>
 
-      <div className="p-5 space-y-4 h-[360px] overflow-hidden">
-        <AnimatePresence mode="popLayout">
-          {MSGS.slice(0, n).map((m, i) => (
+      {/* Topic bar */}
+      <div className="px-4 py-2 bg-[#111113] border-b border-[rgba(255,255,255,0.04)]">
+        <span className="text-[12px] text-[#52525B]">Debate:</span>{" "}
+        <span className="text-[12px] text-[#A1A1AA] font-medium">
+          IA en infraestructura hídrica: riesgos y oportunidades
+        </span>
+      </div>
+
+      {/* Messages */}
+      <div className="p-4 space-y-3 min-h-[340px]">
+        <AnimatePresence>
+          {demoMessages.slice(0, visibleCount).map((msg, i) => (
             <motion.div
-              key={`${i}-${n > MSGS.length ? "r" : ""}`}
-              initial={{ opacity: 0, y: 12 }}
+              key={`${i}-${visibleCount > demoMessages.length ? "r" : ""}`}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className={m.type === "moderation" ? "text-center py-2" : "flex gap-3"}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="flex gap-2.5"
             >
-              {m.type === "moderation" ? (
-                <p className="text-[11px] italic text-neutral-400 max-w-sm mx-auto">{m.text}</p>
-              ) : (
-                <>
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ backgroundColor: m.color }}>
-                    {m.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs font-bold text-neutral-900">{m.name}</span>
-                      <span className="text-[10px] text-neutral-400">{m.role}</span>
-                      {m.type === "challenge" && (
-                        <span className="text-[8px] uppercase tracking-widest font-black text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">Interpelación</span>
-                      )}
-                    </div>
-                    <p className="text-xs leading-relaxed text-neutral-600">{m.text}</p>
-                  </div>
-                </>
-              )}
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0 mt-0.5"
+                style={{ backgroundColor: msg.color }}
+              >
+                {getInitials(msg.name)}
+              </div>
+              <div
+                className="flex-1 rounded-lg px-3.5 py-2.5 border border-[rgba(255,255,255,0.06)]"
+                style={{
+                  borderLeft: `2px solid ${borderMap[msg.type] || "#52525B"}`,
+                  backgroundColor:
+                    msg.type === "challenge" ? "rgba(245,158,11,0.04)" : "#18181B",
+                }}
+              >
+                <div className="flex items-baseline gap-1.5 mb-1">
+                  <span className="text-[12px] font-semibold text-[#FAFAFA]">
+                    {msg.name}
+                  </span>
+                  <span className="text-[10px] text-[#52525B]">{msg.role}</span>
+                </div>
+                <p className="text-[13px] leading-relaxed text-[#D4D4D8]">
+                  {msg.content}
+                </p>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
 
-        {n > 0 && n < MSGS.length && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-1 pl-10">
-            <div className="typing-dot h-1 w-1 rounded-full bg-neutral-300" />
-            <div className="typing-dot h-1 w-1 rounded-full bg-neutral-300" />
-            <div className="typing-dot h-1 w-1 rounded-full bg-neutral-300" />
+        {visibleCount > 0 && visibleCount < demoMessages.length && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-2.5 px-1"
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+              style={{
+                backgroundColor: demoMessages[visibleCount]?.color || "#3F3F46",
+              }}
+            >
+              {getInitials(demoMessages[visibleCount]?.name || "?")}
+            </div>
+            <div className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)]">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#71717A] typing-dot" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#71717A] typing-dot" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#71717A] typing-dot" />
+            </div>
           </motion.div>
         )}
       </div>

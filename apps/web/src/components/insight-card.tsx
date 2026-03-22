@@ -1,25 +1,72 @@
-import { Droplets, TrendingUp, Scale, Leaf } from "lucide-react";
+"use client";
 
-interface InsightCardProps { title: string; content: string; type?: "technical" | "economic" | "regulatory" | "environmental"; }
+import { AlertTriangle, TrendingUp, Lightbulb, Shield, Zap, Droplets, Scale, Leaf } from "lucide-react";
 
-const C = {
-  technical:     { icon: Droplets,   color: "#0D9488", label: "Técnico" },
-  economic:      { icon: TrendingUp, color: "#D97706", label: "Económico" },
-  regulatory:    { icon: Scale,      color: "#4338CA", label: "Regulatorio" },
-  environmental: { icon: Leaf,       color: "#059669", label: "Ambiental" },
+const iconMap: Record<string, React.ElementType> = {
+  warning: AlertTriangle,
+  trend: TrendingUp,
+  insight: Lightbulb,
+  risk: Shield,
+  action: Zap,
+  technical: Droplets,
+  economic: TrendingUp,
+  regulatory: Scale,
+  environmental: Leaf,
 };
 
-export function InsightCard({ title, content, type = "technical" }: InsightCardProps) {
-  const c = C[type];
-  const Icon = c.icon;
+const colorMap: Record<string, string> = {
+  warning: "#F59E0B",
+  trend: "#14B8A6",
+  insight: "#8B5CF6",
+  risk: "#EF4444",
+  action: "#22C55E",
+  technical: "#14B8A6",
+  economic: "#F59E0B",
+  regulatory: "#6366F1",
+  environmental: "#22C55E",
+};
+
+interface InsightCardProps {
+  type: string;
+  title: string;
+  content: string;
+  label?: string;
+}
+
+export function InsightCard({ type, title, content, label }: InsightCardProps) {
+  const Icon = iconMap[type] || Lightbulb;
+  const borderColor = colorMap[type] || "#14B8A6";
+
   return (
-    <div className="border border-edge rounded p-4 hover:border-faint transition-colors" style={{ borderLeft: `2px solid ${c.color}` }}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className="h-3.5 w-3.5" style={{ color: c.color }} />
-        <h4 className="text-xs font-bold text-dark">{title}</h4>
-        <span className="ml-auto text-[8px] font-black uppercase tracking-widest" style={{ color: c.color }}>{c.label}</span>
+    <div
+      className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4"
+      style={{ borderLeft: `3px solid ${borderColor}` }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+          style={{ backgroundColor: `${borderColor}15` }}
+        >
+          <Icon size={16} style={{ color: borderColor }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className="text-[14px] font-semibold text-[#FAFAFA]">{title}</h4>
+            {label && (
+              <span
+                className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                style={{
+                  color: borderColor,
+                  backgroundColor: `${borderColor}15`,
+                }}
+              >
+                {label}
+              </span>
+            )}
+          </div>
+          <p className="text-[14px] leading-relaxed text-[#A1A1AA]">{content}</p>
+        </div>
       </div>
-      <p className="text-[13px] leading-relaxed text-mid pl-5">{content}</p>
     </div>
   );
 }

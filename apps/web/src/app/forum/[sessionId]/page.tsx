@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { MessageBubble } from "@/components/message-bubble";
 import { PipelineDisplay } from "@/components/pipeline-display";
 import { AnalysisPanel } from "@/components/analysis-panel";
@@ -12,116 +11,344 @@ import { TypingIndicator } from "@/components/typing-indicator";
 import { useForumStore } from "@/store/forum-store";
 import { useForumRealtime } from "@/hooks/use-forum-realtime";
 import { api } from "@/lib/api";
-import { ArrowLeft, Download, Pause, Play, Radio, ChevronRight, PanelRightOpen, PanelRightClose } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Pause,
+  Play,
+  Radio,
+  ChevronRight,
+  PanelRightOpen,
+  PanelRightClose,
+} from "lucide-react";
 
 export default function ForumView() {
   const params = useParams();
   const router = useRouter();
   const sessionId = params.sessionId as string;
-  const { messages, pipeline, status, topic, currentRound, maxRounds, config, setSession, setMessages, setStatus, setRound } = useForumStore();
+  const {
+    messages,
+    pipeline,
+    status,
+    topic,
+    currentRound,
+    maxRounds,
+    config,
+    setSession,
+    setMessages,
+    setStatus,
+    setRound,
+  } = useForumStore();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [sidebar, setSidebar] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useForumRealtime(sessionId);
-  useEffect(() => { (async () => { try { const s = await api.getState(sessionId); setMessages(s.messages); setStatus(s.status); setRound(s.current_round); if (s.config && !config) setSession(sessionId, s.config); } catch {} finally { setInitialLoading(false); } })(); }, [sessionId]);
-  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [messages.length]);
 
-  const discussionMessages = messages.filter((m) => !["analysis", "integration"].includes(m.message_type));
+  useEffect(() => {
+    (async () => {
+      try {
+        const s = await api.getState(sessionId);
+        setMessages(s.messages);
+        setStatus(s.status);
+        setRound(s.current_round);
+        if (s.config && !config) setSession(sessionId, s.config);
+      } catch {
+        /* ignore */
+      } finally {
+        setInitialLoading(false);
+      }
+    })();
+  }, [sessionId]);
 
-  if (initialLoading) return (
-    <div className="flex min-h-screen items-center justify-center">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-        <div className="h-1 w-12 bg-accent mx-auto mb-8" />
-        <p className="text-light text-sm">Conectando...</p>
-      </motion.div>
-    </div>
+  useEffect(() => {
+    if (scrollRef.current)
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages.length]);
+
+  const discussionMessages = messages.filter(
+    (m) => !["analysis", "integration"].includes(m.message_type)
   );
 
+  const handleNextCycle = async () => {
+    setLoading(true);
+    try {
+      await api.nextCycle(sessionId);
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePause = async () => {
+    try {
+      await api.stopForum(sessionId);
+      setStatus("paused");
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const handleExport = async () => {
+    setLoading(true);
+    try {
+      const r = await api.exportForum(sessionId);
+      const b = new Blob([r.content], { type: "text/markdown" });
+      const u = URL.createObjectURL(b);
+      const a = document.createElement("a");
+      a.href = u;
+      a.download = `aquaforum-${sessionId.slice(0, 8)}.md`;
+      a.click();
+      URL.revokeObjectURL(u);
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Loading state
+  if (initialLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#09090B]">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <div className="h-1 w-16 bg-[#14B8A6] mx-auto mb-8" />
+          <p className="text-[16px] text-[#52525B]">Conectando al foro...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Determine the color for typing indicator
+  const lastSpeaker = discussionMessages[discussionMessages.length - 1];
+  const typingAgent = config?.panelists[0];
+
   return (
-    <div className="flex h-screen flex-col">
-      <header className="flex items-center justify-between px-5 py-3 border-b border-edge bg-white">
+    <div className="flex h-screen flex-col bg-[#09090B]">
+      {/* Header */}
+      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="h-7 w-7 p-0 text-faint hover:text-dark"><ArrowLeft className="h-3.5 w-3.5" /></Button>
+          <button
+            onClick={() => router.push("/")}
+            className="p-1.5 text-[#3F3F46] hover:text-[#FAFAFA] transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
           <div>
-            <h1 className="text-[10px] font-black uppercase tracking-[0.25em] text-dark">AquaForum AI</h1>
-            <p className="max-w-sm truncate text-[11px] text-light mt-0.5">{topic}</p>
+            <h1 className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#FAFAFA]">
+              AquaForum AI
+            </h1>
+            <p className="max-w-sm truncate text-[12px] text-[#52525B] mt-0.5">
+              {topic}
+            </p>
           </div>
         </div>
+
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 border border-edge rounded-full px-3 py-1">
-            <span className="text-[10px] text-faint">Ronda</span>
-            <span className="text-sm font-black text-accent">{currentRound}</span>
-            <span className="text-[10px] text-faint">/ {maxRounds}</span>
+          {/* Round badge */}
+          <div className="flex items-center gap-1.5 border border-[rgba(255,255,255,0.06)] rounded-full px-3 py-1.5 bg-[#18181B]">
+            <span className="text-[11px] text-[#52525B]">Ronda</span>
+            <span className="text-[14px] font-bold text-[#14B8A6]">
+              {currentRound}
+            </span>
+            <span className="text-[11px] text-[#3F3F46]">/ {maxRounds}</span>
           </div>
-          <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${status === "running" ? "text-accent bg-accent/5" : status === "completed" ? "text-mid bg-surface" : status === "error" ? "text-red-600 bg-red-50" : "text-warn bg-warn-bg"}`}>
-            {status === "running" && <Radio className="h-2.5 w-2.5 animate-pulse" />}
-            {status === "running" ? "En curso" : status === "completed" ? "Completado" : status === "error" ? "Error" : "Pausado"}
+
+          {/* Status badge */}
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold ${
+              status === "running"
+                ? "text-[#22C55E] bg-[rgba(34,197,94,0.08)]"
+                : status === "completed"
+                  ? "text-[#A1A1AA] bg-[#18181B]"
+                  : status === "error"
+                    ? "text-[#EF4444] bg-[rgba(239,68,68,0.08)]"
+                    : "text-[#F59E0B] bg-[rgba(245,158,11,0.08)]"
+            }`}
+          >
+            {status === "running" && (
+              <Radio className="h-3 w-3 status-pulse" />
+            )}
+            {status === "running"
+              ? "En curso"
+              : status === "completed"
+                ? "Completado"
+                : status === "error"
+                  ? "Error"
+                  : "Pausado"}
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setSidebar(!sidebar)} className="hidden lg:flex h-7 w-7 p-0 text-faint hover:text-dark">
-            {sidebar ? <PanelRightClose className="h-3.5 w-3.5" /> : <PanelRightOpen className="h-3.5 w-3.5" />}
-          </Button>
+
+          {/* Sidebar toggle */}
+          <button
+            onClick={() => setSidebar(!sidebar)}
+            className="hidden lg:flex p-1.5 text-[#3F3F46] hover:text-[#FAFAFA] transition-colors"
+          >
+            {sidebar ? (
+              <PanelRightClose className="h-4 w-4" />
+            ) : (
+              <PanelRightOpen className="h-4 w-4" />
+            )}
+          </button>
         </div>
       </header>
 
+      {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
+        {/* Message area */}
         <div className="flex flex-1 flex-col min-w-0">
+          {/* Agent bar */}
           {config && (
-            <div className="flex flex-wrap gap-2 border-b border-edge px-5 py-2.5 bg-white">
-              {config.panelists.map((p) => <AgentBadge key={p.name} name={p.name} role={p.role} color={p.color} active={status === "running"} />)}
+            <div className="flex flex-wrap gap-2 border-b border-[rgba(255,255,255,0.06)] px-5 py-2.5 bg-[#0C0C0F]">
+              {config.panelists.map((p) => (
+                <AgentBadge
+                  key={p.name}
+                  name={p.name}
+                  role={p.role}
+                  color={p.color}
+                  isActive={status === "running"}
+                />
+              ))}
             </div>
           )}
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto bg-surface/30">
+          {/* Messages feed */}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-3xl px-5 py-6">
               <AnimatePresence mode="popLayout">
                 {discussionMessages.map((msg) => (
-                  <MessageBubble key={msg.id} agentName={msg.agent_name} agentRole={msg.agent_role} content={msg.content} messageType={msg.message_type} color={(msg.metadata?.color as string) || "#0D9488"} timestamp={msg.created_at} />
+                  <MessageBubble
+                    key={msg.id}
+                    message={msg}
+                    color={
+                      (msg.metadata?.color as string) ||
+                      config?.panelists.find((p) => p.name === msg.agent_name)
+                        ?.color ||
+                      "#52525B"
+                    }
+                  />
                 ))}
               </AnimatePresence>
-              {status === "running" && messages.length > 0 && <TypingIndicator agentName={config?.panelists[0]?.name || "Agente"} color={config?.panelists[0]?.color || "#0D9488"} />}
+
+              {/* Typing indicator */}
+              {status === "running" && messages.length > 0 && (
+                <TypingIndicator
+                  agentName={typingAgent?.name || "Agente"}
+                  color={typingAgent?.color || "#14B8A6"}
+                />
+              )}
+
+              {/* Empty state */}
               {messages.length === 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-32 text-center">
-                  <div className="h-1 w-12 bg-accent mx-auto mb-8" />
-                  <p className="text-2xl font-black text-faint">El debate comenzará en breve</p>
-                  <p className="mt-3 text-sm text-faint">Pulsa &quot;Siguiente Ronda&quot; para iniciar</p>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-32 text-center"
+                >
+                  <div className="h-1 w-16 bg-[#14B8A6] mx-auto mb-8" />
+                  <p className="text-[28px] font-[800] text-[#27272A]">
+                    El debate comenzará en breve
+                  </p>
+                  <p className="mt-4 text-[16px] text-[#3F3F46]">
+                    Pulsa &quot;Siguiente Ronda&quot; para iniciar
+                  </p>
                 </motion.div>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-3 px-5 py-3 border-t border-edge bg-white">
+          {/* Controls */}
+          <div className="flex items-center gap-3 px-5 py-3 border-t border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
             {status !== "completed" && (
               <>
-                <Button onClick={async () => { setLoading(true); try { await api.nextCycle(sessionId); } catch {} finally { setLoading(false); } }} disabled={loading || status === "running"} className="group bg-dark text-white hover:bg-accent disabled:opacity-30 rounded px-5 text-xs font-bold uppercase tracking-wider">
-                  <Play className="mr-1.5 h-3 w-3" />{currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}<ChevronRight className="ml-1 h-3 w-3 opacity-40 group-hover:translate-x-0.5 transition-transform" />
-                </Button>
-                <Button variant="ghost" onClick={async () => { try { await api.stopForum(sessionId); setStatus("paused"); } catch {} }} disabled={status !== "running"} className="text-light hover:text-dark text-xs"><Pause className="mr-1 h-3 w-3" /> Pausar</Button>
+                <button
+                  onClick={handleNextCycle}
+                  disabled={loading || status === "running"}
+                  className="group flex items-center gap-1.5 px-5 py-2.5 bg-[#14B8A6] text-white rounded-lg text-[13px] font-bold hover:bg-[#0D9488] disabled:opacity-30 transition-colors"
+                >
+                  <Play className="h-3.5 w-3.5" />
+                  {currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}
+                  <ChevronRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+                <button
+                  onClick={handlePause}
+                  disabled={status !== "running"}
+                  className="flex items-center gap-1.5 px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
+                >
+                  <Pause className="h-3.5 w-3.5" /> Pausar
+                </button>
               </>
             )}
-            <Button variant="ghost" onClick={async () => { setLoading(true); try { const r = await api.exportForum(sessionId); const b = new Blob([r.content], { type: "text/markdown" }); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = `aquaforum-${sessionId.slice(0, 8)}.md`; a.click(); URL.revokeObjectURL(u); } catch {} finally { setLoading(false); } }} disabled={loading || !messages.length} className="ml-auto text-light hover:text-dark text-xs">
-              <Download className="mr-1 h-3 w-3" /> Exportar
-            </Button>
+            <button
+              onClick={handleExport}
+              disabled={loading || !messages.length}
+              className="flex items-center gap-1.5 ml-auto px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" /> Exportar
+            </button>
           </div>
         </div>
 
+        {/* Sidebar */}
         <AnimatePresence>
           {sidebar && (
-            <motion.aside initial={{ width: 0, opacity: 0 }} animate={{ width: 300, opacity: 1 }} exit={{ width: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-edge p-4 bg-white">
+            <motion.aside
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 320, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.06)] p-4 bg-[#0C0C0F]"
+            >
+              {/* Panelists */}
               {config && (
-                <div className="border border-edge rounded p-4">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-light mb-3">Panelistas</h3>
+                <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-3">
+                    Panelistas
+                  </h3>
                   {config.panelists.map((p) => (
-                    <div key={p.name} className="flex items-center gap-2.5 py-1.5">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full text-[8px] font-bold text-white" style={{ backgroundColor: p.color }}>{p.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}</div>
-                      <div className="flex-1 min-w-0"><span className="text-[12px] font-bold text-dark block truncate">{p.name}</span><span className="text-[10px] text-light">{p.role}</span></div>
-                      {status === "running" && <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />}
+                    <div
+                      key={p.name}
+                      className="flex items-center gap-2.5 py-2"
+                    >
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+                        style={{ backgroundColor: p.color }}
+                      >
+                        {p.name
+                          .split(" ")
+                          .map((w) => w[0])
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[13px] font-semibold text-[#FAFAFA] block truncate">
+                          {p.name}
+                        </span>
+                        <span className="text-[11px] text-[#52525B]">
+                          {p.role}
+                        </span>
+                      </div>
+                      {status === "running" && (
+                        <div className="h-2 w-2 rounded-full bg-[#22C55E] status-pulse" />
+                      )}
                     </div>
                   ))}
                 </div>
               )}
-              <PipelineDisplay currentNode={pipeline.current_node} progress={pipeline.progress} />
+
+              {/* Pipeline */}
+              <PipelineDisplay
+                currentNode={pipeline.current_node}
+                progress={pipeline.progress}
+              />
+
+              {/* Analysis */}
               <AnalysisPanel messages={messages} />
             </motion.aside>
           )}

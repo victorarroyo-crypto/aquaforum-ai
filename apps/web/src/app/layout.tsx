@@ -7,13 +7,13 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "AquaForum AI",
-  description: "La IA ya nos supera. ¿Y el agua?",
+  description: "Foros de debate autónomos impulsados por agentes de IA para la industria del agua",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full">{children}</body>
+    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="min-h-screen bg-[#09090B] text-[#FAFAFA]">{children}</body>
     </html>
   );
 }

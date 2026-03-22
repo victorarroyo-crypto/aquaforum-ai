@@ -1,58 +1,107 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertTriangle, MessageSquare, Shield, Crown, Sparkles, FileText } from "lucide-react";
+import type { ForumMessage } from "@/lib/api";
 
-interface MessageBubbleProps {
-  agentName: string;
-  agentRole: string;
-  content: string;
-  messageType: string;
-  color?: string;
-  timestamp?: string;
-}
-
-const CFG: Record<string, { icon: React.ElementType; label: string; border: string; badge: string }> = {
-  statement:   { icon: MessageSquare, label: "Declaración",   border: "border-l-faint",    badge: "text-light bg-surface" },
-  challenge:   { icon: AlertTriangle, label: "Interpelación", border: "border-l-warn",     badge: "text-warn bg-warn-bg" },
-  response:    { icon: Shield,        label: "Respuesta",     border: "border-l-accent",   badge: "text-accent bg-accent/5" },
-  moderation:  { icon: Crown,         label: "Moderación",    border: "",                   badge: "text-info bg-info-bg" },
-  analysis:    { icon: Sparkles,      label: "Análisis",      border: "border-l-accent",   badge: "text-accent bg-accent/5" },
-  integration: { icon: FileText,      label: "Integración",   border: "border-l-mid",      badge: "text-mid bg-surface" },
-  summary:     { icon: Sparkles,      label: "Resumen Final", border: "",                   badge: "text-info bg-info-bg" },
+const borderColorMap: Record<string, string> = {
+  statement: "#52525B",
+  challenge: "#F59E0B",
+  interpelacion: "#F59E0B",
+  response: "#14B8A6",
+  moderation: "#8B5CF6",
+  analysis: "#22C55E",
+  integration: "#14B8A6",
+  synthesis: "#6366F1",
+  summary: "#8B5CF6",
 };
 
-export function MessageBubble({ agentName, agentRole, content, messageType, color = "#0D9488", timestamp }: MessageBubbleProps) {
-  const c = CFG[messageType] || CFG.statement;
-  const Icon = c.icon;
-  const isMod = messageType === "moderation" || messageType === "summary";
-  const initials = agentName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+const bgTintMap: Record<string, string> = {
+  challenge: "rgba(245, 158, 11, 0.04)",
+  interpelacion: "rgba(245, 158, 11, 0.04)",
+};
 
-  if (isMod) {
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+interface MessageBubbleProps {
+  message: ForumMessage;
+  color?: string;
+}
+
+export function MessageBubble({ message, color }: MessageBubbleProps) {
+  const borderColor = borderColorMap[message.message_type] || "#52525B";
+  const bgTint = bgTintMap[message.message_type] || "transparent";
+  const isModeration = message.message_type === "moderation" || message.message_type === "summary";
+
+  if (isModeration) {
     return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mx-auto max-w-lg text-center py-8">
-        <div className="h-px w-8 bg-edge mx-auto mb-4" />
-        <p className="text-sm leading-[1.8] text-mid italic">{content}</p>
-        <p className="text-[9px] text-light mt-3 font-bold uppercase tracking-[0.2em]">{c.label}</p>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex justify-center py-4"
+      >
+        <div className="flex items-center gap-2 px-5 py-3 rounded-full border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] max-w-lg">
+          <span className="text-[14px] italic text-[#A1A1AA] leading-relaxed text-center">
+            {message.content}
+          </span>
+        </div>
       </motion.div>
     );
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className={`flex gap-4 py-5 border-l-2 ${c.border} pl-5`}>
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: color }}>
-        {initials}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex gap-3.5 py-3"
+    >
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold text-white"
+        style={{ backgroundColor: color || borderColor }}
+      >
+        {getInitials(message.agent_name)}
       </div>
+
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-sm font-bold text-dark">{agentName}</span>
-          <span className="text-xs text-light">{agentRole}</span>
-          <span className={`ml-auto text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${c.badge}`}>
-            {c.label}
-          </span>
+        <div
+          className="rounded-lg px-4 py-3.5 border border-[rgba(255,255,255,0.06)]"
+          style={{
+            borderLeft: `3px solid ${borderColor}`,
+            backgroundColor: bgTint !== "transparent" ? bgTint : "#18181B",
+          }}
+        >
+          <div className="flex items-baseline gap-2 mb-1.5">
+            <span className="text-[14px] font-semibold text-[#FAFAFA]">
+              {message.agent_name}
+            </span>
+            <span className="text-[12px] text-[#52525B]">{message.agent_role}</span>
+          </div>
+
+          <p className="text-[15px] leading-[1.75] text-[#D4D4D8] whitespace-pre-wrap">
+            {message.content}
+          </p>
+
+          <div className="flex items-center gap-3 mt-2.5">
+            <span className="text-[10px] text-[#52525B] font-mono">
+              R{message.round_number} / T{message.turn_number}
+            </span>
+            <span className="text-[10px] text-[#3F3F46]">
+              {new Date(message.created_at).toLocaleTimeString("es-ES", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </span>
+          </div>
         </div>
-        <div className="text-[15px] leading-[1.8] text-mid whitespace-pre-wrap">{content}</div>
-        {timestamp && <div className="mt-2 text-[10px] text-faint">{new Date(timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</div>}
       </div>
     </motion.div>
   );
