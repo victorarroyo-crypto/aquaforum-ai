@@ -9,7 +9,5 @@ RUN pip install --no-cache-dir .
 # Copy application code
 COPY apps/api/app/ ./app/
 
-COPY apps/api/start.sh ./start.sh
-RUN chmod +x start.sh
-
-CMD ["./start.sh"]
+# Use shell form so $PORT expands at runtime
+CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
