@@ -123,6 +123,7 @@ export default function SetupPage() {
           role: "",
           persona: "",
           color: COLOR_OPTIONS[panelists.length % COLOR_OPTIONS.length],
+          avatar_url: "",
         },
       ]);
   };

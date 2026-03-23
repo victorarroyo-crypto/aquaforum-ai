@@ -507,4 +507,3 @@ export default function LandingPage() {
     </div>
   );
 }
-// avatars 1774255492
