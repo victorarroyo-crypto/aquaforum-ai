@@ -1,44 +1,33 @@
-"""ElevenLabs TTS — production quality, works in any context (sync/async/background)."""
+"""Edge TTS — Microsoft Neural voices, FREE, native Spanish, high quality."""
 
 import logging
 import os
 import re
 import uuid
-
-import httpx
+import asyncio
+import tempfile
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-ELEVENLABS_API = "https://api.elevenlabs.io/v1"
-
+# Native Spanish voices — gender-matched to panelists
 VOICE_MAP = {
-    "Elena Vásquez": "EXAVITQu4vr4xnSDxMaL",
-    "Marcus Chen": "onwK4e9ZLuTAKqWW03F9",
-    "Sofia Andersen": "Xb7hH8MSUJpSbSDYk0k2",
-    "Ahmed Al-Rashid": "JBFqnCBsd6RMkjVDRZzb",
-    "Dr. Ingrid Hoffmann": "XrExE9yKIg1WjnnlVkGX",
-    "James Okafor": "nPczCjzI2devNBz1zQrb",
-    "Moderador": "CwhRBWXzGAHq8TQ4Fs17",
-    "Integrador": "cjVigY5qzO86Huf0OWal",
+    # Female panelists → female Spanish voices
+    "Elena Vásquez": "es-ES-XimenaNeural",
+    "Sofia Andersen": "es-CO-SalomeNeural",
+    "Dr. Ingrid Hoffmann": "es-CL-CatalinaNeural",
+    # Male panelists → male Spanish voices
+    "Marcus Chen": "es-MX-JorgeNeural",
+    "Ahmed Al-Rashid": "es-AR-TomasNeural",
+    "James Okafor": "es-BO-MarceloNeural",
+    "Koji Tanaka": "es-ES-AlvaroNeural",
+    # System agents
+    "Moderador": "es-ES-AlvaroNeural",
+    "Integrador": "es-MX-JorgeNeural",
 }
 
-DEFAULT_VOICE = "CwhRBWXzGAHq8TQ4Fs17"
-
-
-def _get_el_key() -> str:
-    return os.environ.get("ELEVENLABS_API_KEY", "") or settings.elevenlabs_api_key
-
-
-def _get_supabase_jwt() -> str:
-    for key_name in ["SUPABASE_JWT_KEY", "SUPABASE_SERVICE_ROLE_KEY"]:
-        val = os.environ.get(key_name, "")
-        if val.startswith("eyJ"):
-            return val
-    if settings.supabase_service_role_key.startswith("eyJ"):
-        return settings.supabase_service_role_key
-    return ""
+DEFAULT_VOICE = "es-ES-AlvaroNeural"
 
 
 def _clean_text(text: str) -> str:
@@ -52,44 +41,50 @@ def _clean_text(text: str) -> str:
         clean,
         flags=re.IGNORECASE,
     )
+    # Remove markdown bullet points
+    clean = re.sub(r"^[-*]\s+", "", clean, flags=re.MULTILINE)
     return clean.strip()
 
 
-def generate_speech_sync(text: str, agent_name: str, session_id: str) -> str | None:
-    """Generate speech SYNCHRONOUSLY — works in any context including BackgroundTasks."""
-    api_key = _get_el_key()
-    if not api_key:
-        return None
+def _get_supabase_jwt() -> str:
+    for key_name in ["SUPABASE_JWT_KEY", "SUPABASE_SERVICE_ROLE_KEY"]:
+        val = os.environ.get(key_name, "")
+        if val.startswith("eyJ"):
+            return val
+    if settings.supabase_service_role_key.startswith("eyJ"):
+        return settings.supabase_service_role_key
+    return ""
 
-    voice_id = VOICE_MAP.get(agent_name, DEFAULT_VOICE)
+
+async def generate_speech(text: str, agent_name: str, session_id: str) -> str | None:
+    """Generate speech with Edge TTS — native Spanish, FREE."""
+    import edge_tts
+
+    voice = VOICE_MAP.get(agent_name, DEFAULT_VOICE)
     clean = _clean_text(text)
     if len(clean) < 5:
         return None
 
     try:
-        # 1. Generate audio from ElevenLabs (sync)
-        with httpx.Client(timeout=45.0) as client:
-            resp = client.post(
-                f"{ELEVENLABS_API}/text-to-speech/{voice_id}/stream",
-                headers={"xi-api-key": api_key, "Content-Type": "application/json"},
-                params={"output_format": "mp3_44100_128", "optimize_streaming_latency": "3"},
-                json={
-                    "text": clean,
-                    "model_id": "eleven_multilingual_v2",
-                    "voice_settings": {"stability": 0.35, "similarity_boost": 0.8, "style": 0.45, "use_speaker_boost": True},
-                },
-            )
-            if resp.status_code != 200:
-                logger.error(f"ElevenLabs error {resp.status_code}: {resp.text[:200]}")
-                return None
-            audio_bytes = resp.content
+        # Generate audio with edge-tts
+        communicate = edge_tts.Communicate(clean, voice, rate="-5%")
+
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
+            tmp_path = tmp.name
+
+        await communicate.save(tmp_path)
+
+        with open(tmp_path, "rb") as f:
+            audio_bytes = f.read()
+
+        os.unlink(tmp_path)
 
         if len(audio_bytes) < 100:
             return None
 
-        logger.info(f"TTS: {len(audio_bytes)//1000}KB for {agent_name}")
+        logger.info(f"TTS: {len(audio_bytes)//1000}KB for {agent_name} ({voice})")
 
-        # 2. Upload to Supabase Storage (sync)
+        # Upload to Supabase Storage
         return _upload_sync(audio_bytes, session_id)
 
     except Exception as e:
@@ -97,13 +92,32 @@ def generate_speech_sync(text: str, agent_name: str, session_id: str) -> str | N
         return None
 
 
-async def generate_speech(text: str, agent_name: str, session_id: str) -> str | None:
-    """Async wrapper — calls sync version directly (httpx sync works in any context)."""
-    return generate_speech_sync(text, agent_name, session_id)
+def generate_speech_sync(text: str, agent_name: str, session_id: str) -> str | None:
+    """Sync wrapper for contexts that can't use async."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # Already in async context, create a new task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                result = pool.submit(
+                    asyncio.run,
+                    generate_speech(text, agent_name, session_id)
+                ).result(timeout=60)
+            return result
+        else:
+            return loop.run_until_complete(
+                generate_speech(text, agent_name, session_id)
+            )
+    except Exception as e:
+        logger.error(f"TTS sync error: {e}")
+        return None
 
 
 def _upload_sync(audio_bytes: bytes, session_id: str) -> str | None:
     """Upload MP3 to Supabase Storage synchronously."""
+    import httpx
+
     supa_url = os.environ.get("SUPABASE_URL", "") or settings.supabase_url
     supa_key = _get_supabase_jwt()
     if not supa_url or not supa_key:

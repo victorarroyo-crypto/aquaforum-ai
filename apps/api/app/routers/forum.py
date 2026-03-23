@@ -356,12 +356,8 @@ async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
 
 @router.get("/{session_id}/audio/{message_id}")
 async def get_message_audio(session_id: str, message_id: str):
-    """Generate audio on demand via Chatterbox (HuggingFace) — FREE."""
-    import json as jsonlib
-    import os
-    import re
-    import uuid
-    import httpx as hx
+    """Generate audio on demand via Edge TTS — FREE, native Spanish."""
+    from app.services.tts import generate_speech
 
     result = db.get_supabase().table("forum_messages").select("metadata,content,agent_name").eq("id", message_id).execute()
     if not result.data:
@@ -372,98 +368,9 @@ async def get_message_audio(session_id: str, message_id: str):
     if existing_url:
         return {"audio_url": existing_url}
 
-    # Clean text — take first 250 chars of meaningful content
-    text = msg["content"]
-    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
-    text = re.sub(r"\[CHALLENGE:[^\]]+\]", "", text)
-    text = re.sub(r"#{1,3}\s*", "", text)
-    text = re.sub(r"^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"\n+", " ", text).strip()
-    # Take first 2 sentences max 250 chars
-    sentences = re.split(r"(?<=[.!?])\s+", text)
-    text = " ".join(sentences[:2])[:250].strip()
+    audio_url = await generate_speech(msg["content"], msg["agent_name"], session_id)
+    if not audio_url:
+        raise HTTPException(status_code=500, detail="Audio generation failed")
 
-    if len(text) < 5:
-        raise HTTPException(status_code=400, detail="Text too short")
-
-    # Voice seeds per agent
-    seeds = {"Elena Vásquez": 42, "Marcus Chen": 137, "Sofia Andersen": 256, "Ahmed Al-Rashid": 789, "Dr. Ingrid Hoffmann": 512, "James Okafor": 333, "Laura Martínez": 611, "Moderador": 100, "Integrador": 200}
-    seed = seeds.get(msg["agent_name"], 42)
-
-    jwt = os.environ.get("SUPABASE_JWT_KEY", "")
-    supa_url = os.environ.get("SUPABASE_URL", "")
-
-    try:
-        with hx.Client(timeout=120.0) as client:
-            # Step 1: Submit to Chatterbox
-            resp = client.post(
-                "https://resembleai-chatterbox.hf.space/gradio_api/call/generate_tts_audio",
-                headers={"Content-Type": "application/json"},
-                json={"data": [text, None, 0.4, 0.9, seed, 0.5, False]},
-            )
-            if resp.status_code != 200:
-                raise HTTPException(status_code=500, detail=f"Chatterbox submit: {resp.status_code}: {resp.text[:200]}")
-
-            event_id = resp.json().get("event_id")
-            if not event_id:
-                raise HTTPException(status_code=500, detail=f"No event_id: {resp.text[:200]}")
-
-            # Step 2: Stream result (SSE format)
-            result_resp = client.get(
-                f"https://resembleai-chatterbox.hf.space/gradio_api/call/generate_tts_audio/{event_id}",
-                timeout=120.0,
-            )
-
-            audio_hf_url = None
-            for line in result_resp.text.split("\n"):
-                if line.startswith("data: "):
-                    raw = line[6:].strip()
-                    if raw and raw != "null":
-                        try:
-                            data = jsonlib.loads(raw)
-                            if isinstance(data, list) and len(data) > 0:
-                                item = data[0]
-                                if isinstance(item, dict):
-                                    audio_hf_url = item.get("url") or item.get("path")
-                        except (jsonlib.JSONDecodeError, TypeError, IndexError):
-                            pass
-
-            if not audio_hf_url:
-                raise HTTPException(status_code=500, detail=f"No audio URL. Response: {result_resp.text[:300]}")
-
-            # Ensure full URL
-            if audio_hf_url.startswith("/"):
-                audio_hf_url = f"https://resembleai-chatterbox.hf.space{audio_hf_url}"
-            elif not audio_hf_url.startswith("http"):
-                audio_hf_url = f"https://resembleai-chatterbox.hf.space/gradio_api/file={audio_hf_url}"
-
-            # Step 3: Download audio
-            audio_resp = client.get(audio_hf_url, timeout=30.0)
-            if audio_resp.status_code != 200:
-                raise HTTPException(status_code=500, detail=f"Download failed: {audio_resp.status_code}")
-            audio_bytes = audio_resp.content
-
-            if len(audio_bytes) < 1000:
-                raise HTTPException(status_code=500, detail="Audio too small, likely empty")
-
-            # Step 4: Upload to Supabase Storage
-            if not jwt or not supa_url:
-                raise HTTPException(status_code=500, detail="Missing Supabase creds")
-
-            fname = f"{session_id}/{uuid.uuid4().hex[:8]}.wav"
-            r = client.post(
-                f"{supa_url}/storage/v1/object/audio/{fname}",
-                headers={"Authorization": f"Bearer {jwt}", "Content-Type": "audio/wav", "x-upsert": "true"},
-                content=audio_bytes,
-            )
-            if r.status_code not in (200, 201):
-                raise HTTPException(status_code=500, detail=f"Storage upload: {r.status_code}: {r.text[:200]}")
-
-        audio_url = f"{supa_url}/storage/v1/object/public/audio/{fname}"
-        await db.update_message_metadata(message_id, {"audio_url": audio_url})
-        return {"audio_url": audio_url}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
+    await db.update_message_metadata(message_id, {"audio_url": audio_url})
+    return {"audio_url": audio_url}
