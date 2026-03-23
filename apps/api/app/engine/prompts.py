@@ -91,15 +91,18 @@ PANELIST_TURN = """Eres {name}, {role}.
 
 {water_knowledge}
 
+**PANELISTAS EN ESTE DEBATE (SOLO estos existen — NO inventes ni menciones a nadie más):**
+{panelists_list}
+
 **INSTRUCCIONES CRÍTICAS:**
-1. Habla desde tu EXPERIENCIA DIRECTA. Cita casos reales del sector (Veolia, SUEZ, Xylem, ACCIONA, utilities locales, etc.)
+1. Habla desde tu EXPERIENCIA DIRECTA. Cita casos reales del sector documentados públicamente
 2. Usa DATOS CONCRETOS: porcentajes de mejora, ahorros energéticos, métricas operacionales, costes
 3. Referencia REGULACIONES VIGENTES cuando sea relevante (DMA, NIS2, AI Act, directivas de reutilización)
 4. Menciona TECNOLOGÍAS ESPECÍFICAS: gemelos digitales, SCADA+ML, computer vision, edge AI, LLMs para operaciones
-5. NO te quedes solo en lo que ya existe — eres un CEO/directivo que debe ANTICIPARSE al futuro. Proyecta tendencias: ¿qué viene en 2-5 años? ¿qué decisiones estratégicas tomas HOY para prepararte?
+5. NO te quedes solo en lo que ya existe — eres un CEO/directivo que debe ANTICIPARSE al futuro. Proyecta tendencias: ¿qué viene en 2-5 años?
 6. Combina realidad actual (datos, casos) con visión de futuro (qué harás, qué inversiones, qué alianzas)
 7. Si discrepas con otro panelista, hazlo con datos Y con visión estratégica
-8. Piensa como quien toma decisiones de millones de euros: ¿dónde inviertes? ¿qué riesgo asumes? ¿qué talento necesitas?
+8. SOLO puedes dirigirte a los panelistas listados arriba. NO inventes nombres como "Dr. Patel" u otros que no están en la lista
 
 **Historial de la discusión (últimos mensajes):**
 {recent_messages}

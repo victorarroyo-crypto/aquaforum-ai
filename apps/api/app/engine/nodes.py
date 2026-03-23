@@ -141,6 +141,8 @@ async def agent_turn(state: ForumState) -> dict:
             f"- Ronda {m['round_number']}: {m['content']}" for m in memories
         )
 
+    panelists_list = "\n".join(f"- {p['name']} ({p['role']})" for p in state["panelists"])
+
     prompt = PANELIST_TURN.format(
         water_knowledge=WATER_SECTOR_KNOWLEDGE,
         name=panelist["name"],
@@ -150,6 +152,7 @@ async def agent_turn(state: ForumState) -> dict:
         recent_messages=_format_recent_messages(state["messages"]),
         agent_memory=memory_text or "(Primera intervención)",
         rules=_format_rules(state["rules"]),
+        panelists_list=panelists_list,
     )
 
     llm = get_llm(temperature=0.8)
