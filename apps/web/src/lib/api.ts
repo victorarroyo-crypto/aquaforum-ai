@@ -80,4 +80,16 @@ export const api = {
 
   getMessageAudio: (sessionId: string, messageId: string) =>
     request<{ audio_url: string }>(`/forum/${sessionId}/audio/${messageId}`),
+
+  exportDocx: async (sessionId: string) => {
+    const res = await fetch(`${API_URL}/forum/${sessionId}/export-docx`);
+    if (!res.ok) throw new Error("Export failed");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `AquaForum_Informe_${sessionId.slice(0, 8)}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
 };

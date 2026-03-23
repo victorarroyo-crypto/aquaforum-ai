@@ -143,7 +143,7 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
             return (
               <div key={p.name}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[12px] text-[#A1A1AA] truncate flex-1">{p.name.split(" ")[0]}</span>
+                  <span className="text-[12px] text-[#A1A1AA] truncate flex-1">{p.name.startsWith("Dr.") ? p.name.split(" ").slice(0, 2).join(" ") : p.name.split(" ")[0]}</span>
                   <span className="text-[12px] font-bold text-[#FAFAFA] ml-2">{count}</span>
                 </div>
                 <div className="h-1.5 bg-[#27272A] rounded-full overflow-hidden">

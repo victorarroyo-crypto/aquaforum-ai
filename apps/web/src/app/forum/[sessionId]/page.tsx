@@ -14,6 +14,7 @@ import { api } from "@/lib/api";
 import {
   ArrowLeft,
   Download,
+  FileText,
   Pause,
   Play,
   Radio,
@@ -309,11 +310,18 @@ export default function ForumView() {
               </>
             )}
             <button
-              onClick={handleExport}
+              onClick={async () => { setLoading(true); try { await api.exportDocx(sessionId); } catch {} finally { setLoading(false); } }}
               disabled={loading || !messages.length}
               className="flex items-center gap-1.5 ml-auto px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
             >
-              <Download className="h-3.5 w-3.5" /> Exportar
+              <FileText className="h-3.5 w-3.5" /> Informe Word
+            </button>
+            <button
+              onClick={handleExport}
+              disabled={loading || !messages.length}
+              className="flex items-center gap-1.5 px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" /> Markdown
             </button>
           </div>
         </div>

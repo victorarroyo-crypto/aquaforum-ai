@@ -122,6 +122,96 @@ async def export_forum(session_id: str):
     return ExportResponse(report_id=report_id, content=content)
 
 
+@router.get("/{session_id}/export-docx")
+async def export_docx(session_id: str):
+    """Export expert analyses and integrations as a Word document."""
+    import io
+    import re
+
+    from docx import Document
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.shared import Inches, Pt, RGBColor
+    from fastapi.responses import StreamingResponse
+
+    session = await db.get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    messages = await db.get_messages(session_id)
+
+    doc = Document()
+
+    # Style setup
+    style = doc.styles["Normal"]
+    style.font.name = "Calibri"
+    style.font.size = Pt(11)
+
+    # Title
+    title = doc.add_heading("AquaForum AI — Informe Ejecutivo", level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    doc.add_paragraph(f"Tema: {session['topic']}")
+    doc.add_paragraph(f"Rondas: {session.get('max_rounds', 4)} | Estado: {session['status']}")
+    doc.add_paragraph("")
+
+    # Group by round
+    max_round = max((m["round_number"] for m in messages), default=0)
+
+    for r in range(1, max_round + 1):
+        doc.add_heading(f"Ronda {r}", level=1)
+
+        # Round summary (moderator inter-round summary)
+        summaries = [m for m in messages if m["round_number"] == r and m["message_type"] == "round_summary"]
+        if summaries:
+            doc.add_heading("Resumen del Moderador", level=2)
+            clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", summaries[0]["content"])
+            clean = re.sub(r"#{1,3}\s*", "", clean)
+            doc.add_paragraph(clean)
+
+        # Expert analyses
+        analyses = [m for m in messages if m["round_number"] == r and m["message_type"] == "analysis"]
+        if analyses:
+            doc.add_heading("Análisis de Expertos", level=2)
+            for a in analyses:
+                p = doc.add_paragraph()
+                run = p.add_run(f"{a['agent_name']}")
+                run.bold = True
+                run.font.color.rgb = RGBColor(0x14, 0xB8, 0xA6)
+                clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", a["content"])
+                clean = re.sub(r"#{1,3}\s*", "", clean)
+                doc.add_paragraph(clean)
+
+        # Integration
+        integrations = [m for m in messages if m["round_number"] == r and m["message_type"] == "integration"]
+        if integrations:
+            doc.add_heading("Síntesis del Integrador", level=2)
+            clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", integrations[0]["content"])
+            clean = re.sub(r"#{1,3}\s*", "", clean)
+            doc.add_paragraph(clean)
+
+        doc.add_page_break()
+
+    # Final summary
+    final = [m for m in messages if m["message_type"] == "summary"]
+    if final:
+        doc.add_heading("Resumen Final", level=1)
+        clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", final[-1]["content"])
+        clean = re.sub(r"#{1,3}\s*", "", clean)
+        doc.add_paragraph(clean)
+
+    # Save to buffer
+    buf = io.BytesIO()
+    doc.save(buf)
+    buf.seek(0)
+
+    filename = f"AquaForum_Informe_{session_id[:8]}.docx"
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
     """Run ALL debate rounds automatically."""
     try:
