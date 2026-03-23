@@ -22,7 +22,7 @@ const panelists = [
   {
     name: "Marcus Chen",
     role: "CEO · DeepFlow Technologies",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
     icon: "🧠",
   },
   {
@@ -34,25 +34,25 @@ const panelists = [
   {
     name: "Ahmed Al-Rashid",
     role: "CEO · OceanPure Desalination",
-    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
     icon: "🌊",
   },
   {
     name: "Dr. Ingrid Hoffmann",
     role: "Analista Regulatoria · HydroCompliance",
-    img: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face",
+    img: "https://images.unsplash.com/photo-1594824476967-48c8b964f137?w=200&h=200&fit=crop&crop=face",
     icon: "⚖️",
   },
   {
     name: "James Okafor",
     role: "Analista Mercados · BlueWave Capital",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face",
+    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
     icon: "📊",
   },
   {
     name: "Koji Tanaka",
     role: "Director IA Industrial · AquaProcess AI",
-    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
     icon: "🏭",
   },
 ];

@@ -84,8 +84,8 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
         // Get first meaningful sentence
         const clean = m.content
           .replace(/\*\*([^*]+)\*\*/g, "$1")
-          .replace(/\[CHALLENGE:[^\]]+\]/g, "")
-          .replace(/^(DECLARACIÓN|APOYO)\s*/i, "")
+          .replace(/\[CHALLENGE:[^\]]+\]\s*/g, "")
+          .replace(/^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\s*/im, "")
           .trim();
         const firstSentence = clean.split(/[.!?]/)[0]?.trim();
         return {

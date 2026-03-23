@@ -34,8 +34,10 @@ function getInitials(name: string): string {
 function cleanContent(content: string): string {
   // Remove [CHALLENGE:Name] tags
   let clean = content.replace(/\[CHALLENGE:[^\]]+\]\s*/g, "");
-  // Remove bold markdown labels like **DECLARACIÓN**, **APOYO**, etc.
-  clean = clean.replace(/^\*\*(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\*\*\s*/i, "");
+  // Remove bold markdown labels like **DECLARACIÓN**, **APOYO**, **INTERPELACIÓN**, **RESPUESTA**
+  clean = clean.replace(/^\*\*(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)\*\*[:\s]*/gim, "");
+  // Also remove non-bold versions of these labels at the start of lines
+  clean = clean.replace(/^(DECLARACIÓN|APOYO|INTERPELACIÓN|RESPUESTA)[:\s]*/gim, "");
   return clean.trim();
 }
 

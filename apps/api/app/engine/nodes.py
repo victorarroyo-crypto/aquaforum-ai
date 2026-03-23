@@ -440,7 +440,15 @@ Tu tarea: presentar un RESUMEN EJECUTIVO de esta ronda al público. Debe ser cla
 - Incluye las conclusiones del análisis experto
 - Anticipa brevemente qué se abordará en la siguiente ronda
 - Tono: profesional pero accesible, como un presentador de conferencia
-- Máximo 400 palabras"""
+- Máximo 400 palabras
+
+REGLAS CRÍTICAS DE VERACIDAD:
+- NUNCA inventes nombres de empresas reales, multas, sentencias judiciales o datos estadísticos específicos.
+- Si citas un caso real, debe ser verificable y público. Si no estás seguro, di "según fuentes del sector" o "se han reportado casos donde..."
+- NO inventes cifras específicas de multas, porcentajes exactos, o fechas de eventos que no puedas verificar.
+- Puedes hablar de tendencias generales, tecnologías reales, y marcos regulatorios conocidos (GDPR, NIS2, EU Water Framework Directive, etc.)
+- Cuando menciones regulaciones, usa las reales: Directiva Marco del Agua de la UE, Clean Water Act (US), etc.
+- SOLO puedes referirte a los panelistas presentes en este debate. NUNCA menciones panelistas que no están en la lista."""
 
     llm = get_llm(temperature=0.4)
     response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Presenta el resumen de la ronda.")])
