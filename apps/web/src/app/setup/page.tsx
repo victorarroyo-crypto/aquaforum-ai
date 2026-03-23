@@ -15,7 +15,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de utility de agua líder en transformación digital. Experta en gemelos digitales, mantenimiento predictivo con ML, automatización de operaciones. 20 años en el sector.",
     color: "#14B8A6",
-    avatar_url: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=5",
   },
   {
     name: "Marcus Chen",
@@ -23,7 +23,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Fundador de empresa de IA para infraestructura crítica. Visión radical: la IA debe gestionar toda la cadena del agua de forma autónoma. Deep tech, agentes, modelos fundacionales.",
     color: "#8B5CF6",
-    avatar_url: "https://randomuser.me/api/portraits/men/32.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=11",
   },
   {
     name: "Sofia Andersen",
@@ -31,7 +31,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de multinacional de tratamiento químico. PhD en ingeniería química. ML optimiza dosificación de reactivos, reduce fangos, transforma EDAR. Perspectiva industrial.",
     color: "#22C55E",
-    avatar_url: "https://randomuser.me/api/portraits/women/65.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=23",
   },
   {
     name: "Ahmed Al-Rashid",
@@ -39,7 +39,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de la mayor empresa de desalación del Golfo. Pionero en IA para optimización energética de ósmosis inversa. Visión global nexo agua-energía-IA.",
     color: "#F59E0B",
-    avatar_url: "https://randomuser.me/api/portraits/men/75.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=14",
   },
   {
     name: "Dr. Ingrid Hoffmann",
@@ -47,7 +47,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Regulación de IA en servicios públicos. Asesora CE en AI Act. Gobernanza algorítmica, ética de IA, marcos legales para decisiones automatizadas en recursos hídricos.",
     color: "#6366F1",
-    avatar_url: "https://randomuser.me/api/portraits/women/57.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=25",
   },
   {
     name: "James Okafor",
@@ -55,12 +55,12 @@ const DEFAULT_PANELISTS = [
     persona:
       "Inversión en tech para agua. Ex-Goldman, consultor Banco Mundial. Valoración startups IA hídrica, ROI, tendencias de capital riesgo en water tech.",
     color: "#A1A1AA",
-    avatar_url: "https://randomuser.me/api/portraits/men/52.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=53",
   },
   {
     name: "Laura Martínez",
     role: "Directora IA Industrial",
-    avatar_url: "https://randomuser.me/api/portraits/women/33.jpg",
+    avatar_url: "https://i.pravatar.cc/150?img=9",
     persona:
       "Experta en IA aplicada a procesos industriales. Provocadora: cree que el 80% de las EDAR deberían operarse con IA autónoma ya. Ha implementado gemelos digitales en 12 plantas, ML para dosificación de reactivos, y RL para optimización de aireación. Datos de sus proyectos: -25% consumo energético, -30% uso de reactivos. Reta a los conservadores con casos reales de automatización total. 15 años en ingeniería de procesos + 5 en IA industrial.",
     color: "#EF4444",

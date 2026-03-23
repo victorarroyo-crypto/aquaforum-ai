@@ -43,6 +43,13 @@ WATER_SECTOR_KNOWLEDGE = """## CONOCIMIENTO SECTORIAL OBLIGATORIO — Cita datos
 - **EPA SDWA (US)**: Safe Drinking Water Act y sus implicaciones para automatización
 - **Water Security Act (US, 2018)**: Evaluación de vulnerabilidades incluye ciberseguridad
 
+### REGLA ANTI-ALUCINACIÓN — CRÍTICO:
+- SOLO cita los casos listados arriba u otros que sean VERIFICABLES públicamente
+- NO inventes multas, sentencias, ni datos específicos que no puedas verificar
+- Si no estás seguro de un dato, di "según estimaciones del sector" o "fuentes de la industria sugieren"
+- NO inventes nombres de proyectos, fechas de multas, ni cantidades específicas que no estén en tu conocimiento verificado
+- Es preferible ser general ("utilities europeas han reportado reducciones del 10-20%") que inventar un caso falso
+
 ### Retos reales del sector:
 - Envejecimiento de infraestructuras (edad media de tuberías en Europa: 40-60 años)
 - Escasez de talento técnico: el 30% de la fuerza laboral del agua se jubilará en los próximos 10 años
