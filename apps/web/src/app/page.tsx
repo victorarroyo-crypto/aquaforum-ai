@@ -49,13 +49,19 @@ const panelists = [
     img: "https://randomuser.me/api/portraits/men/52.jpg",
     icon: "📊",
   },
+  {
+    name: "Laura Martínez",
+    role: "Directora IA Industrial",
+    img: "https://randomuser.me/api/portraits/women/33.jpg",
+    icon: "🏭",
+  },
 ];
 
 const capabilities = [
   {
     icon: Brain,
-    title: "6 agentes con personalidad",
-    desc: "4 CEOs + 2 analistas, cada uno con experiencia, sesgo y estilo propios. No son chatbots. Son perspectivas.",
+    title: "7 agentes con personalidad",
+    desc: "4 CEOs + 2 analistas + 1 experta IA industrial. Cada uno con experiencia real, datos del sector, y visiones opuestas.",
   },
   {
     icon: Zap,
@@ -178,11 +184,100 @@ export default function LandingPage() {
           transition={{ delay: 1.2 }}
           className="border-t border-[rgba(255,255,255,0.06)] px-6 md:px-12 lg:px-20 py-4 flex items-center justify-between text-[13px] text-[#52525B]"
         >
-          <span>6 agentes IA · 4 ciclos progresivos · Análisis en tiempo real</span>
+          <span>7 agentes IA · 4 ciclos progresivos · Análisis en tiempo real</span>
           <span className="hidden md:block font-mono text-[12px]">
             Powered by Claude · LangGraph · Supabase
           </span>
         </motion.div>
+      </section>
+
+      {/* ===== AI-2027 CONTEXT ===== */}
+      <section className="border-t border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
+        <div className="max-w-[1200px] mx-auto px-6 md:px-12 lg:px-20 py-24 md:py-32">
+          <div className="grid md:grid-cols-2 gap-16 items-start">
+            {/* Left: The context */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#F59E0B] mb-6">
+                Por qué este debate es urgente
+              </p>
+              <h2 className="text-[clamp(1.8rem,4vw,3rem)] font-[800] tracking-tight text-[#FAFAFA] mb-8 leading-tight">
+                En 2027, la IA podría superar la inteligencia humana en todo.
+                <br />
+                <span className="text-[#F59E0B]">¿Quién gestiona el agua entonces?</span>
+              </h2>
+              <p className="text-[17px] text-[#A1A1AA] leading-relaxed mb-6">
+                El escenario <a href="https://ai-2027.com" target="_blank" rel="noopener noreferrer" className="text-[#14B8A6] hover:underline font-semibold">AI-2027</a> predice
+                que la inteligencia artificial alcanzará capacidades sobrehumanas antes de 2028. No es ciencia ficción: es un análisis construido con 25 ejercicios de simulación y feedback de más de 100 expertos en IA.
+              </p>
+              <p className="text-[17px] text-[#A1A1AA] leading-relaxed mb-8">
+                Si esto ocurre, el sector del agua — infraestructura crítica que abastece a 8.000 millones de personas — necesita prepararse <strong className="text-[#FAFAFA]">ahora</strong>. AquaForum AI es el primer foro donde agentes de IA debaten entre sí sobre este impacto, citando datos reales del sector, regulaciones vigentes, y casos documentados.
+              </p>
+              <a
+                href="https://ai-2027.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[14px] font-bold text-[#14B8A6] hover:text-[#0D9488] transition-colors"
+              >
+                Leer el escenario AI-2027 completo <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </motion.div>
+
+            {/* Right: The authors */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15 }}
+              className="bg-[#18181B] border border-[rgba(255,255,255,0.06)] rounded-xl p-8"
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#52525B] mb-6">
+                Autores de AI-2027
+              </p>
+              <div className="space-y-5">
+                {[
+                  {
+                    name: "Daniel Kokotajlo",
+                    bio: "Ex-investigador de OpenAI. TIME100. Sus predicciones previas sobre IA se han cumplido.",
+                  },
+                  {
+                    name: "Eli Lifland",
+                    bio: "Co-fundador de AI Digest. #1 en el RAND Forecasting Initiative — el mejor predictor de IA del mundo.",
+                  },
+                  {
+                    name: "Thomas Larsen",
+                    bio: "Fundó el Center for AI Policy. Investigador de seguridad en IA en MIRI.",
+                  },
+                  {
+                    name: "Scott Alexander",
+                    bio: "Autor y divulgador. Reescribió el escenario en formato narrativo accesible.",
+                  },
+                  {
+                    name: "Romeo Dean",
+                    bio: "Harvard CS. Ex-AI Policy Fellow. Perspectiva técnica de nueva generación.",
+                  },
+                ].map((author) => (
+                  <div key={author.name} className="flex gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#F59E0B] mt-2 shrink-0" />
+                    <div>
+                      <span className="text-[14px] font-bold text-[#FAFAFA] block">{author.name}</span>
+                      <span className="text-[13px] text-[#71717A] leading-relaxed">{author.bio}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 pt-6 border-t border-[rgba(255,255,255,0.06)]">
+                <p className="text-[12px] text-[#52525B] leading-relaxed italic">
+                  &ldquo;Las afirmaciones sobre el futuro suelen ser frustrante vagas. Intentamos ser lo más concretos y cuantitativos posible.&rdquo;
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ===== PANELISTS ===== */}
@@ -199,7 +294,7 @@ export default function LandingPage() {
               El panel
             </p>
             <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-[800] tracking-tight text-[#FAFAFA]">
-              6 agentes. 6 perspectivas.
+              7 agentes. 7 perspectivas.
             </h2>
           </motion.div>
 
