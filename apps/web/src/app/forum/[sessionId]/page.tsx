@@ -147,9 +147,12 @@ export default function ForumView() {
     );
   }
 
-  // Determine the color for typing indicator
-  const lastSpeaker = discussionMessages[discussionMessages.length - 1];
-  const typingAgent = config?.panelists[0];
+  // Determine the NEXT speaker for typing indicator
+  const lastMsg = messages[messages.length - 1];
+  const nextAgentIndex = lastMsg
+    ? ((config?.panelists.findIndex(p => p.name === lastMsg.agent_name) ?? -1) + 1) % (config?.panelists.length || 1)
+    : 0;
+  const typingAgent = config?.panelists[nextAgentIndex] || config?.panelists[0];
 
   return (
     <div className="flex h-screen flex-col bg-[#09090B]">
@@ -312,16 +315,9 @@ export default function ForumView() {
             <button
               onClick={async () => { setLoading(true); try { await api.exportDocx(sessionId); } catch {} finally { setLoading(false); } }}
               disabled={loading || !messages.length}
-              className="flex items-center gap-1.5 ml-auto px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
+              className="flex items-center gap-2 ml-auto px-5 py-2.5 bg-[#18181B] border border-[rgba(255,255,255,0.1)] text-[#FAFAFA] text-[13px] font-semibold rounded-lg hover:bg-[#27272A] hover:border-[#14B8A6] disabled:opacity-30 transition-colors"
             >
-              <FileText className="h-3.5 w-3.5" /> Informe Word
-            </button>
-            <button
-              onClick={handleExport}
-              disabled={loading || !messages.length}
-              className="flex items-center gap-1.5 px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
-            >
-              <Download className="h-3.5 w-3.5" /> Markdown
+              <FileText className="h-4 w-4 text-[#14B8A6]" /> Generar Informe del Evento
             </button>
           </div>
         </div>
@@ -331,7 +327,7 @@ export default function ForumView() {
           {sidebar && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 320, opacity: 1 }}
+              animate={{ width: 400, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.25 }}
               className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.06)] p-4 bg-[#0C0C0F]"
