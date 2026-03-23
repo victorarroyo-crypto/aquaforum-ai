@@ -15,6 +15,7 @@ from app.engine.prompts import (
     MODERATOR_CHECK,
     MODERATOR_OPEN,
     PANELIST_TURN,
+    WATER_SECTOR_KNOWLEDGE,
 )
 from app.engine.state import ForumMessage, ForumState
 from app.services import supabase_client as db
@@ -93,6 +94,7 @@ async def moderator_open(state: ForumState) -> dict:
 
     prompt = MODERATOR_OPEN.format(
         ai_2027_context=AI_2027_CONTEXT,
+        water_knowledge=WATER_SECTOR_KNOWLEDGE,
         topic=state["topic"],
         panelists_description=_format_panelists(state["panelists"]),
         rules=_format_rules(state["rules"]),
@@ -140,7 +142,7 @@ async def agent_turn(state: ForumState) -> dict:
         )
 
     prompt = PANELIST_TURN.format(
-        ai_2027_context=AI_2027_CONTEXT,
+        water_knowledge=WATER_SECTOR_KNOWLEDGE,
         name=panelist["name"],
         role=panelist["role"],
         persona=panelist["persona"],
@@ -219,7 +221,7 @@ async def handle_challenge(state: ForumState) -> dict:
         return {"pending_challenge": None}
 
     prompt = CHALLENGE_RESPONSE.format(
-        ai_2027_context=AI_2027_CONTEXT,
+        water_knowledge=WATER_SECTOR_KNOWLEDGE,
         name=target["name"],
         role=target["role"],
         persona=target["persona"],
@@ -322,12 +324,12 @@ async def expert_analysis(state: ForumState) -> dict:
 
     for expert_type in EXPERT_TYPES:
         prompt = EXPERT_ANALYSIS.format(
-            ai_2027_context=AI_2027_CONTEXT,
+            water_knowledge=WATER_SECTOR_KNOWLEDGE,
             expert_type=expert_type,
             topic=state["topic"],
             round_number=state["current_round"],
             round_messages=round_text,
-            search_context="",  # TODO: Add Tavily search results
+            search_context="",
         )
 
         llm = get_llm(temperature=0.5)
@@ -369,6 +371,7 @@ async def integration(state: ForumState) -> dict:
     )
 
     prompt = INTEGRATOR.format(
+        water_knowledge=WATER_SECTOR_KNOWLEDGE,
         topic=state["topic"],
         expert_analyses=analyses_text,
     )
@@ -472,6 +475,7 @@ async def final_summary(state: ForumState) -> dict:
 
     prompt = FINAL_SUMMARY.format(
         ai_2027_context=AI_2027_CONTEXT,
+        water_knowledge=WATER_SECTOR_KNOWLEDGE,
         topic=state["topic"],
         all_integrations=integrations_text,
         key_messages=key_text,

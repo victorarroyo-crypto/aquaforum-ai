@@ -55,7 +55,7 @@ const DEFAULT_PANELISTS = [
     name: "Laura Martínez",
     role: "Directora IA Industrial",
     persona:
-      "Experta en IA aplicada a procesos industriales: tratamiento de aguas industriales, EDAR, reutilización, control de procesos con ML, gemelos digitales de plantas, optimización energética. 15 años en ingeniería de procesos + 5 en IA industrial.",
+      "Experta en IA aplicada a procesos industriales. Provocadora: cree que el 80% de las EDAR deberían operarse con IA autónoma ya. Ha implementado gemelos digitales en 12 plantas, ML para dosificación de reactivos, y RL para optimización de aireación. Datos de sus proyectos: -25% consumo energético, -30% uso de reactivos. Reta a los conservadores con casos reales de automatización total. 15 años en ingeniería de procesos + 5 en IA industrial.",
     color: "#EF4444",
   },
 ];
