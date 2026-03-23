@@ -42,9 +42,10 @@ function cleanContent(content: string): string {
 interface MessageBubbleProps {
   message: ForumMessage;
   color?: string;
+  avatarUrl?: string;
 }
 
-export function MessageBubble({ message, color }: MessageBubbleProps) {
+export function MessageBubble({ message, color, avatarUrl }: MessageBubbleProps) {
   const borderColor = borderColorMap[message.message_type] || "#52525B";
   const bgTint = bgTintMap[message.message_type] || "transparent";
   const isModeration = message.message_type === "moderation" || message.message_type === "summary";
@@ -105,12 +106,21 @@ export function MessageBubble({ message, color }: MessageBubbleProps) {
       transition={{ duration: 0.3 }}
       className="flex gap-3.5 py-3"
     >
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold text-white"
-        style={{ backgroundColor: color || borderColor }}
-      >
-        {getInitials(message.agent_name)}
-      </div>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={message.agent_name}
+          className="w-10 h-10 rounded-full shrink-0 object-cover border-2"
+          style={{ borderColor: color || borderColor }}
+        />
+      ) : (
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold text-white"
+          style={{ backgroundColor: color || borderColor }}
+        >
+          {getInitials(message.agent_name)}
+        </div>
+      )}
 
       <div className="flex-1 min-w-0">
         <div

@@ -5,6 +5,7 @@ interface AgentBadgeProps {
   role: string;
   color: string;
   isActive?: boolean;
+  avatarUrl?: string;
 }
 
 function getInitials(name: string): string {
@@ -16,16 +17,24 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-export function AgentBadge({ name, role, color, isActive }: AgentBadgeProps) {
+export function AgentBadge({ name, role, color, isActive, avatarUrl }: AgentBadgeProps) {
   return (
     <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#18181B] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.1)] transition-colors">
       <div className="relative">
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-          style={{ backgroundColor: color }}
-        >
-          {getInitials(name)}
-        </div>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={name}
+            className="w-6 h-6 rounded-full object-cover"
+          />
+        ) : (
+          <div
+            className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+            style={{ backgroundColor: color }}
+          >
+            {getInitials(name)}
+          </div>
+        )}
         {isActive && (
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#22C55E] border-2 border-[#18181B] status-pulse" />
         )}

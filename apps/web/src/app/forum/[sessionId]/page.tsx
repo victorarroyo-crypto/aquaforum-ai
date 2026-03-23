@@ -237,6 +237,7 @@ export default function ForumView() {
                   role={p.role}
                   color={p.color}
                   isActive={status === "running"}
+                  avatarUrl={p.avatar_url}
                 />
               ))}
             </div>
@@ -255,6 +256,10 @@ export default function ForumView() {
                       config?.panelists.find((p) => p.name === msg.agent_name)
                         ?.color ||
                       "#52525B"
+                    }
+                    avatarUrl={
+                      config?.panelists.find((p) => p.name === msg.agent_name)
+                        ?.avatar_url
                     }
                   />
                 ))}
