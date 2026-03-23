@@ -147,13 +147,6 @@ export default function ForumView() {
     );
   }
 
-  // Determine the NEXT speaker for typing indicator
-  const lastMsg = messages[messages.length - 1];
-  const nextAgentIndex = lastMsg
-    ? ((config?.panelists.findIndex(p => p.name === lastMsg.agent_name) ?? -1) + 1) % (config?.panelists.length || 1)
-    : 0;
-  const typingAgent = config?.panelists[nextAgentIndex] || config?.panelists[0];
-
   return (
     <div className="flex h-screen flex-col bg-[#09090B]">
       {/* Header */}
@@ -265,12 +258,9 @@ export default function ForumView() {
                 ))}
               </AnimatePresence>
 
-              {/* Typing indicator */}
+              {/* Typing indicator — generic, no specific agent */}
               {status === "running" && messages.length > 0 && (
-                <TypingIndicator
-                  agentName={typingAgent?.name || "Agente"}
-                  color={typingAgent?.color || "#14B8A6"}
-                />
+                <TypingIndicator />
               )}
 
               {/* Empty state */}
@@ -332,7 +322,7 @@ export default function ForumView() {
           {sidebar && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 400, opacity: 1 }}
+              animate={{ width: 480, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.25 }}
               className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.06)] p-4 bg-[#0C0C0F]"

@@ -36,3 +36,6 @@ build/
 
 # Supabase
 supabase/.temp/
+.vercel
+mockups.html
+.claude/settings.local.json

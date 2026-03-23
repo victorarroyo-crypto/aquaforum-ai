@@ -115,7 +115,7 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 overflow-y-auto">
+    <div className="flex flex-col gap-4 p-2 overflow-y-auto">
       {/* Live stats */}
       <div className="grid grid-cols-3 gap-2">
         {[
@@ -188,10 +188,10 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
           <div className="space-y-3">
             {keyQuotes.map((q, i) => (
               <div key={i} className="border-l-2 pl-3 py-1" style={{ borderColor: q.color }}>
-                <p className="text-[12px] text-[#D4D4D8] leading-relaxed italic">
+                <p className="text-[14px] text-[#D4D4D8] leading-relaxed italic">
                   &ldquo;{q.quote}&rdquo;
                 </p>
-                <span className="text-[10px] text-[#52525B] mt-1 block">— {q.agent}</span>
+                <span className="text-[12px] text-[#52525B] mt-1 block">— {q.agent}</span>
               </div>
             ))}
           </div>
@@ -207,29 +207,40 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
           <div className="space-y-2">
             {roundSummaries.map((rs) => (
               <details key={rs.round} className="group">
-                <summary className="flex items-center justify-between cursor-pointer text-[13px] text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-1.5">
-                  <span className="font-medium">Ronda {rs.round}</span>
-                  <span className="text-[10px] text-[#52525B] group-open:hidden">
-                    {rs.experts} análisis + síntesis
+                <summary className="flex items-center justify-between cursor-pointer text-[14px] text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-2">
+                  <span className="font-semibold">Ronda {rs.round}</span>
+                  <span className="text-[12px] text-[#52525B] group-open:hidden">
+                    {rs.experts} análisis + sintesis
                   </span>
                 </summary>
-                <div className="mt-2 space-y-2 pl-2 border-l border-[rgba(255,255,255,0.06)]">
-                  {rs.expertMessages.map((m, i) => (
-                    <div key={i} className="text-[11px] text-[#71717A] leading-relaxed">
-                      <span className="text-[#14B8A6] font-medium block mb-0.5">{m.agent_name}</span>
-                      <p className="line-clamp-3">{m.content.replace(/\*\*/g, "").slice(0, 200)}...</p>
-                    </div>
-                  ))}
-                  {rs.integration && (
-                    <div className="text-[11px] text-[#71717A] leading-relaxed border-t border-[rgba(255,255,255,0.04)] pt-2">
-                      <span className="text-[#8B5CF6] font-medium block mb-0.5">Integrador</span>
-                      <p className="line-clamp-4">{rs.integration.content.replace(/\*\*/g, "").slice(0, 300)}...</p>
-                    </div>
-                  )}
+                <div className="mt-2 space-y-3 pl-3 border-l-2 border-[rgba(255,255,255,0.08)]">
+                  {rs.expertMessages.map((m, i) => {
+                    // Extract first 2-3 sentences as highlights
+                    const clean = m.content.replace(/\*\*/g, "").replace(/\n+/g, " ").trim();
+                    const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+                    const highlight = sentences.slice(0, 3).join(" ").trim();
+                    return (
+                      <div key={i} className="text-[14px] text-[#A1A1AA] leading-relaxed">
+                        <span className="text-[#14B8A6] font-semibold block mb-1 text-[13px]">{m.agent_name}</span>
+                        <p>{highlight}</p>
+                      </div>
+                    );
+                  })}
+                  {rs.integration && (() => {
+                    const clean = rs.integration.content.replace(/\*\*/g, "").replace(/\n+/g, " ").trim();
+                    const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+                    const highlight = sentences.slice(0, 3).join(" ").trim();
+                    return (
+                      <div className="text-[14px] text-[#A1A1AA] leading-relaxed border-t border-[rgba(255,255,255,0.06)] pt-2 mt-1">
+                        <span className="text-[#8B5CF6] font-semibold block mb-1 text-[13px]">Integrador</span>
+                        <p>{highlight}</p>
+                      </div>
+                    );
+                  })()}
                   {rs.summary && (
-                    <div className="text-[11px] text-[#D4D4D8] leading-relaxed border-t border-[rgba(255,255,255,0.04)] pt-2 bg-[rgba(20,184,166,0.05)] rounded p-2">
-                      <span className="text-[#14B8A6] font-medium block mb-0.5">Resumen del Moderador</span>
-                      <p className="line-clamp-6">{rs.summary.content.replace(/\*\*/g, "").slice(0, 400)}...</p>
+                    <div className="text-[14px] text-[#E4E4E7] leading-relaxed border-t border-[rgba(255,255,255,0.06)] pt-2 mt-1 bg-[rgba(20,184,166,0.06)] rounded-lg p-3">
+                      <span className="text-[#14B8A6] font-semibold block mb-1 text-[13px]">Resumen del Moderador</span>
+                      <p className="max-h-[300px] overflow-y-auto">{rs.summary.content.replace(/\*\*/g, "")}</p>
                     </div>
                   )}
                 </div>
