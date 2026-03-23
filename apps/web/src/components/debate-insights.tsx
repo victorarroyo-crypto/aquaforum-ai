@@ -7,12 +7,44 @@ import type { ForumMessage } from "@/lib/api";
 
 interface DebateInsightsProps {
   messages: ForumMessage[];
+  allMessages: ForumMessage[];
   panelists: { name: string; role: string; color: string }[];
   status: string;
   currentRound: number;
 }
 
-export function DebateInsights({ messages, panelists, status, currentRound }: DebateInsightsProps) {
+export function DebateInsights({ messages, allMessages, panelists, status, currentRound }: DebateInsightsProps) {
+  // Build round summaries from expert analysis, integration, and round_summary messages
+  const roundSummaries = useMemo(() => {
+    const rounds: Record<number, {
+      round: number;
+      experts: number;
+      expertMessages: ForumMessage[];
+      integration: ForumMessage | null;
+      summary: ForumMessage | null;
+    }> = {};
+
+    for (const m of allMessages) {
+      const r = m.round_number;
+      if (!rounds[r]) {
+        rounds[r] = { round: r, experts: 0, expertMessages: [], integration: null, summary: null };
+      }
+      if (m.message_type === "analysis") {
+        rounds[r].experts++;
+        rounds[r].expertMessages.push(m);
+      }
+      if (m.message_type === "integration") {
+        rounds[r].integration = m;
+      }
+      if (m.message_type === "round_summary") {
+        rounds[r].summary = m;
+      }
+    }
+
+    return Object.values(rounds)
+      .filter((r) => r.experts > 0 || r.integration || r.summary)
+      .sort((a, b) => a.round - b.round);
+  }, [allMessages]);
   const stats = useMemo(() => {
     const participation: Record<string, number> = {};
     const challenges: { from: string; to: string }[] = [];
@@ -161,6 +193,47 @@ export function DebateInsights({ messages, panelists, status, currentRound }: De
                 </p>
                 <span className="text-[10px] text-[#52525B] mt-1 block">— {q.agent}</span>
               </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Round summaries — from moderator + experts + integrator */}
+      {roundSummaries.length > 0 && (
+        <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-3">
+            📋 Resúmenes por ronda
+          </h3>
+          <div className="space-y-2">
+            {roundSummaries.map((rs) => (
+              <details key={rs.round} className="group">
+                <summary className="flex items-center justify-between cursor-pointer text-[13px] text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-1.5">
+                  <span className="font-medium">Ronda {rs.round}</span>
+                  <span className="text-[10px] text-[#52525B] group-open:hidden">
+                    {rs.experts} análisis + síntesis
+                  </span>
+                </summary>
+                <div className="mt-2 space-y-2 pl-2 border-l border-[rgba(255,255,255,0.06)]">
+                  {rs.expertMessages.map((m, i) => (
+                    <div key={i} className="text-[11px] text-[#71717A] leading-relaxed">
+                      <span className="text-[#14B8A6] font-medium block mb-0.5">{m.agent_name}</span>
+                      <p className="line-clamp-3">{m.content.replace(/\*\*/g, "").slice(0, 200)}...</p>
+                    </div>
+                  ))}
+                  {rs.integration && (
+                    <div className="text-[11px] text-[#71717A] leading-relaxed border-t border-[rgba(255,255,255,0.04)] pt-2">
+                      <span className="text-[#8B5CF6] font-medium block mb-0.5">Integrador</span>
+                      <p className="line-clamp-4">{rs.integration.content.replace(/\*\*/g, "").slice(0, 300)}...</p>
+                    </div>
+                  )}
+                  {rs.summary && (
+                    <div className="text-[11px] text-[#D4D4D8] leading-relaxed border-t border-[rgba(255,255,255,0.04)] pt-2 bg-[rgba(20,184,166,0.05)] rounded p-2">
+                      <span className="text-[#14B8A6] font-medium block mb-0.5">Resumen del Moderador</span>
+                      <p className="line-clamp-6">{rs.summary.content.replace(/\*\*/g, "").slice(0, 400)}...</p>
+                    </div>
+                  )}
+                </div>
+              </details>
             ))}
           </div>
         </div>

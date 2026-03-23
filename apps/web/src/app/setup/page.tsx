@@ -51,6 +51,13 @@ const DEFAULT_PANELISTS = [
       "Inversión en tech para agua. Ex-Goldman, consultor Banco Mundial. Valoración startups IA hídrica, ROI, tendencias de capital riesgo en water tech.",
     color: "#A1A1AA",
   },
+  {
+    name: "Laura Martínez",
+    role: "Directora IA Industrial",
+    persona:
+      "Experta en IA aplicada a procesos industriales: tratamiento de aguas industriales, EDAR, reutilización, control de procesos con ML, gemelos digitales de plantas, optimización energética. 15 años en ingeniería de procesos + 5 en IA industrial.",
+    color: "#EF4444",
+  },
 ];
 
 const COLOR_OPTIONS = [

@@ -391,6 +391,69 @@ async def integration(state: ForumState) -> dict:
     return {"messages": [msg]}
 
 
+async def round_summary(state: ForumState) -> dict:
+    """Inter-round summary: moderator synthesizes expert analysis + integration for the audience."""
+    # Gather expert analyses and integration from this round
+    round_analyses = [
+        m for m in state["messages"]
+        if m["message_type"] == "analysis" and m["round_number"] == state["current_round"]
+    ]
+    round_integration = [
+        m for m in state["messages"]
+        if m["message_type"] == "integration" and m["round_number"] == state["current_round"]
+    ]
+
+    analyses_text = "\n\n".join(
+        f"**{m['agent_name']}:** {m['content'][:400]}" for m in round_analyses
+    )
+    integration_text = round_integration[0]["content"] if round_integration else ""
+
+    # Key debate moments
+    round_debate = [
+        m for m in state["messages"]
+        if m["round_number"] == state["current_round"] and m["message_type"] in ("statement", "challenge", "response")
+    ]
+    debate_highlights = _format_recent_messages(round_debate[-8:])
+
+    prompt = f"""Eres el Moderador del foro AquaForum AI. Acabas de recibir el análisis del panel de expertos y la síntesis del integrador estratégico para la Ronda {state['current_round']}.
+
+Tu tarea: presentar un RESUMEN EJECUTIVO de esta ronda al público. Debe ser claro, estructurado y accionable.
+
+## Debate de esta ronda:
+{debate_highlights}
+
+## Análisis de expertos:
+{analyses_text}
+
+## Síntesis del integrador:
+{integration_text}
+
+## Instrucciones:
+- Resume los puntos clave del debate en 3-4 bullets
+- Destaca las tensiones o desacuerdos principales
+- Incluye las conclusiones del análisis experto
+- Anticipa brevemente qué se abordará en la siguiente ronda
+- Tono: profesional pero accesible, como un presentador de conferencia
+- Máximo 400 palabras"""
+
+    llm = get_llm(temperature=0.4)
+    response = await llm.ainvoke([SystemMessage(content=prompt), HumanMessage(content="Presenta el resumen de la ronda.")])
+
+    msg: ForumMessage = {
+        "agent_name": "Moderador",
+        "agent_role": "moderator",
+        "content": response.content,
+        "message_type": "round_summary",
+        "round_number": state["current_round"],
+        "turn_number": 0,
+        "metadata": {"summary_type": "inter_round"},
+    }
+
+    await _persist_message(state["session_id"], msg)
+
+    return {"messages": [msg]}
+
+
 async def final_summary(state: ForumState) -> dict:
     await _update_pipeline(state["session_id"], "final_summary")
 

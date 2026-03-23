@@ -33,10 +33,10 @@ def route_after_moderator_check(state: ForumState) -> str:
     return "agent_turn"
 
 
-def route_after_integration(state: ForumState) -> str:
+def route_after_round_summary(state: ForumState) -> str:
     # If this is the final round, generate final summary
     if state.get("is_final_round"):
         return "final_summary"
 
-    # Otherwise the round is done (next cycle will start a new round)
+    # Otherwise the round is done (runner.run_all_rounds handles next round)
     return "__end__"

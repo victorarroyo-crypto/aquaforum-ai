@@ -87,6 +87,8 @@ export default function ForumView() {
   const allDiscussion = messages.filter(
     (m) => !["analysis", "integration"].includes(m.message_type)
   );
+  // All messages including expert analysis for sidebar
+  const allMessages = messages;
   // Only show messages that audio player has revealed
   const discussionMessages = allDiscussion.slice(0, revealCount);
 
@@ -328,6 +330,7 @@ export default function ForumView() {
             >
               <DebateInsights
                 messages={discussionMessages}
+                allMessages={allMessages}
                 panelists={config?.panelists || []}
                 status={status}
                 currentRound={currentRound}

@@ -21,7 +21,7 @@ async def run_forum_round(session_id: str, config: ForumConfig, round_number: in
         "max_rounds": config.max_rounds,
         "current_agent_index": 0,
         "turn_count": 0,
-        "max_turns_per_round": len(config.panelists) * 2,
+        "max_turns_per_round": len(config.panelists) * 3,
         "pending_challenge": None,
         "should_end_round": False,
         "is_final_round": is_final,
@@ -29,6 +29,13 @@ async def run_forum_round(session_id: str, config: ForumConfig, round_number: in
 
     # Run the graph to completion
     async for _chunk in graph.astream(initial_state, stream_mode="updates"):
-        # Nodes handle their own persistence to Supabase.
-        # Supabase Realtime delivers messages to the frontend.
         pass
+
+
+async def run_all_rounds(session_id: str, config: ForumConfig):
+    """Run ALL rounds automatically — no manual next-cycle needed."""
+    from app.services import supabase_client as db
+
+    for round_number in range(1, config.max_rounds + 1):
+        await db.update_session_round(session_id, round_number)
+        await run_forum_round(session_id, config, round_number)

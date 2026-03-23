@@ -123,23 +123,17 @@ async def export_forum(session_id: str):
 
 
 async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
-    """Run a debate cycle using the LangGraph engine."""
+    """Run ALL debate rounds automatically."""
     try:
-        await db.update_session_round(session_id, round_number)
         await db.update_session_status(session_id, "running")
 
-        # Import here to avoid circular imports
-        from app.engine.runner import run_forum_round
+        from app.engine.runner import run_all_rounds
 
-        await run_forum_round(session_id, config, round_number)
-
-        # Check if this was the last round
-        if round_number >= config.max_rounds:
-            await db.update_session_status(session_id, "completed")
+        await run_all_rounds(session_id, config)
+        await db.update_session_status(session_id, "completed")
 
     except Exception as e:
         await db.update_session_status(session_id, "error")
-        # Log error message to forum
         await db.add_message(
             session_id=session_id,
             agent_name="Sistema",
@@ -182,7 +176,7 @@ async def get_message_audio(session_id: str, message_id: str):
         raise HTTPException(status_code=400, detail="Text too short")
 
     # Voice params per agent (different seed = different voice)
-    seeds = {"Elena Vásquez": 42, "Marcus Chen": 137, "Sofia Andersen": 256, "Ahmed Al-Rashid": 789, "Dr. Ingrid Hoffmann": 512, "James Okafor": 333, "Moderador": 100, "Integrador": 200}
+    seeds = {"Elena Vásquez": 42, "Marcus Chen": 137, "Sofia Andersen": 256, "Ahmed Al-Rashid": 789, "Dr. Ingrid Hoffmann": 512, "James Okafor": 333, "Laura Martínez": 611, "Moderador": 100, "Integrador": 200}
     seed = seeds.get(msg["agent_name"], 42)
 
     hf_token = os.environ.get("HF_TOKEN", "")
