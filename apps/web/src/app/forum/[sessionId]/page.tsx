@@ -90,8 +90,8 @@ export default function ForumView() {
   );
   // All messages including expert analysis for sidebar
   const allMessages = messages;
-  // Only show messages that audio player has revealed
-  const discussionMessages = allDiscussion.slice(0, revealCount);
+  // Show all messages immediately (audio disabled)
+  const discussionMessages = allDiscussion;
 
   const handleNextCycle = async () => {
     setLoading(true);
@@ -282,8 +282,7 @@ export default function ForumView() {
             </div>
           </div>
 
-          {/* Audio Player — controls which messages are visible */}
-          <AudioPlayer messages={allDiscussion} onRevealUpTo={setRevealCount} />
+          {/* Audio disabled for now */}
 
           {/* Controls */}
           <div className="flex items-center gap-3 px-5 py-3 border-t border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">

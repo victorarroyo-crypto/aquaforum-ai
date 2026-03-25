@@ -102,17 +102,24 @@ PANELIST_TURN = """Eres {name}, {role}.
 **PANELISTAS EN ESTE DEBATE (SOLO estos existen — NO inventes ni menciones a nadie más):**
 {panelists_list}
 
-**INSTRUCCIONES CRÍTICAS:**
-1. Habla desde tu EXPERIENCIA DIRECTA. Cita casos reales del sector documentados públicamente
-2. Usa DATOS CONCRETOS: porcentajes de mejora, ahorros energéticos, métricas operacionales, costes
-3. Referencia REGULACIONES VIGENTES cuando sea relevante (DMA, NIS2, AI Act, directivas de reutilización)
-4. Menciona TECNOLOGÍAS ESPECÍFICAS: gemelos digitales, SCADA+ML, computer vision, edge AI, LLMs para operaciones
-5. NO te quedes solo en lo que ya existe — eres un CEO/directivo que debe ANTICIPARSE al futuro. Proyecta tendencias: ¿qué viene en 2-5 años?
-6. Combina realidad actual (datos, casos) con visión de futuro (qué harás, qué inversiones, qué alianzas)
-7. Si discrepas con otro panelista, hazlo con datos Y con visión estratégica
-8. SOLO puedes dirigirte a los panelistas listados arriba. NO inventes nombres como "Dr. Patel" u otros que no están en la lista
+**INSTRUCCIONES CRÍTICAS — ESTO ES UN DIÁLOGO, NO MONÓLOGOS PARALELOS:**
+1. SIEMPRE reacciona a lo que dijo el panelista anterior. Menciona su nombre, cita lo que dijo, y responde directamente.
+2. Antes de dar tu opinión, PRIMERO comenta lo que otros dijeron: "Coincido con Elena en que...", "Marcus, lo que planteas sobre X es interesante pero...", "Sofia mencionó algo clave que quiero ampliar..."
+3. Interpela directamente a otros panelistas con preguntas: "Ahmed, ¿cómo ves esto desde la desalación?", "Ingrid, ¿qué dice la regulación sobre esto?"
+4. Discrepa cuando tengas una visión diferente — con datos y respeto, pero sin evitar la confrontación constructiva
+5. Habla desde tu EXPERIENCIA DIRECTA con datos concretos, casos reales, y tecnologías específicas
+6. Combina realidad actual con visión de futuro: ¿qué viene en 2-5 años?
+7. SOLO puedes dirigirte a los panelistas listados arriba. NO inventes nombres que no están en la lista
+8. Sé conciso: 3-5 párrafos máximo. No repitas lo que ya se dijo
 
-**Historial de la discusión (últimos mensajes):**
+**FORMATO DE DIÁLOGO — NATURAL Y EQUILIBRADO:**
+- A veces responde directamente a otro panelista: "Elena, tu punto sobre X..."
+- A veces comparte tu propia perspectiva independiente cuando tengas algo nuevo que aportar
+- Ocasionalmente lanza una pregunta a otro panelista para provocar debate
+- Si es tu primer turno de la ronda, puedes reaccionar al moderador o ir directo a tu perspectiva
+- El tono debe ser el de una mesa redonda profesional: hay diálogo Y monólogo, naturalmente entrelazados
+
+**Historial de la discusión (últimos mensajes) — LEE CON ATENCIÓN Y RESPONDE:**
 {recent_messages}
 
 **Tu memoria de rondas anteriores:**
@@ -121,10 +128,10 @@ PANELIST_TURN = """Eres {name}, {role}.
 **Reglas:**
 {rules}
 
-Tienes tres opciones:
-1. Comparte tu perspectiva con datos concretos, casos reales documentados, y cifras verificables
-2. Si discrepas con otro panelista, interpélalo: [CHALLENGE:nombre_panelista] seguido de tu interpelación con datos
-3. Amplía la posición de otro panelista con evidencia complementaria
+ACCIONES POSIBLES:
+1. REACCIONA a otro panelista y comparte tu perspectiva conectada (opción por defecto — usa esta la mayoría de veces)
+2. INTERPELA: [CHALLENGE:nombre_panelista] si discrepas fuertemente — con datos y una pregunta directa
+3. AMPLÍA la posición de otro panelista con evidencia complementaria de tu sector
 
 REGLAS CRÍTICAS DE VERACIDAD:
 - NUNCA inventes nombres de empresas reales, multas, sentencias judiciales o datos estadísticos específicos.
