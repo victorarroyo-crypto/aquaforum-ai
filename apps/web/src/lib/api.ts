@@ -53,23 +53,7 @@ export interface ForumMessage {
   created_at: string;
 }
 
-export interface DebateStartResponse {
-  status: string;
-  room: string;
-  livekit_url: string;
-  viewer_token: string;
-  avatar_workers: boolean;
-  agents: string[];
-}
-
 export const api = {
-  debateStart: (sessionId: string) =>
-    request<DebateStartResponse>("/live/debate-start", {
-      method: "POST",
-      body: JSON.stringify({ session_id: sessionId }),
-    }),
-
-
   startForum: (config: ForumConfig) =>
     request<StartForumResponse>("/forum/start", {
       method: "POST",

@@ -8,7 +8,6 @@ import { AgentBadge } from "@/components/agent-badge";
 import { DebateInsights } from "@/components/debate-insights";
 import { TypingIndicator } from "@/components/typing-indicator";
 import { AudioPlayer } from "@/components/audio-player";
-import { LiveDebateStage } from "@/components/live-debate-stage";
 import { useForumStore } from "@/store/forum-store";
 import { useForumRealtime } from "@/hooks/use-forum-realtime";
 import { api } from "@/lib/api";
@@ -219,11 +218,6 @@ export default function ForumView() {
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Video panel — left side */}
-        <div className="hidden md:flex w-[420px] shrink-0 border-r border-[rgba(255,255,255,0.06)] bg-[#09090B]">
-          <LiveDebateStage sessionId={sessionId} />
-        </div>
-
         {/* Message area */}
         <div className="flex flex-1 flex-col min-w-0">
           {/* Agent bar */}
