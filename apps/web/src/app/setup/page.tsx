@@ -39,7 +39,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de la mayor empresa de desalación del Golfo. Pionero en IA para optimización energética de ósmosis inversa. Visión global nexo agua-energía-IA.",
     color: "#F59E0B",
-    avatar_url: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Dr. Ingrid Hoffmann",

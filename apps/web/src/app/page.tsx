@@ -34,7 +34,7 @@ const panelists = [
   {
     name: "Ahmed Al-Rashid",
     role: "CEO · OceanPure Desalination",
-    img: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
+    img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
     icon: "🌊",
   },
   {
