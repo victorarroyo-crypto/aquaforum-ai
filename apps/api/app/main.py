@@ -6,8 +6,8 @@ from app.routers import forum
 
 app = FastAPI(
     title="AquaForum AI API",
-    description="Multi-agent forum engine for the water industry",
-    version="0.1.0",
+    description="Multi-agent forum engine — TEXT ONLY (no avatars)",
+    version="1.0.0",
 )
 
 app.add_middleware(
