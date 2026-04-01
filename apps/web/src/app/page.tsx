@@ -16,7 +16,7 @@ const panelists = [
   {
     name: "Elena Vásquez",
     role: "CEO · AquaNova Solutions",
-    img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&h=200&fit=crop&crop=face",
+    img: "/avatars/elena-vasquez.png",
     icon: "⚙️",
   },
   {

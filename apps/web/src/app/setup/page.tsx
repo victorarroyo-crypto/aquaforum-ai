@@ -15,7 +15,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de utility de agua líder en transformación digital. Experta en gemelos digitales, mantenimiento predictivo con ML, automatización de operaciones. 20 años en el sector.",
     color: "#14B8A6",
-    avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "/avatars/elena-vasquez.png",
   },
   {
     name: "Marcus Chen",
