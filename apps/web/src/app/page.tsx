@@ -316,9 +316,6 @@ export default function LandingPage() {
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                     />
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[#18181B] border border-[rgba(255,255,255,0.08)] rounded-full w-8 h-8 flex items-center justify-center text-sm">
-                    {p.icon}
-                  </div>
                 </div>
                 <h3 className="text-[15px] font-bold text-[#FAFAFA] mt-1">
                   {p.name}
