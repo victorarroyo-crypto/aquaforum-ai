@@ -339,7 +339,7 @@ export default function SetupPage() {
                       Panel de Expertos
                     </h2>
                     <p className="text-[15px] text-[#A1A1AA]">
-                      7 voces. 7 perspectivas. Click en un panelista para editar.
+                      7 voces. 7 perspectivas. Click en un panelista para ver su bio.
                     </p>
                   </div>
                 </div>
