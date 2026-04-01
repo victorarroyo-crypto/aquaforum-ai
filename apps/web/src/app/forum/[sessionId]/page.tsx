@@ -345,7 +345,11 @@ export default function ForumView() {
                     className="group flex items-center gap-1.5 px-5 py-2.5 bg-[#14B8A6] text-white rounded-lg text-[13px] font-bold hover:bg-[#0D9488] disabled:opacity-30 transition-all shadow-[0_0_20px_rgba(20,184,166,0.2)] hover:shadow-[0_0_30px_rgba(20,184,166,0.35)]"
                   >
                     <Play className="h-3.5 w-3.5" />
-                    {currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}
+                    {status === "paused"
+                      ? "Reanudar"
+                      : currentRound < maxRounds
+                        ? "Siguiente Ronda"
+                        : "Ronda Final"}
                     <ChevronRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 transition-transform" />
                   </motion.button>
                   <button
