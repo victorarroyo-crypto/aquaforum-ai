@@ -55,7 +55,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Inversión en tech para agua. Consultor organismos internacionales. Valoración startups IA hídrica, ROI, tendencias de capital riesgo en water tech.",
     color: "#A1A1AA",
-    avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Koji Tanaka",
