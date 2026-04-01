@@ -167,14 +167,7 @@ function PanelistCards({
                     <div className="flex items-center justify-between">
                       <h3 className="text-[18px] font-bold text-[#FAFAFA]">{p.name || "Nuevo panelista"}</h3>
                       <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => onRemove(i)}
-                          disabled={panelists.length <= 2}
-                          className="p-1.5 text-[#3F3F46] hover:text-[#EF4444] disabled:opacity-30 transition-colors"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                        <button
+                          <button
                           onClick={() => setExpanded(null)}
                           className="text-[11px] text-[#71717A] hover:text-[#FAFAFA] px-2 py-1 rounded border border-[rgba(255,255,255,0.1)] transition-colors"
                         >
@@ -408,13 +401,6 @@ export default function SetupPage() {
                       7 voces. 7 perspectivas. Click en un panelista para editar.
                     </p>
                   </div>
-                  <button
-                    onClick={addPanelist}
-                    disabled={panelists.length >= 8}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#A1A1AA] text-[13px] font-medium hover:border-[rgba(255,255,255,0.2)] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Añadir
-                  </button>
                 </div>
 
                 <PanelistCards panelists={panelists} onUpdate={updatePanelist} onRemove={removePanelist} />
