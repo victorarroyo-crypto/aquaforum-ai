@@ -101,6 +101,130 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
+function PanelistCards({
+  panelists,
+  onUpdate,
+  onRemove,
+}: {
+  panelists: typeof DEFAULT_PANELISTS;
+  onUpdate: (i: number, field: string, value: string) => void;
+  onRemove: (i: number) => void;
+}) {
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      {panelists.map((p, i) => {
+        const isOpen = expanded === i;
+        return (
+          <motion.div
+            key={i}
+            layout
+            className={`rounded-xl bg-[#18181B] border border-[rgba(255,255,255,0.06)] overflow-hidden cursor-pointer transition-all hover:border-[rgba(255,255,255,0.15)] ${
+              isOpen ? "col-span-2 lg:col-span-3" : ""
+            }`}
+            style={{ borderTop: `3px solid ${p.color}` }}
+            onClick={() => !isOpen && setExpanded(i)}
+          >
+            {!isOpen ? (
+              /* Collapsed: speaker card */
+              <div className="p-4 text-center">
+                <div className="w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.1)]">
+                  {p.avatar_url ? (
+                    <img src={p.avatar_url} alt={p.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center text-[18px] font-bold text-white"
+                      style={{ backgroundColor: p.color }}
+                    >
+                      {getInitials(p.name)}
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-[14px] font-bold text-[#FAFAFA]">{p.name || "Nuevo"}</h3>
+                <p className="text-[11px] text-[#71717A] mt-0.5">{p.role || "Sin rol"}</p>
+                <p className="text-[10px] text-[#3F3F46] mt-2 line-clamp-2 leading-relaxed">
+                  {p.persona || "Click para editar..."}
+                </p>
+              </div>
+            ) : (
+              /* Expanded: edit form */
+              <div className="p-5" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-start gap-5">
+                  <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.1)]">
+                    {p.avatar_url ? (
+                      <img src={p.avatar_url} alt={p.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center text-[22px] font-bold text-white"
+                        style={{ backgroundColor: p.color }}
+                      >
+                        {getInitials(p.name)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[18px] font-bold text-[#FAFAFA]">{p.name || "Nuevo panelista"}</h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => onRemove(i)}
+                          disabled={panelists.length <= 2}
+                          className="p-1.5 text-[#3F3F46] hover:text-[#EF4444] disabled:opacity-30 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => setExpanded(null)}
+                          className="text-[11px] text-[#71717A] hover:text-[#FAFAFA] px-2 py-1 rounded border border-[rgba(255,255,255,0.1)] transition-colors"
+                        >
+                          Cerrar
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        value={p.name}
+                        onChange={(e) => onUpdate(i, "name", e.target.value)}
+                        placeholder="Nombre"
+                        className="w-full rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[14px] text-[#FAFAFA] placeholder-[#3F3F46] px-3 py-2 focus:outline-none focus:border-[#14B8A6] transition-colors"
+                      />
+                      <input
+                        value={p.role}
+                        onChange={(e) => onUpdate(i, "role", e.target.value)}
+                        placeholder="Rol · Organización"
+                        className="w-full rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[14px] text-[#FAFAFA] placeholder-[#3F3F46] px-3 py-2 focus:outline-none focus:border-[#14B8A6] transition-colors"
+                      />
+                    </div>
+                    <textarea
+                      value={p.persona}
+                      onChange={(e) => onUpdate(i, "persona", e.target.value)}
+                      placeholder="Bio, expertise, perspectiva en el debate..."
+                      className="w-full min-h-[80px] rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[13px] text-[#D4D4D8] placeholder-[#3F3F46] px-3 py-2 focus:outline-none focus:border-[#14B8A6] resize-none transition-colors"
+                    />
+                    <div className="flex items-center gap-2">
+                      {COLOR_OPTIONS.map((c) => (
+                        <button
+                          key={c}
+                          onClick={() => onUpdate(i, "color", c)}
+                          className={`h-5 w-5 rounded-full transition-transform hover:scale-125 ${
+                            p.color === c ? "ring-2 ring-[#FAFAFA] ring-offset-2 ring-offset-[#18181B]" : "opacity-40 hover:opacity-100"
+                          }`}
+                          style={{ backgroundColor: c }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function SetupPage() {
   const router = useRouter();
   const setSession = useForumStore((s) => s.setSession);
@@ -186,7 +310,7 @@ export default function SetupPage() {
       </header>
 
       {/* Step indicators */}
-      <div className="mx-auto w-full max-w-3xl px-6 pt-10 pb-4 flex items-center justify-center gap-6">
+      <div className="mx-auto w-full max-w-5xl px-6 pt-10 pb-4 flex items-center justify-center gap-6">
         {stepLabels.map((s, i) => (
           <div key={s.id} className="flex items-center gap-3">
             <button
@@ -225,7 +349,7 @@ export default function SetupPage() {
 
       {/* Content */}
       <div className="flex-1 px-6 md:px-12 pb-10">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           <AnimatePresence mode="wait">
             {/* Step 1: Topic */}
             {step === 1 && (
@@ -266,7 +390,7 @@ export default function SetupPage() {
               </motion.div>
             )}
 
-            {/* Step 2: Panelists */}
+            {/* Step 2: Panelists — Conference speaker cards */}
             {step === 2 && (
               <motion.div
                 key="step2"
@@ -278,11 +402,10 @@ export default function SetupPage() {
                 <div className="flex items-center justify-between mt-8 mb-8">
                   <div>
                     <h2 className="text-[clamp(1.75rem,3.5vw,2.5rem)] font-[800] tracking-tight text-[#FAFAFA] mb-1">
-                      Panelistas
+                      Panel de Expertos
                     </h2>
                     <p className="text-[15px] text-[#A1A1AA]">
-                      4 CEOs + 2 Analistas. Moderador, Expertos e Integrador
-                      son agentes ocultos.
+                      7 voces. 7 perspectivas. Click en un panelista para editar.
                     </p>
                   </div>
                   <button
@@ -294,80 +417,7 @@ export default function SetupPage() {
                   </button>
                 </div>
 
-                <div className="space-y-4">
-                  {panelists.map((p, i) => (
-                    <motion.div
-                      key={i}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-5"
-                      style={{ borderLeft: `3px solid ${p.color}` }}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                            style={{ backgroundColor: p.color }}
-                          >
-                            {getInitials(p.name)}
-                          </div>
-                          <div>
-                            <div className="text-[16px] font-bold text-[#FAFAFA]">
-                              {p.name || "Nuevo panelista"}
-                            </div>
-                            <div className="text-[12px] text-[#52525B]">
-                              {p.role || "Sin rol"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {COLOR_OPTIONS.slice(0, 6).map((c) => (
-                            <button
-                              key={c}
-                              onClick={() => updatePanelist(i, "color", c)}
-                              className={`h-4 w-4 rounded-full hover:scale-125 transition-transform ${
-                                p.color === c
-                                  ? "ring-2 ring-[#FAFAFA] ring-offset-2 ring-offset-[#18181B]"
-                                  : "opacity-40 hover:opacity-100"
-                              }`}
-                              style={{ backgroundColor: c }}
-                            />
-                          ))}
-                          <div className="ml-2 h-4 w-px bg-[rgba(255,255,255,0.06)]" />
-                          <button
-                            onClick={() => removePanelist(i)}
-                            disabled={panelists.length <= 2}
-                            className="p-1.5 text-[#3F3F46] hover:text-[#EF4444] disabled:opacity-30 transition-colors"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <input
-                          value={p.name}
-                          onChange={(e) => updatePanelist(i, "name", e.target.value)}
-                          placeholder="Nombre"
-                          className="w-full rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[15px] text-[#FAFAFA] placeholder-[#3F3F46] px-3 py-2.5 focus:outline-none focus:border-[#14B8A6] transition-colors"
-                        />
-                        <input
-                          value={p.role}
-                          onChange={(e) => updatePanelist(i, "role", e.target.value)}
-                          placeholder="Rol"
-                          className="w-full rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[15px] text-[#FAFAFA] placeholder-[#3F3F46] px-3 py-2.5 focus:outline-none focus:border-[#14B8A6] transition-colors"
-                        />
-                      </div>
-                      <textarea
-                        value={p.persona}
-                        onChange={(e) => updatePanelist(i, "persona", e.target.value)}
-                        placeholder="Perfil y perspectiva del panelista..."
-                        className="w-full mt-3 min-h-[60px] rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[14px] text-[#D4D4D8] placeholder-[#3F3F46] px-3 py-2.5 focus:outline-none focus:border-[#14B8A6] resize-none transition-colors"
-                      />
-                    </motion.div>
-                  ))}
-                </div>
+                <PanelistCards panelists={panelists} onUpdate={updatePanelist} onRemove={removePanelist} />
               </motion.div>
             )}
 
