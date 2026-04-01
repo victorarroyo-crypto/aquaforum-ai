@@ -101,19 +101,11 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-function PanelistCards({
-  panelists,
-  onUpdate,
-  onRemove,
-}: {
-  panelists: typeof DEFAULT_PANELISTS;
-  onUpdate: (i: number, field: string, value: string) => void;
-  onRemove: (i: number) => void;
-}) {
+function PanelistCards({ panelists }: { panelists: typeof DEFAULT_PANELISTS }) {
   const [expanded, setExpanded] = useState<number | null>(null);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {panelists.map((p, i) => {
         const isOpen = expanded === i;
         return (
@@ -121,92 +113,41 @@ function PanelistCards({
             key={i}
             layout
             className={`rounded-xl bg-[#18181B] border border-[rgba(255,255,255,0.06)] overflow-hidden cursor-pointer transition-all hover:border-[rgba(255,255,255,0.15)] ${
-              isOpen ? "col-span-2 lg:col-span-3" : ""
+              isOpen ? "col-span-2" : ""
             }`}
             style={{ borderTop: `3px solid ${p.color}` }}
-            onClick={() => !isOpen && setExpanded(i)}
+            onClick={() => setExpanded(isOpen ? null : i)}
           >
             {!isOpen ? (
-              /* Collapsed: speaker card */
-              <div className="p-4 text-center">
-                <div className="w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.1)]">
+              <div className="p-5 text-center">
+                <div className="w-28 h-28 mx-auto mb-3 rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.1)]">
                   {p.avatar_url ? (
                     <img src={p.avatar_url} alt={p.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center text-[18px] font-bold text-white"
-                      style={{ backgroundColor: p.color }}
-                    >
+                    <div className="w-full h-full flex items-center justify-center text-[20px] font-bold text-white" style={{ backgroundColor: p.color }}>
                       {getInitials(p.name)}
                     </div>
                   )}
                 </div>
-                <h3 className="text-[14px] font-bold text-[#FAFAFA]">{p.name || "Nuevo"}</h3>
-                <p className="text-[11px] text-[#71717A] mt-0.5">{p.role || "Sin rol"}</p>
-                <p className="text-[10px] text-[#3F3F46] mt-2 line-clamp-2 leading-relaxed">
-                  {p.persona || "Click para editar..."}
-                </p>
+                <h3 className="text-[15px] font-bold text-[#FAFAFA]">{p.name}</h3>
+                <p className="text-[11px] mt-0.5" style={{ color: p.color }}>{p.role}</p>
               </div>
             ) : (
-              /* Expanded: edit form */
-              <div className="p-5" onClick={(e) => e.stopPropagation()}>
+              <div className="p-5">
                 <div className="flex items-start gap-5">
-                  <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.1)]">
+                  <div className="w-28 h-28 shrink-0 rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.1)]">
                     {p.avatar_url ? (
                       <img src={p.avatar_url} alt={p.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div
-                        className="w-full h-full flex items-center justify-center text-[22px] font-bold text-white"
-                        style={{ backgroundColor: p.color }}
-                      >
+                      <div className="w-full h-full flex items-center justify-center text-[20px] font-bold text-white" style={{ backgroundColor: p.color }}>
                         {getInitials(p.name)}
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-[18px] font-bold text-[#FAFAFA]">{p.name || "Nuevo panelista"}</h3>
-                      <div className="flex items-center gap-2">
-                          <button
-                          onClick={() => setExpanded(null)}
-                          className="text-[11px] text-[#71717A] hover:text-[#FAFAFA] px-2 py-1 rounded border border-[rgba(255,255,255,0.1)] transition-colors"
-                        >
-                          Cerrar
-                        </button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        value={p.name}
-                        onChange={(e) => onUpdate(i, "name", e.target.value)}
-                        placeholder="Nombre"
-                        className="w-full rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[14px] text-[#FAFAFA] placeholder-[#3F3F46] px-3 py-2 focus:outline-none focus:border-[#14B8A6] transition-colors"
-                      />
-                      <input
-                        value={p.role}
-                        onChange={(e) => onUpdate(i, "role", e.target.value)}
-                        placeholder="Rol · Organización"
-                        className="w-full rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[14px] text-[#FAFAFA] placeholder-[#3F3F46] px-3 py-2 focus:outline-none focus:border-[#14B8A6] transition-colors"
-                      />
-                    </div>
-                    <textarea
-                      value={p.persona}
-                      onChange={(e) => onUpdate(i, "persona", e.target.value)}
-                      placeholder="Bio, expertise, perspectiva en el debate..."
-                      className="w-full min-h-[80px] rounded-md bg-[#27272A] border border-[rgba(255,255,255,0.06)] text-[13px] text-[#D4D4D8] placeholder-[#3F3F46] px-3 py-2 focus:outline-none focus:border-[#14B8A6] resize-none transition-colors"
-                    />
-                    <div className="flex items-center gap-2">
-                      {COLOR_OPTIONS.map((c) => (
-                        <button
-                          key={c}
-                          onClick={() => onUpdate(i, "color", c)}
-                          className={`h-5 w-5 rounded-full transition-transform hover:scale-125 ${
-                            p.color === c ? "ring-2 ring-[#FAFAFA] ring-offset-2 ring-offset-[#18181B]" : "opacity-40 hover:opacity-100"
-                          }`}
-                          style={{ backgroundColor: c }}
-                        />
-                      ))}
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[17px] font-bold text-[#FAFAFA]">{p.name}</h3>
+                    <p className="text-[12px] mt-0.5" style={{ color: p.color }}>{p.role}</p>
+                    <p className="text-[12px] text-[#A1A1AA] mt-3 leading-relaxed">{p.persona}</p>
                   </div>
                 </div>
               </div>
@@ -403,7 +344,7 @@ export default function SetupPage() {
                   </div>
                 </div>
 
-                <PanelistCards panelists={panelists} onUpdate={updatePanelist} onRemove={removePanelist} />
+                <PanelistCards panelists={panelists} />
               </motion.div>
             )}
 
