@@ -145,14 +145,19 @@ async def export_docx(session_id: str):
 
 
 async def _run_cycle(session_id: str, config: ForumConfig, round_number: int):
-    """Run ALL debate rounds automatically."""
+    """Run a single debate round."""
     try:
         await db.update_session_status(session_id, "running")
+        await db.update_session_round(session_id, round_number)
 
-        from app.engine.runner import run_all_rounds
+        from app.engine.runner import run_forum_round
 
-        await run_all_rounds(session_id, config)
-        await db.update_session_status(session_id, "completed")
+        await run_forum_round(session_id, config, round_number)
+
+        if round_number >= config.max_rounds:
+            await db.update_session_status(session_id, "completed")
+        else:
+            await db.update_session_status(session_id, "paused")
 
     except Exception as e:
         await db.update_session_status(session_id, "error")
