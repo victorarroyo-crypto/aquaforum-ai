@@ -406,7 +406,7 @@ export default function ForumView() {
                       className="relative shrink-0"
                     >
                       {speaker.avatar_url ? (
-                        <div className="relative h-48 overflow-hidden">
+                        <div className="relative h-72 overflow-hidden">
                           <img
                             src={speaker.avatar_url}
                             alt={speaker.name}
