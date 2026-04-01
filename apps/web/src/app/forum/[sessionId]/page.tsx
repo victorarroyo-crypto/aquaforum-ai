@@ -384,18 +384,72 @@ export default function ForumView() {
           {sidebar && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 480, opacity: 1 }}
+              animate={{ width: 340, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.04)] p-4 bg-[#0A0A0D]"
+              className="hidden lg:flex flex-col overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.04)] bg-[#0A0A0D]"
             >
-              <DebateInsights
-                messages={discussionMessages}
-                allMessages={allMessages}
-                panelists={config?.panelists || []}
-                status={status}
-                currentRound={currentRound}
-              />
+              {/* Speaker spotlight */}
+              {(() => {
+                const speaker = config?.panelists.find((p) => p.name === lastSpeaker);
+                if (!speaker) return null;
+                return (
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={speaker.name}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="relative shrink-0"
+                    >
+                      {speaker.avatar_url ? (
+                        <div className="relative h-48 overflow-hidden">
+                          <img
+                            src={speaker.avatar_url}
+                            alt={speaker.name}
+                            className="w-full h-full object-cover object-top"
+                          />
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0D] via-transparent to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <p className="text-[15px] font-bold text-[#FAFAFA]">{speaker.name}</p>
+                            <p className="text-[11px] text-[#A1A1AA]">{speaker.role}</p>
+                          </div>
+                          {/* Color accent line */}
+                          <div
+                            className="absolute bottom-0 left-0 right-0 h-[2px]"
+                            style={{ backgroundColor: speaker.color }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-4 flex items-center gap-3 border-b border-[rgba(255,255,255,0.06)]">
+                          <div
+                            className="w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-bold text-white shrink-0"
+                            style={{ backgroundColor: speaker.color }}
+                          >
+                            {speaker.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)}
+                          </div>
+                          <div>
+                            <p className="text-[15px] font-bold text-[#FAFAFA]">{speaker.name}</p>
+                            <p className="text-[11px] text-[#A1A1AA]">{speaker.role}</p>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                );
+              })()}
+
+              <div className="p-3 flex-1 overflow-y-auto">
+                <DebateInsights
+                  messages={discussionMessages}
+                  allMessages={allMessages}
+                  panelists={config?.panelists || []}
+                  status={status}
+                  currentRound={currentRound}
+                />
+              </div>
             </motion.aside>
           )}
         </AnimatePresence>
