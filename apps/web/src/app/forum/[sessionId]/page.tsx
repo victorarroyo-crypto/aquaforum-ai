@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageBubble } from "@/components/message-bubble";
@@ -21,6 +21,7 @@ import {
   ChevronRight,
   PanelRightOpen,
   PanelRightClose,
+  MessageSquare,
 } from "lucide-react";
 
 export default function ForumView() {
@@ -88,10 +89,23 @@ export default function ForumView() {
   const allDiscussion = messages.filter(
     (m) => !["analysis", "integration"].includes(m.message_type)
   );
-  // All messages including expert analysis for sidebar
   const allMessages = messages;
-  // Show all messages immediately (audio disabled)
   const discussionMessages = allDiscussion;
+
+  // Determine last speaker for agent bar highlight
+  const lastSpeaker = useMemo(() => {
+    const discussion = messages.filter(
+      (m) => !["moderation", "summary", "analysis", "integration", "round_summary"].includes(m.message_type)
+    );
+    return discussion.length > 0 ? discussion[discussion.length - 1].agent_name : null;
+  }, [messages]);
+
+  // Count discussion interventions
+  const interventionCount = useMemo(() => {
+    return messages.filter(
+      (m) => !["moderation", "summary", "analysis", "integration"].includes(m.message_type)
+    ).length;
+  }, [messages]);
 
   const handleNextCycle = async () => {
     setLoading(true);
@@ -136,11 +150,11 @@ export default function ForumView() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#09090B]">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="h-1 w-16 bg-[#14B8A6] mx-auto mb-8" />
+          <div className="h-1 w-16 bg-gradient-to-r from-[#14B8A6] to-[#8B5CF6] mx-auto mb-8 rounded-full" />
           <p className="text-[16px] text-[#52525B]">Conectando al foro...</p>
         </motion.div>
       </div>
@@ -149,96 +163,127 @@ export default function ForumView() {
 
   return (
     <div className="flex h-screen flex-col bg-[#09090B]">
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 border-b border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.push("/")}
-            className="p-1.5 text-[#3F3F46] hover:text-[#FAFAFA] transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <div>
-            <h1 className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#FAFAFA]">
-              AquaForum AI
-            </h1>
-            <p className="max-w-sm truncate text-[12px] text-[#52525B] mt-0.5">
-              {topic}
-            </p>
+      {/* ── Header ─────────────────────────────────────────── */}
+      <header className="relative sticky top-0 z-50 glass border-b border-transparent">
+        {/* Ambient glow */}
+        {status === "running" && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-0 left-1/4 w-64 h-16 bg-[rgba(20,184,166,0.06)] blur-3xl ambient-glow" />
           </div>
-        </div>
+        )}
 
-        <div className="flex items-center gap-3">
-          {/* Round badge */}
-          <div className="flex items-center gap-1.5 border border-[rgba(255,255,255,0.06)] rounded-full px-3 py-1.5 bg-[#18181B]">
-            <span className="text-[11px] text-[#52525B]">Ronda</span>
-            <span className="text-[14px] font-bold text-[#14B8A6]">
-              {currentRound}
-            </span>
-            <span className="text-[11px] text-[#3F3F46]">/ {maxRounds}</span>
+        <div className="flex items-center justify-between px-5 py-3 relative">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push("/")}
+              className="p-1.5 text-[#3F3F46] hover:text-[#FAFAFA] transition-colors rounded-lg hover:bg-[rgba(255,255,255,0.04)]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <div>
+              <h1 className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#52525B]">
+                AquaForum AI
+              </h1>
+              <p className="max-w-md text-[16px] font-semibold text-[#FAFAFA] mt-0.5 truncate">
+                {topic}
+              </p>
+            </div>
           </div>
 
-          {/* Status badge */}
-          <div
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold ${
-              status === "running"
-                ? "text-[#22C55E] bg-[rgba(34,197,94,0.08)]"
+          <div className="flex items-center gap-4">
+            {/* Round dots indicator */}
+            <div className="flex items-center gap-2 border border-[rgba(255,255,255,0.06)] rounded-full px-4 py-2 bg-[rgba(24,24,27,0.6)]">
+              <span className="text-[11px] text-[#52525B] mr-1">Ronda</span>
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: maxRounds || 4 }, (_, i) => {
+                  const roundNum = i + 1;
+                  const isCurrent = roundNum === currentRound;
+                  const isPast = roundNum < currentRound;
+                  return (
+                    <div
+                      key={i}
+                      className={`rounded-full transition-all duration-300 ${
+                        isCurrent
+                          ? "w-2.5 h-2.5 bg-[#14B8A6] dot-active"
+                          : isPast
+                            ? "w-2 h-2 bg-[#14B8A6]"
+                            : "w-2 h-2 bg-[#27272A]"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Status badge */}
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition-all ${
+                status === "running"
+                  ? "text-[#22C55E] bg-[rgba(34,197,94,0.1)] shadow-[0_0_12px_rgba(34,197,94,0.1)]"
+                  : status === "completed"
+                    ? "text-[#A1A1AA] bg-[#18181B]"
+                    : status === "error"
+                      ? "text-[#EF4444] bg-[rgba(239,68,68,0.1)]"
+                      : "text-[#F59E0B] bg-[rgba(245,158,11,0.1)]"
+              }`}
+            >
+              {status === "running" && (
+                <Radio className="h-3 w-3 status-pulse" />
+              )}
+              {status === "running"
+                ? "En curso"
                 : status === "completed"
-                  ? "text-[#A1A1AA] bg-[#18181B]"
+                  ? "Completado"
                   : status === "error"
-                    ? "text-[#EF4444] bg-[rgba(239,68,68,0.08)]"
-                    : "text-[#F59E0B] bg-[rgba(245,158,11,0.08)]"
-            }`}
-          >
-            {status === "running" && (
-              <Radio className="h-3 w-3 status-pulse" />
-            )}
-            {status === "running"
-              ? "En curso"
-              : status === "completed"
-                ? "Completado"
-                : status === "error"
-                  ? "Error"
-                  : "Pausado"}
-          </div>
+                    ? "Error"
+                    : "Pausado"}
+            </div>
 
-          {/* Sidebar toggle */}
-          <button
-            onClick={() => setSidebar(!sidebar)}
-            className="hidden lg:flex p-1.5 text-[#3F3F46] hover:text-[#FAFAFA] transition-colors"
-          >
-            {sidebar ? (
-              <PanelRightClose className="h-4 w-4" />
-            ) : (
-              <PanelRightOpen className="h-4 w-4" />
-            )}
-          </button>
+            {/* Sidebar toggle */}
+            <button
+              onClick={() => setSidebar(!sidebar)}
+              className="hidden lg:flex p-2 text-[#3F3F46] hover:text-[#FAFAFA] transition-colors rounded-lg hover:bg-[rgba(255,255,255,0.04)]"
+            >
+              {sidebar ? (
+                <PanelRightClose className="h-4 w-4" />
+              ) : (
+                <PanelRightOpen className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Gradient bottom border */}
+        <div className="h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/30 to-transparent" />
       </header>
 
-      {/* Main content */}
+      {/* ── Main content ───────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Message area */}
         <div className="flex flex-1 flex-col min-w-0">
           {/* Agent bar */}
           {config && (
-            <div className="flex flex-wrap gap-2 border-b border-[rgba(255,255,255,0.06)] px-5 py-2.5 bg-[#0C0C0F]">
-              {config.panelists.map((p) => (
-                <AgentBadge
-                  key={p.name}
-                  name={p.name}
-                  role={p.role}
-                  color={p.color}
-                  isActive={status === "running"}
-                  avatarUrl={p.avatar_url}
-                />
-              ))}
+            <div className="glass-subtle border-b border-transparent">
+              <div className="flex flex-wrap gap-2 px-5 py-2.5">
+                {config.panelists.map((p) => (
+                  <AgentBadge
+                    key={p.name}
+                    name={p.name}
+                    role={p.role}
+                    color={p.color}
+                    isActive={status === "running"}
+                    isSpeaking={status === "running" && lastSpeaker === p.name}
+                    avatarUrl={p.avatar_url}
+                  />
+                ))}
+              </div>
+              <div className="h-[1px] bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />
             </div>
           )}
 
           {/* Messages feed */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-3xl px-5 py-6">
+            <div className="mx-auto max-w-4xl px-5 py-6 timeline-feed">
               <AnimatePresence mode="popLayout">
                 {discussionMessages.map((msg) => (
                   <MessageBubble
@@ -258,21 +303,23 @@ export default function ForumView() {
                 ))}
               </AnimatePresence>
 
-              {/* Typing indicator — generic, no specific agent */}
-              {status === "running" && messages.length > 0 && (
-                <TypingIndicator />
-              )}
+              {/* Typing indicator */}
+              <AnimatePresence>
+                {status === "running" && messages.length > 0 && (
+                  <TypingIndicator />
+                )}
+              </AnimatePresence>
 
               {/* Empty state */}
               {messages.length === 0 && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="py-32 text-center"
                 >
-                  <div className="h-1 w-16 bg-[#14B8A6] mx-auto mb-8" />
+                  <div className="h-1 w-16 bg-gradient-to-r from-[#14B8A6] to-[#8B5CF6] mx-auto mb-8 rounded-full" />
                   <p className="text-[28px] font-[800] text-[#27272A]">
-                    El debate comenzará en breve
+                    El debate comenzara en breve
                   </p>
                   <p className="mt-4 text-[16px] text-[#3F3F46]">
                     Pulsa &quot;Siguiente Ronda&quot; para iniciar
@@ -282,49 +329,65 @@ export default function ForumView() {
             </div>
           </div>
 
-          {/* Audio disabled for now */}
+          {/* ── Controls ─────────────────────────────────── */}
+          <div className="relative glass border-t border-transparent">
+            {/* Gradient top border */}
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.08)] to-transparent" />
 
-          {/* Controls */}
-          <div className="flex items-center gap-3 px-5 py-3 border-t border-[rgba(255,255,255,0.06)] bg-[#0C0C0F]">
-            {status !== "completed" && (
-              <>
-                <button
-                  onClick={handleNextCycle}
-                  disabled={loading || status === "running"}
-                  className="group flex items-center gap-1.5 px-5 py-2.5 bg-[#14B8A6] text-white rounded-lg text-[13px] font-bold hover:bg-[#0D9488] disabled:opacity-30 transition-colors"
-                >
-                  <Play className="h-3.5 w-3.5" />
-                  {currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}
-                  <ChevronRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-                <button
-                  onClick={handlePause}
-                  disabled={status !== "running"}
-                  className="flex items-center gap-1.5 px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors"
-                >
-                  <Pause className="h-3.5 w-3.5" /> Pausar
-                </button>
-              </>
-            )}
-            <button
-              onClick={async () => { setLoading(true); try { await api.exportDocx(sessionId); } catch {} finally { setLoading(false); } }}
-              disabled={loading || !messages.length}
-              className="flex items-center gap-2 ml-auto px-5 py-2.5 bg-[#18181B] border border-[rgba(255,255,255,0.1)] text-[#FAFAFA] text-[13px] font-semibold rounded-lg hover:bg-[#27272A] hover:border-[#14B8A6] disabled:opacity-30 transition-colors"
-            >
-              <FileText className="h-4 w-4 text-[#14B8A6]" /> Generar Informe del Evento
-            </button>
+            <div className="flex items-center gap-3 px-5 py-3">
+              {status !== "completed" && (
+                <>
+                  <motion.button
+                    onClick={handleNextCycle}
+                    disabled={loading || status === "running"}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group flex items-center gap-1.5 px-5 py-2.5 bg-[#14B8A6] text-white rounded-lg text-[13px] font-bold hover:bg-[#0D9488] disabled:opacity-30 transition-all shadow-[0_0_20px_rgba(20,184,166,0.2)] hover:shadow-[0_0_30px_rgba(20,184,166,0.35)]"
+                  >
+                    <Play className="h-3.5 w-3.5" />
+                    {currentRound < maxRounds ? "Siguiente Ronda" : "Ronda Final"}
+                    <ChevronRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 transition-transform" />
+                  </motion.button>
+                  <button
+                    onClick={handlePause}
+                    disabled={status !== "running"}
+                    className="flex items-center gap-1.5 px-4 py-2.5 text-[#52525B] text-[13px] hover:text-[#FAFAFA] disabled:opacity-30 transition-colors rounded-lg hover:bg-[rgba(255,255,255,0.04)]"
+                  >
+                    <Pause className="h-3.5 w-3.5" /> Pausar
+                  </button>
+                </>
+              )}
+
+              {/* Intervention counter */}
+              {interventionCount > 0 && (
+                <div className="flex items-center gap-1.5 text-[12px] text-[#3F3F46] ml-2">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  <span>{interventionCount} intervenciones</span>
+                </div>
+              )}
+
+              <motion.button
+                onClick={async () => { setLoading(true); try { await api.exportDocx(sessionId); } catch {} finally { setLoading(false); } }}
+                disabled={loading || !messages.length}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-2 ml-auto px-5 py-2.5 bg-[#131316] border border-[rgba(255,255,255,0.08)] text-[#FAFAFA] text-[13px] font-semibold rounded-lg hover:bg-[#1a1a1f] hover:border-[#14B8A6]/40 disabled:opacity-30 transition-all"
+              >
+                <FileText className="h-4 w-4 text-[#14B8A6]" /> Generar Informe del Evento
+              </motion.button>
+            </div>
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* ── Sidebar ──────────────────────────────────── */}
         <AnimatePresence>
           {sidebar && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 480, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.06)] p-4 bg-[#0C0C0F]"
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="hidden lg:flex flex-col gap-4 overflow-y-auto overflow-x-hidden border-l border-[rgba(255,255,255,0.04)] p-4 bg-[#0A0A0D]"
             >
               <DebateInsights
                 messages={discussionMessages}

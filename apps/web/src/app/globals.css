@@ -142,3 +142,120 @@
 .status-pulse {
   animation: status-pulse 1.5s ease-in-out infinite;
 }
+
+/* Glass-morphism surface */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(9, 9, 11, 0.75);
+}
+
+.glass-subtle {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(24, 24, 27, 0.6);
+}
+
+/* Ring pulse for speaking avatar */
+@keyframes ring-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.ring-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  animation: ring-pulse 1.8s ease-out infinite;
+}
+
+/* Ambient glow for header */
+@keyframes ambient-glow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.ambient-glow {
+  animation: ambient-glow 4s ease-in-out infinite;
+}
+
+/* Timeline connector line */
+.timeline-feed {
+  position: relative;
+}
+
+.timeline-feed::before {
+  content: '';
+  position: absolute;
+  left: 21px; /* center of w-11 avatar (44px / 2 = 22px, minus 1px for line width) */
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.04) 5%, rgba(255, 255, 255, 0.04) 95%, transparent);
+  pointer-events: none;
+}
+
+/* Gradient border line */
+.border-gradient-teal {
+  background: linear-gradient(to right, #14B8A6, transparent);
+  height: 1px;
+}
+
+/* Breathing animation for typing */
+@keyframes breathing {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.breathing {
+  animation: breathing 2s ease-in-out infinite;
+}
+
+/* Number count-up entrance */
+@keyframes count-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.count-pop {
+  animation: count-pop 0.4s ease-out;
+}
+
+/* Round dot active pulse */
+@keyframes dot-active {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0);
+  }
+}
+
+.dot-active {
+  animation: dot-active 2s ease-in-out infinite;
+}

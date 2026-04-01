@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, AlertTriangle, Users, TrendingUp } from "lucide-react";
+import { MessageSquare, AlertTriangle, Users, TrendingUp, FileText, ChevronRight } from "lucide-react";
 import type { ForumMessage } from "@/lib/api";
 
 interface DebateInsightsProps {
@@ -14,7 +14,6 @@ interface DebateInsightsProps {
 }
 
 export function DebateInsights({ messages, allMessages, panelists, status, currentRound }: DebateInsightsProps) {
-  // Build round summaries from expert analysis, integration, and round_summary messages
   const roundSummaries = useMemo(() => {
     const rounds: Record<number, {
       round: number;
@@ -45,6 +44,7 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
       .filter((r) => r.experts > 0 || r.integration || r.summary)
       .sort((a, b) => a.round - b.round);
   }, [allMessages]);
+
   const stats = useMemo(() => {
     const participation: Record<string, number> = {};
     const challenges: { from: string; to: string }[] = [];
@@ -60,7 +60,6 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
       if (m.message_type === "statement") totalStatements++;
       if (m.message_type === "challenge") {
         totalChallenges++;
-        // Try to find who was challenged from content
         const match = m.content.match(/\[CHALLENGE:([^\]]+)\]/i) ||
                       m.content.match(/interpelación a (\w+ \w+)/i) ||
                       m.content.match(/a (\w+):/i);
@@ -75,13 +74,11 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
     return { participation, challenges, totalStatements, totalChallenges, maxParticipation };
   }, [messages]);
 
-  // Extract key quotes (first sentence of statements, max 3)
   const keyQuotes = useMemo(() => {
     return messages
       .filter((m) => m.message_type === "statement" || m.message_type === "challenge")
       .slice(-6)
       .map((m) => {
-        // Get first meaningful sentence
         const clean = m.content
           .replace(/\*\*([^*]+)\*\*/g, "$1")
           .replace(/\[CHALLENGE:[^\]]+\]\s*/g, "")
@@ -108,14 +105,14 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="text-center">
           <TrendingUp className="h-6 w-6 text-[#27272A] mx-auto mb-3" />
-          <p className="text-[13px] text-[#3F3F46]">Los insights aparecerán cuando inicie el debate</p>
+          <p className="text-[13px] text-[#3F3F46]">Los insights apareceran cuando inicie el debate</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 p-2 overflow-y-auto">
+    <div className="flex flex-col gap-3 overflow-y-auto">
       {/* Live stats */}
       <div className="grid grid-cols-3 gap-2">
         {[
@@ -123,18 +120,26 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
           { icon: AlertTriangle, label: "Retos", value: stats.totalChallenges, color: "#F59E0B" },
           { icon: Users, label: "Ronda", value: currentRound, color: "#8B5CF6" },
         ].map((s) => (
-          <div key={s.label} className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-3 text-center">
+          <div key={s.label} className="rounded-xl bg-[#131316] border border-[rgba(255,255,255,0.06)] p-3 text-center hover:border-[rgba(255,255,255,0.1)] transition-colors">
             <s.icon className="h-3.5 w-3.5 mx-auto mb-1.5" style={{ color: s.color }} />
-            <div className="text-[20px] font-bold text-[#FAFAFA]">{s.value}</div>
-            <div className="text-[10px] text-[#52525B] uppercase tracking-wider">{s.label}</div>
+            <motion.div
+              key={s.value}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="text-[22px] font-bold text-[#FAFAFA]"
+            >
+              {s.value}
+            </motion.div>
+            <div className="text-[10px] text-[#3F3F46] uppercase tracking-wider mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Participation bars */}
-      <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-4">
-          Participación
+      <div className="rounded-xl bg-[#131316] border border-[rgba(255,255,255,0.06)] p-4">
+        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B] mb-4">
+          Participacion
         </h3>
         <div className="space-y-3">
           {panelists.map((p) => {
@@ -142,17 +147,21 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
             const pct = stats.maxParticipation > 0 ? (count / stats.maxParticipation) * 100 : 0;
             return (
               <div key={p.name}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[12px] text-[#A1A1AA] truncate flex-1">{p.name.startsWith("Dr.") ? p.name.split(" ").slice(0, 2).join(" ") : p.name.split(" ")[0]}</span>
-                  <span className="text-[12px] font-bold text-[#FAFAFA] ml-2">{count}</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[12px] text-[#A1A1AA] truncate flex-1">
+                    {p.name.startsWith("Dr.") ? p.name.split(" ").slice(0, 2).join(" ") : p.name.split(" ")[0]}
+                  </span>
+                  <span className="text-[13px] font-bold text-[#FAFAFA] ml-2 tabular-nums">{count}</span>
                 </div>
-                <div className="h-1.5 bg-[#27272A] rounded-full overflow-hidden">
+                <div className="h-2 bg-[#1a1a1f] rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${pct}%` }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                     className="h-full rounded-full"
-                    style={{ backgroundColor: p.color }}
+                    style={{
+                      background: `linear-gradient(90deg, ${p.color}90, ${p.color})`,
+                    }}
                   />
                 </div>
               </div>
@@ -163,15 +172,21 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
 
       {/* Tension map */}
       {stats.challenges.length > 0 && (
-        <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-3">
+        <div className="rounded-xl bg-[#131316] border border-[rgba(255,255,255,0.06)] p-4">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B] mb-3">
             Interpelaciones
           </h3>
           <div className="space-y-2">
             {stats.challenges.map((c, i) => (
-              <div key={i} className="flex items-center gap-2 text-[12px]">
-                <span className="text-[#FAFAFA] font-medium">{c.from.split(" ")[0]}</span>
-                <span className="text-[#F59E0B]">→</span>
+              <div
+                key={i}
+                className="flex items-center gap-2.5 text-[12px] px-3 py-2 rounded-lg bg-[rgba(245,158,11,0.04)] border border-[rgba(245,158,11,0.08)]"
+              >
+                <span className="text-[#FAFAFA] font-semibold">{c.from.split(" ")[0]}</span>
+                <div className="flex items-center gap-1 text-[#F59E0B]">
+                  <div className="h-[1px] w-4 bg-[#F59E0B]/40" />
+                  <ChevronRight className="h-3 w-3" />
+                </div>
                 <span className="text-[#A1A1AA]">{c.to.split(" ")[0]}</span>
               </div>
             ))}
@@ -181,47 +196,57 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
 
       {/* Key quotes */}
       {keyQuotes.length > 0 && (
-        <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-3">
+        <div className="rounded-xl bg-[#131316] border border-[rgba(255,255,255,0.06)] p-4">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#52525B] mb-3">
             Citas destacadas
           </h3>
           <div className="space-y-3">
             {keyQuotes.map((q, i) => (
-              <div key={i} className="border-l-2 pl-3 py-1" style={{ borderColor: q.color }}>
-                <p className="text-[14px] text-[#D4D4D8] leading-relaxed italic">
-                  &ldquo;{q.quote}&rdquo;
+              <div key={i} className="relative border-l-2 pl-3.5 py-1" style={{ borderColor: q.color }}>
+                {/* Decorative quote mark */}
+                <span
+                  className="absolute -left-1 -top-2 text-[28px] font-serif leading-none opacity-15 select-none"
+                  style={{ color: q.color }}
+                >
+                  &ldquo;
+                </span>
+                <p className="text-[13px] text-[#D4D4D8] leading-relaxed italic">
+                  {q.quote}
                 </p>
-                <span className="text-[12px] text-[#52525B] mt-1 block">— {q.agent}</span>
+                <span className="text-[11px] text-[#3F3F46] mt-1 block">— {q.agent}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Round summaries — from moderator + experts + integrator */}
+      {/* Round summaries */}
       {roundSummaries.length > 0 && (
-        <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-4">
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#71717A] mb-3">
-            📋 Resúmenes por ronda
+        <div className="rounded-xl bg-[#131316] border border-[rgba(255,255,255,0.06)] p-4">
+          <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#52525B] mb-3">
+            <FileText className="h-3.5 w-3.5" />
+            Resumenes por ronda
           </h3>
           <div className="space-y-2">
             {roundSummaries.map((rs) => (
               <details key={rs.round} className="group">
-                <summary className="flex items-center justify-between cursor-pointer text-[14px] text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-2">
-                  <span className="font-semibold">Ronda {rs.round}</span>
-                  <span className="text-[12px] text-[#52525B] group-open:hidden">
-                    {rs.experts} análisis + sintesis
+                <summary className="flex items-center justify-between cursor-pointer text-[13px] text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-2 rounded-lg px-2 hover:bg-[rgba(255,255,255,0.02)]">
+                  <div className="flex items-center gap-2">
+                    <ChevronRight className="h-3.5 w-3.5 text-[#3F3F46] transition-transform group-open:rotate-90" />
+                    <span className="font-semibold">Ronda {rs.round}</span>
+                  </div>
+                  <span className="text-[11px] text-[#3F3F46] group-open:hidden">
+                    {rs.experts} analisis + sintesis
                   </span>
                 </summary>
-                <div className="mt-2 space-y-3 pl-3 border-l-2 border-[rgba(255,255,255,0.08)]">
+                <div className="mt-2 space-y-3 pl-3 ml-2 border-l-2 border-[rgba(255,255,255,0.06)]">
                   {rs.expertMessages.map((m, i) => {
-                    // Extract first 2-3 sentences as highlights
                     const clean = m.content.replace(/\*\*/g, "").replace(/\n+/g, " ").trim();
                     const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
                     const highlight = sentences.slice(0, 3).join(" ").trim();
                     return (
-                      <div key={i} className="text-[14px] text-[#A1A1AA] leading-relaxed">
-                        <span className="text-[#14B8A6] font-semibold block mb-1 text-[13px]">{m.agent_name}</span>
+                      <div key={i} className="text-[13px] text-[#A1A1AA] leading-relaxed">
+                        <span className="text-[#14B8A6] font-semibold block mb-1 text-[12px]">{m.agent_name}</span>
                         <p>{highlight}</p>
                       </div>
                     );
@@ -231,15 +256,15 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
                     const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
                     const highlight = sentences.slice(0, 3).join(" ").trim();
                     return (
-                      <div className="text-[14px] text-[#A1A1AA] leading-relaxed border-t border-[rgba(255,255,255,0.06)] pt-2 mt-1">
-                        <span className="text-[#8B5CF6] font-semibold block mb-1 text-[13px]">Integrador</span>
+                      <div className="text-[13px] text-[#A1A1AA] leading-relaxed border-t border-[rgba(255,255,255,0.04)] pt-2 mt-1">
+                        <span className="text-[#8B5CF6] font-semibold block mb-1 text-[12px]">Integrador</span>
                         <p>{highlight}</p>
                       </div>
                     );
                   })()}
                   {rs.summary && (
-                    <div className="text-[14px] text-[#E4E4E7] leading-relaxed border-t border-[rgba(255,255,255,0.06)] pt-2 mt-1 bg-[rgba(20,184,166,0.06)] rounded-lg p-3">
-                      <span className="text-[#14B8A6] font-semibold block mb-1 text-[13px]">Resumen del Moderador</span>
+                    <div className="text-[13px] text-[#E4E4E7] leading-relaxed border-t border-[rgba(255,255,255,0.04)] pt-2 mt-1 bg-[rgba(20,184,166,0.04)] rounded-lg p-3">
+                      <span className="text-[#14B8A6] font-semibold block mb-1 text-[12px]">Resumen del Moderador</span>
                       <p className="max-h-[300px] overflow-y-auto">{rs.summary.content.replace(/\*\*/g, "")}</p>
                     </div>
                   )}
@@ -251,9 +276,9 @@ export function DebateInsights({ messages, allMessages, panelists, status, curre
       )}
 
       {/* Status indicator */}
-      <div className="rounded-lg bg-[#18181B] border border-[rgba(255,255,255,0.06)] p-3 text-center">
+      <div className="rounded-xl bg-[#131316] border border-[rgba(255,255,255,0.06)] p-3 text-center">
         <div className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${
-          status === "running" ? "text-[#22C55E]" : "text-[#52525B]"
+          status === "running" ? "text-[#22C55E]" : "text-[#3F3F46]"
         }`}>
           {status === "running" && <div className="h-1.5 w-1.5 rounded-full bg-[#22C55E] status-pulse" />}
           {status === "running" ? "Debate en curso" : status === "completed" ? "Debate finalizado" : "En pausa"}
