@@ -46,13 +46,13 @@ const panelists = [
   {
     name: "James Okafor",
     role: "Analista Mercados · BlueWave Capital",
-    img: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&h=200&fit=crop&crop=face",
+    img: "/avatars/james-okafor.png",
     icon: "📊",
   },
   {
     name: "Koji Tanaka",
     role: "Director IA Industrial · AquaProcess AI",
-    img: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=200&h=200&fit=crop&crop=face",
+    img: "/avatars/koji-tanaka.png",
     icon: "🏭",
   },
 ];

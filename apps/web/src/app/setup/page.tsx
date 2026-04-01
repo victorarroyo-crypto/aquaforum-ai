@@ -55,12 +55,12 @@ const DEFAULT_PANELISTS = [
     persona:
       "Inversión en tech para agua. Consultor organismos internacionales. Valoración startups IA hídrica, ROI, tendencias de capital riesgo en water tech.",
     color: "#A1A1AA",
-    avatar_url: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "/avatars/james-okafor.png",
   },
   {
     name: "Koji Tanaka",
     role: "Director IA Industrial · AquaProcess AI",
-    avatar_url: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "/avatars/koji-tanaka.png",
     persona:
       "Experto en IA aplicada a procesos industriales de agua. Ha implementado gemelos digitales en plantas de tratamiento, ML para dosificación de reactivos, y RL para optimización de aireación. 15 años en ingeniería de procesos + 5 en IA industrial.",
     color: "#EF4444",
