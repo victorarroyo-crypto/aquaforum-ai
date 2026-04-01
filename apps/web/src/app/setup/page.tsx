@@ -23,7 +23,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Fundador de empresa de IA para infraestructura crítica. Visión radical: la IA debe gestionar toda la cadena del agua de forma autónoma. Deep tech, agentes, modelos fundacionales.",
     color: "#8B5CF6",
-    avatar_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "/avatars/marcus-chen.png",
   },
   {
     name: "Sofia Andersen",
@@ -47,7 +47,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Regulación de IA en servicios públicos. Asesora CE en AI Act. Gobernanza algorítmica, ética de IA, marcos legales para decisiones automatizadas en recursos hídricos.",
     color: "#6366F1",
-    avatar_url: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "/avatars/ingrid-hoffmann.png",
   },
   {
     name: "James Okafor",

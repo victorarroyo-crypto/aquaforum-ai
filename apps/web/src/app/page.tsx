@@ -22,7 +22,7 @@ const panelists = [
   {
     name: "Marcus Chen",
     role: "CEO · DeepFlow Technologies",
-    img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face",
+    img: "/avatars/marcus-chen.png",
     icon: "🧠",
   },
   {
@@ -40,7 +40,7 @@ const panelists = [
   {
     name: "Dr. Ingrid Hoffmann",
     role: "Analista Regulatoria · HydroCompliance",
-    img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop&crop=face",
+    img: "/avatars/ingrid-hoffmann.png",
     icon: "⚖️",
   },
   {
