@@ -15,7 +15,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de utility de agua líder en transformación digital. Experta en gemelos digitales, mantenimiento predictivo con ML, automatización de operaciones. 20 años en el sector.",
     color: "#14B8A6",
-    avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Marcus Chen",
@@ -23,7 +23,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Fundador de empresa de IA para infraestructura crítica. Visión radical: la IA debe gestionar toda la cadena del agua de forma autónoma. Deep tech, agentes, modelos fundacionales.",
     color: "#8B5CF6",
-    avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Sofia Andersen",
@@ -31,7 +31,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de multinacional de tratamiento químico. PhD en ingeniería química. ML optimiza dosificación de reactivos, reduce fangos, transforma EDAR. Perspectiva industrial.",
     color: "#22C55E",
-    avatar_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Ahmed Al-Rashid",
@@ -39,7 +39,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de la mayor empresa de desalación del Golfo. Pionero en IA para optimización energética de ósmosis inversa. Visión global nexo agua-energía-IA.",
     color: "#F59E0B",
-    avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Dr. Ingrid Hoffmann",
@@ -47,7 +47,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "Regulación de IA en servicios públicos. Asesora CE en AI Act. Gobernanza algorítmica, ética de IA, marcos legales para decisiones automatizadas en recursos hídricos.",
     color: "#6366F1",
-    avatar_url: "https://images.unsplash.com/photo-1594824476967-48c8b964f137?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "James Okafor",
@@ -55,12 +55,12 @@ const DEFAULT_PANELISTS = [
     persona:
       "Inversión en tech para agua. Consultor organismos internacionales. Valoración startups IA hídrica, ROI, tendencias de capital riesgo en water tech.",
     color: "#A1A1AA",
-    avatar_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
   },
   {
     name: "Koji Tanaka",
     role: "Director IA Industrial · AquaProcess AI",
-    avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=200&h=200&fit=crop&crop=face",
     persona:
       "Experto en IA aplicada a procesos industriales de agua. Ha implementado gemelos digitales en plantas de tratamiento, ML para dosificación de reactivos, y RL para optimización de aireación. 15 años en ingeniería de procesos + 5 en IA industrial.",
     color: "#EF4444",
