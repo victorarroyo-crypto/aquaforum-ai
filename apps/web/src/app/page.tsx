@@ -28,7 +28,7 @@ const panelists = [
   {
     name: "Sofia Andersen",
     role: "CEO · ClearChem Water",
-    img: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=face",
+    img: "/avatars/sofia-andersen.png",
     icon: "🧪",
   },
   {

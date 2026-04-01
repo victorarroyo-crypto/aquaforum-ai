@@ -31,7 +31,7 @@ const DEFAULT_PANELISTS = [
     persona:
       "CEO de multinacional de tratamiento químico. PhD en ingeniería química. ML optimiza dosificación de reactivos, reduce fangos, transforma EDAR. Perspectiva industrial.",
     color: "#22C55E",
-    avatar_url: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=face",
+    avatar_url: "/avatars/sofia-andersen.png",
   },
   {
     name: "Ahmed Al-Rashid",
